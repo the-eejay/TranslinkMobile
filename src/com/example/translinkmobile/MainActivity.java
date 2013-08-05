@@ -25,13 +25,13 @@ public class MainActivity extends Activity {
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
 		
-		Marker platformA = mMap.addMarker(new MarkerOptions()
+		Marker UQLakes = mMap.addMarker(new MarkerOptions()
         .position(new LatLng(-27.498029,153.017672))
-        .title("UQ Lakes Platform A"));
+        .title("UQ Lakes"));
 		
-		Marker platformB = mMap.addMarker(new MarkerOptions()
+		Marker ChancellorsPlace = mMap.addMarker(new MarkerOptions()
         .position(new LatLng(-27.498037,153.017823))
-        .title("UQ Lakes Platform B"));
+        .title("UQ Chancellors Place"));
 		
 		
 	}

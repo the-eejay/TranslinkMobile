@@ -40,7 +40,6 @@ public class MainActivity1 extends Activity implements NetworkListener{
 		
 		TextView tv = new TextView(this);
 		Toast.makeText(this, result, Toast.LENGTH_LONG).show();
-		tv.setText(result);
-		
+		tv.setText(result);	
 	}
 }
