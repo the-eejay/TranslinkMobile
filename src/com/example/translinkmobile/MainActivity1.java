@@ -33,7 +33,6 @@ public class MainActivity1 extends Activity implements NetworkListener{
 		request.execute(urlString);
 	}
 
-	@Override
 	public void networkRequestCompleted(String result) {
 		if (result == null) {
 			return;
