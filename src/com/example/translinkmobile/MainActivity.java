@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -30,7 +31,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity{
 	
 	private GoogleMap mMap;
 	private Marker UQLakes;
@@ -46,6 +47,16 @@ public class MainActivity extends Activity {
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
 		
+		StopDataLoader stopLoader = new StopDataLoader(mMap);
+		stopLoader.requestStopsNear(-27.498037,153.017823, 1000);
+		
+		/*ArrayList<Stop> stops = stopLoader.getStopsNear();
+		for (Stop stop : stops) {
+			mMap.addMarker(new MarkerOptions()
+			.position(stop.getPosition())
+			.title(stop.getId()));
+			
+		}
 		UQLakes = mMap.addMarker(new MarkerOptions()
         .position(new LatLng(-27.498029,153.017672))
         .title("UQ Lakes"));
@@ -53,12 +64,12 @@ public class MainActivity extends Activity {
 		ChancellorsPlace = mMap.addMarker(new MarkerOptions()
         .position(new LatLng(-27.497974,153.011139))
         .title("UQ Chancellors Place"));
-		
+		*/
 		mMap.setOnMarkerClickListener(new OnMarkerClickListener() {
 
 			@Override
 			public boolean onMarkerClick(Marker marker) {
-				Intent intent = new Intent(getApplicationContext(), DisplayTimetableActivity.class);
+				Intent intent = new Intent(getApplicationContext(), RetreiveScheduleActivity.class);
 				startActivity(intent);
 				return true;
 			}
