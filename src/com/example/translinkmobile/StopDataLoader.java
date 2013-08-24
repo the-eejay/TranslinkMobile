@@ -79,7 +79,8 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 						if (!isAlreadyUsed) {
 							Marker m = map.addMarker(new MarkerOptions()
 							.position(stop.getParentPosition())
-							.title(stop.getParentId()));
+							.title(stop.getParentId())
+							.snippet("Click here for more"));
 							stopMarkers.add(m);
 							stopMarkersMap.put(m, stop);
 							Log.d("Location", "!alreadyused");
@@ -89,7 +90,8 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 					} else {
 						Marker m = map.addMarker(new MarkerOptions()
 						.position(stop.getPosition())
-						.title(stop.getDescription()));
+						.title(stop.getDescription())
+						.snippet("Click here for more"));
 						stopMarkers.add(m);
 						stopMarkersMap.put(m, stop);
 						Log.d("Location", "no parent");

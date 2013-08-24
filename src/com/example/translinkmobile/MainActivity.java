@@ -37,6 +37,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+/**
+ * NOTE: This has been renamed to NearbyStops.java 
+ *
+ *
+ */
 public class MainActivity extends Activity{
 	
 	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823);
