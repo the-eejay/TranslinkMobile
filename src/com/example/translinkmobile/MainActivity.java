@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
@@ -79,13 +80,18 @@ public class MainActivity extends Activity{
         	.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
 		
 		
-		mMap.setOnMarkerClickListener(new OnMarkerClickListener() {
-
+		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+			
 			@Override
-			public boolean onMarkerClick(Marker marker) {
-				Intent intent = new Intent(getApplicationContext(), RetreiveScheduleActivity.class);
-				startActivity(intent);
-				return true;
+			public void onInfoWindowClick(Marker marker) {
+				Stop stop = stopLoader.getIdOfMarker(marker);
+				if (stop != null) {
+					MainApplication app = (MainApplication)getApplicationContext();
+					app.setSelectedStop(stop);
+					Intent intent = new Intent(getApplicationContext(), DisplayRoutesActivity.class);
+					startActivity(intent);
+				}
+				
 			}
 			
 		});

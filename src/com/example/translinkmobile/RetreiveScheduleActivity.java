@@ -48,7 +48,7 @@ public class RetreiveScheduleActivity extends Activity {
 	public void checkConnection() {
 		ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		String url = "http://translink.com.au/resources/about-translink/reporting-and-publications/open-data/gtfs/seq.zip";
+		String url = "http://";
 		
 		if (networkInfo != null && networkInfo.isConnected())
         {

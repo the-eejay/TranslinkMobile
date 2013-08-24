@@ -3,6 +3,7 @@ package com.example.translinkmobile;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -26,11 +27,13 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 	private GoogleMap map;
 	private ArrayList<Stop> stops; //might need to move this and the marker arraylist into MainActivity.java
 	private ArrayList<Marker> stopMarkers;
+	private HashMap<Marker, Stop> stopMarkersMap;
 	
 	public StopDataLoader(GoogleMap map) {
 		isLoading = false;
 		this.map = map;
 		stopMarkers = new ArrayList<Marker>();
+		stopMarkersMap = new HashMap<Marker, Stop>();
 	}
 	public void requestStopsNear(double lat, double lng, int radius) {
 		
@@ -42,6 +45,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 		request.execute(urlString);
 		state=State.STOPS_NEAR;
 		isLoading=true;
+		
 		
 }
 	@Override
@@ -58,16 +62,47 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 				
 			}
 			stopMarkers.clear();
-			//Add new stops to map
+			//Add new stop markers to map
 			stops = getStopsNear();
+			ArrayList<String> usedParentIds = new ArrayList<String>();
 			if (stops != null) {
-				for (int i=0; i<stops.size(); i++) {
-					stopMarkers.add(map.addMarker(new MarkerOptions()
-					.position(stops.get(i).getPosition())
-					.title(stops.get(i).getId())));
+				for (Stop stop: stops) {
 					
+					if (stop.hasParent()) {
+						boolean isAlreadyUsed = false;
+						for (String str: usedParentIds) {
+							if (str.equals(stop.getParentId())){
+								isAlreadyUsed = true;
+								break;
+							}
+						}
+						if (!isAlreadyUsed) {
+							Marker m = map.addMarker(new MarkerOptions()
+							.position(stop.getParentPosition())
+							.title(stop.getParentId()));
+							stopMarkers.add(m);
+							stopMarkersMap.put(m, stop);
+							Log.d("Location", "!alreadyused");
+						} else {
+							Log.d("Location", "ISalreadyused");
+						}
+					} else {
+						Marker m = map.addMarker(new MarkerOptions()
+						.position(stop.getPosition())
+						.title(stop.getDescription()));
+						stopMarkers.add(m);
+						stopMarkersMap.put(m, stop);
+						Log.d("Location", "no parent");
+					}
 					
 				}
+				
+				//set the click events
+				for (Marker stopMarker : stopMarkers) {
+					//stopMarker.
+				}
+			} else {
+				Log.d("Location", "stops was null");
 			}
 		}
 		
@@ -81,7 +116,8 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 		ArrayList<Stop> output = new ArrayList<Stop>();
 		if (state == State.STOPS_NEAR) {
 			Object obj = JSONValue.parse(result);
-			try {
+			//try {
+				/*
 				JSONArray array = (JSONArray)((JSONObject)obj).get("Stops");
 				for (int i=0; i<array.size(); i++) {
 					JSONObject obj2 = (JSONObject)array.get(i);
@@ -90,14 +126,43 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 					output.add(new Stop((String)obj2.get("StopId"), ((Long)obj2.get("ServiceType")).toString(),
 							new LatLng((Double)pos.get("Lat"), (Double)pos.get("Lng"))));
 				}
+				*/
+				JSONArray array = (JSONArray)((JSONObject)obj).get("Stops");
+				for (int i=0; i<array.size(); i++) {
+					JSONObject obj2 = (JSONObject)array.get(i);
+					Log.d("RESULT=", obj2.toJSONString());
+					JSONObject pos = (JSONObject)obj2.get("Position");
+					Stop stop = new Stop((String)obj2.get("StopId"), (String)obj2.get("Description"), ((Long)obj2.get("ServiceType")).toString(),
+							new LatLng((Double)pos.get("Lat"), (Double)pos.get("Lng")));
+					if ((Boolean)obj2.get("HasParentLocation")) {
+						JSONObject parent = (JSONObject)obj2.get("ParentLocation");
+						JSONObject parentPosJSON = (JSONObject)parent.get("Position");
+						LatLng parentPos = new LatLng((Double)parentPosJSON.get("Lat"), (Double)parentPosJSON.get("Lng"));
+						stop.setParentPosition((String)parent.get("Id"), parentPos);
+					}
+					JSONArray routes = (JSONArray)((JSONObject)obj2).get("Routes");
+					for (int j=0; j<routes.size(); j++) {
+						JSONObject route = (JSONObject)routes.get(j);
+						stop.addRoute(new Route((String)route.get("Code")));
+					}
+					output.add(stop);
+				}
 				return output;
-			} catch (Exception e) {
+			/*} catch (Exception e) {
 				//No stops were found for the given location, or there was some network error
+				Log.d("Location", e.toString());
 				return null;
-			}
+			}*/
 		} else {
 			return null;
 		}
 	}
 	
+	public Stop getIdOfMarker(Marker marker) {
+		if (stopMarkersMap.containsKey(marker)) {
+			return stopMarkersMap.get(marker);
+		} else {
+			return null;
+		}
+	}
 }
