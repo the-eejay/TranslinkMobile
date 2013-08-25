@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,119 +20,72 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Editable;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
-public class JourneyPlanner extends Activity {
+public class JourneyPlanner extends Activity implements JSONRequest.NetworkListener {
+	/** Gets the location IDs from translink's resolve API and sends them to JourneyMap class */
 	
-	private EditText toLocation;
+	private EditText fromText;
+	private EditText destText;
+	
+	private LocationManager locManager;
+	private Location loc;
+	private List<String> idList = new ArrayList<String>();
+	int requests = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.journey_planner);
 		
-		toLocation = (EditText) findViewById(R.id.toLocation);
-		toLocation.setOnEditorActionListener(new OnEditorActionListener() {
-		    @Override
-		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-		        boolean handled = false;
-		        if (actionId == EditorInfo.IME_ACTION_SEND) {
-		            requestPlan();
-		            handled = true;
-		        }
-		        return handled;
-		    }
+		fromText = (EditText) findViewById(R.id.fromLocation);
+		destText = (EditText) findViewById(R.id.toLocation);
+		
+		Button button = (Button) findViewById(R.id.sendDestButton);
+		button.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				getLocIds();
+				
+			}
 		});
 	}
 	
-	private void requestPlan() {
-		Location loc = getCurrentLoc();
-		if (loc == null) {
-			final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Your location could not be established.  " +
-					"Would you like to go to your GPS Settings?")
-				   .setPositiveButton("GPS Settings", new OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-						
-					}
-					   
-				   })
-				   .setNegativeButton("Cancel", new OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.cancel();
-							finish();
-						}
-				   });
-			final AlertDialog alert = builder.create();
-			alert.show();
-		} else {
-			String fromLocationId = getLocationId(loc);
-			String destinationId = getLocationId(toLocation.getText().toString());
-		}
+	private void getLocIds() {
+		getLocationId(fromText.getText().toString());
+		getLocationId(destText.getText().toString());
 	}
 	
-	private Location getCurrentLoc() {
-		/** Loops through all possible providers to get a location.
-		 * Returns a null location if location was not found
-		 */
-		LocationManager mgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		Location loc = null;
+	private void getLocationId(String loc) {
 		
-		for (String provider : mgr.getProviders(true)) {
-			loc = mgr.getLastKnownLocation(provider);
-		}
-		return loc;
+		String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" + Uri.encode(loc);
+		JSONRequest request = new JSONRequest();
+		request.setListener(this);
+		request.execute(url);
 	}
-	
-	private String getLocationId(Location loc) {
-		double lat = loc.getLatitude();
-		double lng = loc.getLongitude();
-		String input = "" + lat + "," + lng;
-		try {
-			URL url = new URL("http://deco3801-010.zones.eait.uq.edu.au/resolve.php?str=" + input);
-			URLConnection conn = url.openConnection();
-			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			String line = "";
-			while ((line += rd.readLine()) != null) {
-				System.out.println(line);
-			}
-			rd.close();
-			return line;
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+
+	@Override
+	public void networkRequestCompleted(String result) {
+		idList.add(result);
+		if (idList.size() == 2) {
+			Intent intent = new Intent(getApplicationContext(), JourneyMap.class);
+			intent.putExtra("locs", idList.toArray());
+			startActivity(intent);
 		}
-		return "";
-	}
-	
-	private String getLocationId(String loc) {
-		try {
-			URL url = new URL("http://deco3801-010.zones.eait.uq.edu.au/resolve.php?str=" + loc);
-			URLConnection conn = url.openConnection();
-			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			String line = "";
-			while ((line += rd.readLine()) != null) {
-				System.out.println(line);
-			}
-			rd.close();
-			return line;
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return "";
 	}
 }

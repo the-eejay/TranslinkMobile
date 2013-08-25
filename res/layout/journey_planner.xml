@@ -3,10 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
+    <EditText
+	    android:id="@+id/fromLocation"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:hint="@string/fromLocation"
+	    android:inputType="text" />
+    
 	<EditText
 	    android:id="@+id/toLocation"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
+	    android:layout_below="@id/fromLocation"
 	    android:hint="@string/toLocation"
 	    android:inputType="text" />
+	
+	
+	<Button 
+	    android:id="@+id/sendDestButton"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/toLocation"
+	    android:text="@string/sendDest" />
 </RelativeLayout>
