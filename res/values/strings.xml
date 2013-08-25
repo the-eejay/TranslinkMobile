@@ -9,5 +9,6 @@
     <string name="toLocation">Enter your destination</string>
     <string name="sendDest">Search</string>
     <string name="fromLocation">Where are you leaving from?</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
 
 </resources>

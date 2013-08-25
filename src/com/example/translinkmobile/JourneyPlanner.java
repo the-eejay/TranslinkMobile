@@ -13,6 +13,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.example.sidemenu.SlideHolder;
+
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -23,6 +26,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Editable;
@@ -40,6 +44,8 @@ public class JourneyPlanner extends Activity implements JSONRequest.NetworkListe
 	
 	private EditText fromText;
 	private EditText destText;
+	private SlideHolder mSlideHolder;
+	private ActionBar bar;
 	
 	private LocationManager locManager;
 	private Location loc;
@@ -50,6 +56,14 @@ public class JourneyPlanner extends Activity implements JSONRequest.NetworkListe
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.journey_planner);
+		
+		mSlideHolder = (SlideHolder) findViewById(R.id.slideHolder);
+		bar = getActionBar();
+		
+		bar.setDisplayHomeAsUpEnabled(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+		   // bar.setHomeButtonEnabled(true);    
+		}
 		
 		fromText = (EditText) findViewById(R.id.fromLocation);
 		destText = (EditText) findViewById(R.id.toLocation);
@@ -87,5 +101,15 @@ public class JourneyPlanner extends Activity implements JSONRequest.NetworkListe
 			intent.putExtra("locs", idList.toArray());
 			startActivity(intent);
 		}
+	}
+	
+	public void nsClick(View view)
+	{	
+		startActivity(new Intent(getApplicationContext(), NearbyStops.class));
+	}
+	
+	public void jpClick(View view)
+	{
+		startActivity(new Intent(getApplicationContext(), JourneyPlanner.class));
 	}
 }

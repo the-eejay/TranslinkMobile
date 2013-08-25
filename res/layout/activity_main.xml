@@ -1,6 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
+<com.example.sidemenu.SlideHolder xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/slideHolder"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context=".MainActivity" >
+    
+    <ScrollView
+        android:layout_width="200dp"
+        android:layout_height="fill_parent"
+        android:background="@android:color/black" >
+
+       	<LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/nsButtonString" 
+                android:textColor="@color/white"
+                android:layout_marginTop="5dp"
+                android:onClick="nsClick" 
+                android:background="@drawable/editedbutton" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/jpButtonString"
+                android:textColor="@color/white"
+                android:layout_marginTop="5dp"
+                android:onClick="jpClick"
+                android:background="@drawable/editedbutton" />
+     
+        </LinearLayout>
+    </ScrollView>
+    
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
           android:id="@+id/map"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:name="com.google.android.gms.maps.MapFragment"/>
+
+</com.example.sidemenu.SlideHolder>

@@ -1,15 +1,21 @@
 package com.example.translinkmobile;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 
+import com.example.sidemenu.SlideHolder;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -28,6 +34,8 @@ private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823)
 	private Marker clickPos;
 	private StopDataLoader stopLoader;
 	private boolean updatedOnce;
+	private SlideHolder mSlideHolder;
+	private ActionBar bar;
 
 	
 	@SuppressLint("NewApi")
@@ -35,6 +43,16 @@ private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823)
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		mSlideHolder = (SlideHolder) findViewById(R.id.slideHolder);
+		mSlideHolder.setAllowInterceptTouch(false);
+		bar = getActionBar();
+		
+		bar.setDisplayHomeAsUpEnabled(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+		    bar.setHomeButtonEnabled(true);    
+		}
+		
 		LatLng center = DEFAULT_LOCATION;
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
@@ -133,7 +151,27 @@ private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823)
 	public void locationChanged(LatLng location) {
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
 		stopLoader.requestStopsNear(location.latitude, location.longitude, 1000);
-		
-		
+	}
+	
+	public void nsClick(View view)
+	{	
+		startActivity(new Intent(getApplicationContext(), NearbyStops.class));
+	}
+	
+	public void jpClick(View view)
+	{
+		startActivity(new Intent(getApplicationContext(), JourneyPlanner.class));
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) 
+	{    
+	   switch (item.getItemId()) 
+	   {        
+	      case android.R.id.home:            
+	    	  mSlideHolder.toggle();         
+	         return true;        
+	      default:            
+	         return super.onOptionsItemSelected(item);    
+	   }
 	}
 }

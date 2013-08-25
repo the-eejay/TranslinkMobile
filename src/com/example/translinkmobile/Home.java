@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class Menu extends Activity {
+public class Home extends Activity {
 	
 	/** The main menu: consists of a number of buttons to take the user
 	 * to various functions such as the Journey Planner and Stops Nearby
@@ -19,7 +19,7 @@ public class Menu extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		// Set layout
-		setContentView(R.layout.menu);
+		setContentView(R.layout.home);
 		
 		// Journey Planner button & listener
 		Button jpButton = (Button) findViewById(R.id.jpButton);

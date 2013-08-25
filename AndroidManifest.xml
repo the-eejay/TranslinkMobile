@@ -3,39 +3,35 @@
     package="com.example.translinkmobile"
     android:versionCode="1"
     android:versionName="1.0" >
-	
-    <uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-	<!-- The following two permissions are not required to use
-	     Google Maps Android API v2, but are recommended. -->
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <!--
+         The following two permissions are not required to use
+	     Google Maps Android API v2, but are recommended.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="11"
         android:targetSdkVersion="17" />
 
     <application
         android:name="com.example.translinkmobile.MainApplication"
         android:allowBackup="true"
-        
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.translinkmobile.Menu"
+            android:name="com.example.translinkmobile.Home"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.example.translinkmobile.JourneyPlanner"
             android:label="@string/app_name" />
-        <activity 
+        <activity
             android:name="com.example.translinkmobile.NearbyStops"
             android:label="@string/app_name" />
         <activity
@@ -44,9 +40,21 @@
         <activity
             android:name="com.example.translinkmobile.JourneyMap"
             android:label="@string/app_name" />
+        
+        <activity
+            android:name="com.example.translinkmobile.SplashScreen"
+            android:label="@string/title_activity_splash_screen" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <meta-data
-   			android:name="com.google.android.maps.v2.API_KEY"
-    		android:value="AIzaSyCXVBaCTYhOLBtj0Sa731w1irBgjVbAYT0"/>
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBeuOaNJZsGsjpAfqT-bbq_4TfqdxL38Fo" />
+
     </application>
 
 </manifest>
