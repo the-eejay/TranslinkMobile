@@ -60,6 +60,6 @@ public class JourneyMap extends Activity implements JSONRequest.NetworkListener 
 	}
 
 	private void parseResult() {
-		
+		;
 	}
 }
