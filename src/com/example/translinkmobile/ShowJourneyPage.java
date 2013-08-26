@@ -1,10 +1,8 @@
 package com.example.translinkmobile;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -12,28 +10,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.WebView;
 
-public class JourneyMap extends Activity implements JSONRequest.NetworkListener {
-	/** Draw a polyline on the map marking the from > to destination
-	 * Include the user's position on this map
-	 */
-	
-	
-	/* Placeholder for now. */
-	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823);
-	
-	private GoogleMap map;
-	private Marker userPos; // Mark the user's position
-	private String result; // To store the result
-	
+public class ShowJourneyPage extends Activity implements JSONRequest.NetworkListener {
+
+	String result;
+	WebView wv;
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.journey_map);
-		LatLng center = DEFAULT_LOCATION;
-		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-		map.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
+		setContentView(R.layout.journey_page);
+		wv = (WebView) findViewById (R.id.webView);
 		Intent intent = getIntent();
 		String[] ids = intent.getStringArrayExtra("locs");
 		String fromId = ids[0];
@@ -55,10 +43,10 @@ public class JourneyMap extends Activity implements JSONRequest.NetworkListener 
 	public void networkRequestCompleted(String result) {
 		this.result = result;
 		Log.d("Journeymap got result: ", result);
-		parseResult();
+		parseResult(result);
 	}
 
-	private void parseResult() {
-		
+	private void parseResult(String result) {
+		wv.loadUrl(result);
 	}
 }

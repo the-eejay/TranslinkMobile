@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -25,6 +26,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -73,10 +76,30 @@ public class JourneyPlanner extends Activity implements JSONRequest.NetworkListe
 
 			@Override
 			public void onClick(View v) {
-				getLocIds();
-				
+				if (isNetworkAvailable()) {
+					getLocIds();
+				} else {
+					AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+					builder.setTitle("No network connection");
+					builder.setMessage("No network connection!");
+					builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		                @Override
+		                public void onClick(DialogInterface dialog, int which) {
+		                    dialog.dismiss();
+		                }
+					});
+					AlertDialog alert = builder.create();
+					alert.show();
+				}
 			}
 		});
+	}
+	
+	private boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 	
 	private void getLocIds() {
@@ -97,8 +120,10 @@ public class JourneyPlanner extends Activity implements JSONRequest.NetworkListe
 	public void networkRequestCompleted(String result) {
 		idList.add(result);
 		if (idList.size() == 2) {
-			Intent intent = new Intent(getApplicationContext(), JourneyMap.class);
-			intent.putExtra("locs", idList.toArray());
+			Intent intent = new Intent(getApplicationContext(), ShowJourneyPage.class);
+			Object[] objArray = idList.toArray();
+			String[] strArray = Arrays.copyOf(objArray, objArray.length, String[].class);
+			intent.putExtra("locs", strArray);
 			startActivity(intent);
 		}
 	}
