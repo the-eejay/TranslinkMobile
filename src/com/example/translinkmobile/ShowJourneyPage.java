@@ -4,6 +4,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -42,11 +46,14 @@ public class ShowJourneyPage extends Activity implements JSONRequest.NetworkList
 	@Override
 	public void networkRequestCompleted(String result) {
 		this.result = result;
-		Log.d("Journeymap got result: ", result);
+		Log.d("ShowJourneyPage got result: ", result);
 		parseResult(result);
 	}
 
 	private void parseResult(String result) {
-		wv.loadUrl(result);
+		Object obj = JSONValue.parse(result);
+		String url = (String) ((JSONObject)obj).get("JourneyPlannerUrl");
+		Log.d("URL: ", url.toString());
+		wv.loadUrl(url);
 	}
 }
