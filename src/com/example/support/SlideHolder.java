@@ -1,4 +1,4 @@
-package com.example.sidemenu;
+package com.example.support;
 
 /*
  * Copyright dmitry.zaicew@gmail.com Dmitry Zaitsev

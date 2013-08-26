@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.sidemenu.SlideHolder xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.support.SlideHolder xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/slideHolder"
     android:layout_width="fill_parent"
@@ -43,4 +43,4 @@
           android:layout_height="match_parent"
           android:name="com.google.android.gms.maps.MapFragment"/>
 
-</com.example.sidemenu.SlideHolder>
+</com.example.support.SlideHolder>

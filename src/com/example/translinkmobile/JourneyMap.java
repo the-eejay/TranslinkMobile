@@ -38,14 +38,15 @@ public class JourneyMap extends Activity implements JSONRequest.NetworkListener 
 		String[] ids = intent.getStringArrayExtra("locs");
 		String fromId = ids[0];
 		String destId = ids[1];
-		requestPlan(fromId, destId);
+		String date = ids[2];
+		requestPlan(fromId, destId, date);
 	}
 
-	private void requestPlan(String fromId, String destId) {
+	private void requestPlan(String fromId, String destId, String date) {
 		
 		/* Call our php code on web zone */
 		
-		String urlString = "http://deco3801-010.uqcloud.net/journeyplan.php?fromLocId=" + Uri.encode(fromId) + "&destLocId=" + Uri.encode(destId);
+		String urlString = "http://deco3801-010.uqcloud.net/journeyplan.php?fromLocId=" + Uri.encode(fromId) + "&destLocId=" + Uri.encode(destId) + "&date=" + Uri.encode(date);
 		Log.d("JourneyMap request: ", urlString);
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);

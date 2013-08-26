@@ -8,6 +8,9 @@
     <string name="nsButtonString">Nearby Stops</string>
     <string name="toLocation">Enter your destination</string>
     <string name="sendDest">Search</string>
+    <string name="leaveAfter">Leave after:</string>
+    <string name="currentDate">Current Date</string>
+    <string name="currentTime">Current Time</string>
     <string name="fromLocation">Where are you leaving from?</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
 
