@@ -38,7 +38,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 	public void requestStopsNear(double lat, double lng, int radius) {
 		
 		String urlString = "http://deco3801-010.uqcloud.net/stopsnearby.php?lat="+lat+"&lng="+lng+"&rad="+radius;
-
+		Log.d("urlString: ", urlString);
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
 		request.execute(urlString);

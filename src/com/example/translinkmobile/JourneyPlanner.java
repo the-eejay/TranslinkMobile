@@ -155,7 +155,13 @@ public class JourneyPlanner extends Activity implements
 	}
 
 	private void getLocationId(String loc) {
-
+		
+		if(loc == null || loc.equalsIgnoreCase(""))
+		{
+			Toast.makeText(this, "Please enter the From & To location!", Toast.LENGTH_SHORT).show();
+		    return;
+		}
+		
 		String url = "http://deco3801-010.uqcloud.net/resolve.php?input="
 				+ Uri.encode(loc);
 		JSONRequest request = new JSONRequest();
