@@ -1,5 +1,7 @@
 package com.example.translinkmobile;
 
+import java.util.ArrayList;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -98,7 +100,15 @@ private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823)
 				Stop stop = stopLoader.getIdOfMarker(marker);
 				if (stop != null) {
 					MainApplication app = (MainApplication)getApplicationContext();
-					app.setSelectedStop(stop);
+					ArrayList<Stop> stops;
+					if (stop.hasParent()) {
+						stops = stopLoader.getStopsFromParent(stop);
+					} else {
+						stops = new ArrayList<Stop>();
+						stops.add(stop);
+					}
+					app.setSelectedStops(stops);
+					
 					Intent intent = new Intent(getApplicationContext(), DisplayRoutesActivity.class);
 					startActivity(intent);
 				}

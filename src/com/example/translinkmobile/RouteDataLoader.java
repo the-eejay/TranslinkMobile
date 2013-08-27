@@ -25,7 +25,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	private boolean isLoading;
 	//private State state;
 	private String result;
-	private Stop stop;
+	private ArrayList<Stop> stops;
 	//private ArrayList<Stop> stops; //might need to move this and the marker arraylist into MainActivity.java
 	//private ArrayList<Marker> stopMarkers;
 	//private HashMap<Marker, Stop> stopMarkersMap;
@@ -43,9 +43,19 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		stopRoutes = new ArrayList<StopRoute>();
 		this.adapter = adapter;
 	}
-	public void requestRouteTimes(Stop stop) {
-		this.stop = stop;
-		String urlString = "http://deco3801-010.uqcloud.net/routeschedule.php?stop=" + stop.getId();
+	public void requestRouteTimes(ArrayList<Stop> stops) {
+		this.stops = stops;
+		String stopString = "";
+		boolean isFirst = true;
+		for (Stop stop: stops) {
+			if (isFirst) {
+				stopString = stopString + stop.getId();
+				isFirst = false;
+			} else {
+				stopString = stopString + "%2C" + stop.getId();
+			}
+		}
+		String urlString = "http://deco3801-010.uqcloud.net/routeschedule.php?stop=" + stopString;
 
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
@@ -71,31 +81,40 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	
 	public void setStopRouteTimes() {
 		//ArrayList<String> output = new ArrayList<String>();
-		ArrayList<Route> routes = stop.getRoutes();
+		
 			Object obj = JSONValue.parse(result);
 			//try {
 				//Not sure if  the get(0) part will cause problems
-				JSONArray trips = (JSONArray)((JSONObject)((JSONArray)((JSONObject)obj).get("StopTimetables")).get(0)).get("Trips");
-				for (int i=0; i<trips.size(); i++) {
-					JSONObject time = (JSONObject)trips.get(i);
-					String timestr = (String)time.get("DepartureTime");
-					String routecode = (String)((JSONObject)time.get("Route")).get("Code");
-					Log.d("RESULT=", timestr);
-					//find the route associated with this time
-					for (Route r: routes) {
-						if (r.getCode().equals(routecode)) {
-							try {
-								StopRoute sr = new StopRoute(stop, r);
-								//sr.addTime(ISO8601DateParser.parse(timestr));
-								Log.d("Route", "longstr="+timestr.substring(6,18));
-								sr.addTime(new Date(Long.parseLong(timestr.substring(6,18))));
-								stopRoutes.add(sr);
-								
-							} catch (Exception e) {
-								Log.d("Route", "error in parsing JSON date");
+				JSONArray timetables = (JSONArray)((JSONObject)obj).get("StopTimetables");
+				for (int h=0; h<timetables.size(); h++) {
+					JSONArray trips = (JSONArray)((JSONObject)timetables.get(h)).get("Trips");
+					//JSONArray trips = (JSONArray)((JSONObject)((JSONArray)((JSONObject)obj).get("StopTimetables")).get(0)).get("Trips");
+					for (int i=0; i<trips.size(); i++) {
+						JSONObject time = (JSONObject)trips.get(i);
+						String timestr = (String)time.get("DepartureTime");
+						String routecode = (String)((JSONObject)time.get("Route")).get("Code");
+						Log.d("RESULT=", timestr);
+						
+						for (Stop stop: stops) { 
+							ArrayList<Route> routes = stop.getRoutes();
+							
+							//find the route associated with this time
+							for (Route r: routes) {
+								if (r.getCode().equals(routecode)) {
+									try {
+										StopRoute sr = new StopRoute(stop, r);
+										//sr.addTime(ISO8601DateParser.parse(timestr));
+										Log.d("Route", "longstr="+timestr.substring(6,18));
+										sr.addTime(new Date(Long.parseLong(timestr.substring(6,18))));
+										stopRoutes.add(sr);
+										
+									} catch (Exception e) {
+										Log.d("Route", "error in parsing JSON date");
+									}
+								}
+								//output.add(timestr);
 							}
 						}
-						//output.add(timestr);
 					}
 					
 				}

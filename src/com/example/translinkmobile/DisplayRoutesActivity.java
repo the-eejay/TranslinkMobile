@@ -27,10 +27,10 @@ import android.widget.Toast;
 public class DisplayRoutesActivity extends Activity {
 	
 	private List<String> lines = new ArrayList<String>();
-	private HashMap<Route, String> routeMap = new HashMap<Route, String>();
+	//private HashMap<Route, String> routeMap = new HashMap<Route, String>();
 	private static final String DEBUG_TAG = "HttpExample";
 	private ListView listView;
-	private Stop stop;
+	private ArrayList<Stop> stops;
 	private RouteDataLoader routeLoader;
 	private ArrayAdapter<String> adapter; 
 	
@@ -45,14 +45,14 @@ public class DisplayRoutesActivity extends Activity {
 		listView.setCacheColorHint(Color.TRANSPARENT);
 		
 		MainApplication app = (MainApplication)getApplicationContext();
-		stop = app.getSelectedStop();
+		stops = app.getSelectedStops();
 		
 		
 		makeLines();
 		showLines();
 		
 		routeLoader = new RouteDataLoader(lines, adapter);
-		routeLoader.requestRouteTimes(stop);
+		routeLoader.requestRouteTimes(stops);
 	}
 	
 	
@@ -68,14 +68,31 @@ public class DisplayRoutesActivity extends Activity {
     
     private void makeLines()
     {
-    	if (stop.hasParent()) {
-    		//Will need to do something slightly different here. Not sure how to fix yet. Maybe use the StopParent class afterall?
+    	if (stops.size()>1) {
+    		//Looking at a group of stops
+    		ArrayList<String> routeIdsAlready = new ArrayList<String>();
+    		for (Stop stop: stops) {
+    			ArrayList<Route> routes = stop.getRoutes();
+    			for (Route route: routes) {
+	    			boolean foundRouteIdMatch = false;
+	    			for (String routeIdAlready: routeIdsAlready) {
+	    				if (routeIdAlready.equals(route.getCode())) {
+	    					foundRouteIdMatch = true;
+	    					break;
+	    				}
+	    			}
+	    			if (!foundRouteIdMatch) {
+	    				routeIdsAlready.add(route.getCode());
+	    				lines.add(route.getCode());
+	    			}
+    			}
+    		}
     	} else {
-    		ArrayList<Route> routes = stop.getRoutes();
+    		ArrayList<Route> routes = stops.get(0).getRoutes();
     		for (int i=0; i<routes.size(); i++) {
     			String code = routes.get(i).getCode();
     			lines.add(code);
-    			routeMap.put(routes.get(i), code);
+    			//routeMap.put(routes.get(i), code);
     		}
     	}
     

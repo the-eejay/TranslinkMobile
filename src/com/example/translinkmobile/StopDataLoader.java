@@ -165,4 +165,17 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 			return null;
 		}
 	}
+	
+	public ArrayList<Stop> getStopsFromParent(Stop stop) {
+		ArrayList<Stop> output = new ArrayList<Stop>();
+		String pId = stop.getParentId();
+		for (Stop s: stops) {
+			if (s.hasParent()) {
+				if (s.getParentId().equals(pId)) {
+					output.add(s);
+				}
+			}
+		}
+		return output;
+	}
 }
