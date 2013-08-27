@@ -144,7 +144,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 					JSONArray routes = (JSONArray)((JSONObject)obj2).get("Routes");
 					for (int j=0; j<routes.size(); j++) {
 						JSONObject route = (JSONObject)routes.get(j);
-						stop.addRoute(new Route((String)route.get("Code")));
+						stop.addRoute(new Route((String)route.get("Code"), (String)route.get("Name")));
 					}
 					output.add(stop);
 				}

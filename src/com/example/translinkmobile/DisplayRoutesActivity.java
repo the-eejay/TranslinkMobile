@@ -27,9 +27,12 @@ import android.widget.Toast;
 public class DisplayRoutesActivity extends Activity {
 	
 	private List<String> lines = new ArrayList<String>();
+	private HashMap<String, Route> routeMap = new HashMap<String, Route>();
 	private static final String DEBUG_TAG = "HttpExample";
 	private ListView listView;
 	private Stop stop;
+	private RouteDataLoader routeLoader;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,8 @@ public class DisplayRoutesActivity extends Activity {
 		MainApplication app = (MainApplication)getApplicationContext();
 		stop = app.getSelectedStop();
 		
+		routeLoader = new RouteDataLoader(lines, routeMap);
+		routeLoader.requestRouteTimes(stop);
 		makeLines();
 		showLines();
 	}
