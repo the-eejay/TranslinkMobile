@@ -27,11 +27,12 @@ import android.widget.Toast;
 public class DisplayRoutesActivity extends Activity {
 	
 	private List<String> lines = new ArrayList<String>();
-	private HashMap<String, Route> routeMap = new HashMap<String, Route>();
+	private HashMap<Route, String> routeMap = new HashMap<Route, String>();
 	private static final String DEBUG_TAG = "HttpExample";
 	private ListView listView;
 	private Stop stop;
 	private RouteDataLoader routeLoader;
+	private ArrayAdapter<String> adapter; 
 	
 	
 	@Override
@@ -46,10 +47,12 @@ public class DisplayRoutesActivity extends Activity {
 		MainApplication app = (MainApplication)getApplicationContext();
 		stop = app.getSelectedStop();
 		
-		routeLoader = new RouteDataLoader(lines, routeMap);
-		routeLoader.requestRouteTimes(stop);
+		
 		makeLines();
 		showLines();
+		
+		routeLoader = new RouteDataLoader(lines, adapter);
+		routeLoader.requestRouteTimes(stop);
 	}
 	
 	
@@ -57,7 +60,7 @@ public class DisplayRoutesActivity extends Activity {
 	
     public void showLines() 
     {
-        final StableArrayAdapter adapter = new StableArrayAdapter(
+        adapter = new ArrayAdapter<String>(
         		getApplicationContext(), android.R.layout.simple_list_item_1, lines);
         
         listView.setAdapter(adapter);
@@ -70,18 +73,21 @@ public class DisplayRoutesActivity extends Activity {
     	} else {
     		ArrayList<Route> routes = stop.getRoutes();
     		for (int i=0; i<routes.size(); i++) {
-    			lines.add(routes.get(i).getCode());
+    			String code = routes.get(i).getCode();
+    			lines.add(code);
+    			routeMap.put(routes.get(i), code);
     		}
     	}
     
     }
-	private class StableArrayAdapter extends ArrayAdapter<String> {
+	public class CustomArrayAdapter extends ArrayAdapter<String> {
 
 	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
 
-	    public StableArrayAdapter(Context context, int textViewResourceId,
+	    public CustomArrayAdapter(Context context, int textViewResourceId,
 	    			List<String> objects) {
 	    	super(context, textViewResourceId, objects);
+	    	//this.setNotifyOnChange(true);
 	    	for (int i = 0; i < objects.size(); ++i) {
 	    		mIdMap.put(objects.get(i), i);
 	    	}
@@ -89,13 +95,16 @@ public class DisplayRoutesActivity extends Activity {
 	
 	    @Override
 	    public long getItemId(int position) {
+	    	Log.d("AdapterPosition", Integer.toString(position));
 	    	String item = getItem(position);
+	    	Log.d("AdapterPosition", "mIdMap="+mIdMap);
+	    	Log.d("AdapterPosition", "item="+item);
 	    	return mIdMap.get(item);
 	    }
 	
 	    @Override
 	    public boolean hasStableIds() {
-	    	return true;
+	    	return false;
 	    }
 	
 	}

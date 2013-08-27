@@ -15,11 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.support.SlideHolder;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -41,6 +43,7 @@ private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_main);
 		
 		mSlideHolder = (SlideHolder) findViewById(R.id.slideHolder);
@@ -54,6 +57,15 @@ private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823)
 		
 		LatLng center = DEFAULT_LOCATION;
 		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+		/*try {
+			MapsInitializer.initialize(this);
+		} catch (GooglePlayServicesNotAvailableException e) {
+			// TODO Auto-generated catch block
+			Log.d("Location", e.toString());
+		}*/
+		while (mMap == null) {
+			; //this is not good and will need to change it later
+		}
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
 		
 		stopLoader = new StopDataLoader(mMap);
