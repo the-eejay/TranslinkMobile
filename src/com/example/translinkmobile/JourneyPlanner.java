@@ -43,9 +43,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -62,10 +66,11 @@ public class JourneyPlanner extends Activity implements
 	private EditText destText;
 	private SlideHolder mSlideHolder;
 	private ActionBar bar;
+	private Spinner spinner;
 
 	private LocationManager locManager;
 	private Location loc;
-	private List<String> idList = new ArrayList<String>();
+	private List<String> paramList = new ArrayList<String>();
 	int requests = 0;
 
 	static String date;
@@ -78,6 +83,8 @@ public class JourneyPlanner extends Activity implements
 	static int minute;
 	static Button dateButton;
 	static Button timeButton;
+	
+	int leaveOption = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +118,32 @@ public class JourneyPlanner extends Activity implements
 		timeButton = (Button) findViewById(R.id.timeSpinner);
 		dateButton.setText(date);
 		timeButton.setText(time);
+		
+		spinner = (Spinner) findViewById(R.id.leave_options_spinner);
+		// Create an ArrayAdapter using the string array and a default spinner layout
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+		        R.array.leave_options_array, android.R.layout.simple_spinner_item);
+		// Specify the layout to use when the list of choices appears
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// Apply the adapter to the spinner
+		spinner.setAdapter(adapter);
+		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {           
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            	leaveOption = position;
+    	        if (position > 1) {
+    	        	// First or last services
+    	        	timeButton.setEnabled(false);
+    	        	dateButton.setEnabled(false);
+    	        } else {
+    	        	timeButton.setEnabled(true);
+    	        	dateButton.setEnabled(true);
+    	        }
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 		fromText = (EditText) findViewById(R.id.fromLocation);
 		destText = (EditText) findViewById(R.id.toLocation);
@@ -171,17 +204,19 @@ public class JourneyPlanner extends Activity implements
 
 	@Override
 	public void networkRequestCompleted(String result) {
-		idList.add(result);
-		if (idList.size() == 2) {
+		paramList.add(result);
+		if (paramList.size() == 2) {
 			Intent intent = new Intent(getApplicationContext(),
 					ShowJourneyPage.class);
 			
-			idList.add(date + " " + time);
-			Object[] objArray = idList.toArray();
-			String[] strArray = Arrays.copyOf(objArray, objArray.length,
+			paramList.add(date + " " + time);
+			paramList.add("" + leaveOption);
+			Log.d("LeaveOption: ", "" + leaveOption);
+			Object[] paramArray = paramList.toArray();
+			String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length,
 					String[].class);
 			
-			intent.putExtra("locs", strArray);
+			intent.putExtra("locs", paramStrArray);
 			startActivity(intent);
 		}
 	}

@@ -47,15 +47,17 @@ public class ShowJourneyPage extends Activity implements
 		String fromId = ids[0];
 		String destId = ids[1];
 		String date = ids[2];
-		requestPlan(fromId, destId, date);
+		String leaveOption = ids[3];
+		requestPlan(fromId, destId, date, leaveOption);
 	}
 
-	private void requestPlan(String fromId, String destId, String date) {
+	private void requestPlan(String fromId, String destId, String date, String leaveOption) {
 
 		/* Call our php code on web zone */
 
 		String urlString = "http://deco3801-010.uqcloud.net/journeyplan.php?fromLocId="
-				+ Uri.encode(fromId) + "&destLocId=" + Uri.encode(destId) + "&date=" + Uri.encode(date);
+				+ Uri.encode(fromId) + "&destLocId=" + Uri.encode(destId) + "&date=" + Uri.encode(date)
+				+ "&leaveOption=" + Uri.encode(leaveOption);
 		Log.d("JourneyMap request: ", urlString);
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
