@@ -11,7 +11,6 @@ import org.json.simple.JSONValue;
 
 import android.util.Log;
 
-import com.example.translinkmobile.HttpRequest.NetworkListener;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
