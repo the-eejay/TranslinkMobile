@@ -83,7 +83,7 @@ public class DisplayRoutesActivity extends Activity {
 	    			}
 	    			if (!foundRouteIdMatch) {
 	    				routeIdsAlready.add(route.getCode());
-	    				lines.add(route.getCode());
+	    				lines.add(route.getCode() + "\t\t");
 	    			}
     			}
     		}
@@ -91,7 +91,7 @@ public class DisplayRoutesActivity extends Activity {
     		ArrayList<Route> routes = stops.get(0).getRoutes();
     		for (int i=0; i<routes.size(); i++) {
     			String code = routes.get(i).getCode();
-    			lines.add(code);
+    			lines.add(code + "\t\t");
     			//routeMap.put(routes.get(i), code);
     		}
     	}

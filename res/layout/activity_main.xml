@@ -1,41 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<com.example.support.SlideHolder xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/slideHolder"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    tools:context=".MainActivity" >
-    
-    <ScrollView
-        android:layout_width="200dp"
-        android:layout_height="fill_parent"
-        android:background="@android:color/black" >
-
-       	<LinearLayout
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/nsButtonString" 
-                android:textColor="@color/white"
-                android:layout_marginTop="5dp"
-                android:onClick="nsClick" 
-                android:background="@drawable/editedbutton" />
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/jpButtonString"
-                android:textColor="@color/white"
-                android:layout_marginTop="5dp"
-                android:onClick="jpClick"
-                android:background="@drawable/editedbutton" />
-     
-        </LinearLayout>
-    </ScrollView>
+<!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout_ns"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
           android:id="@+id/map"
@@ -43,4 +11,13 @@
           android:layout_height="match_parent"
           android:name="com.google.android.gms.maps.MapFragment"/>
 
-</com.example.support.SlideHolder>
+<ListView
+        android:id="@+id/left_drawer_ns"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:background="#111"/>
+</android.support.v4.widget.DrawerLayout>

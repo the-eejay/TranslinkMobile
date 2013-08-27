@@ -27,6 +27,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.res.Configuration;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -37,10 +38,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -49,6 +56,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -64,8 +72,6 @@ public class JourneyPlanner extends Activity implements
 
 	private EditText fromText;
 	private EditText destText;
-	private SlideHolder mSlideHolder;
-	private ActionBar bar;
 	private Spinner spinner;
 
 	private LocationManager locManager;
@@ -85,19 +91,56 @@ public class JourneyPlanner extends Activity implements
 	static Button timeButton;
 	
 	int leaveOption = 0;
+	private DrawerLayout mDrawerLayout;
+	private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+    String[] menuList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.journey_planner);
 
-		mSlideHolder = (SlideHolder) findViewById(R.id.slideHolder);
-		bar = getActionBar();
+		mTitle = "Journey Planner";
+		mDrawerTitle = "Translink Mobile";
+		String[] arr = {"Nearby Stops", "Journey Planner"};
+		menuList = arr;
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_jp);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer_jp);
 
-		bar.setDisplayHomeAsUpEnabled(true);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			// bar.setHomeButtonEnabled(true);
-		}
+        // set a custom shadow that overlays the main content when the drawer opens
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        // set up the drawer's list view with items and click listener
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.drawer_list_item, menuList));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+	    
+        mDrawerList.setItemChecked(1, true);
+	    setTitle(mTitle);
+	    
+	    getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+        
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+                ) {
+            public void onDrawerClosed(View view) {
+                getActionBar().setTitle(mTitle);
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle(mDrawerTitle);
+            }
+        };
+        
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 		
 		year = c.get(Calendar.YEAR);
 		month = c.get(Calendar.MONTH);
@@ -281,5 +324,64 @@ public class JourneyPlanner extends Activity implements
 			time = hourOfDay + ":" + temp;
 			timeButton.setText(time);
 		}
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar home/up action should open or close the drawer.
+        // ActionBarDrawerToggle will take care of this.
+       if (mDrawerToggle.onOptionsItemSelected(item)) {
+           return true;
+       }
+       return super.onOptionsItemSelected(item);
+	}
+	
+	private class DrawerItemClickListener implements ListView.OnItemClickListener {
+	    @Override
+	    public void onItemClick(AdapterView parent, View view, int position, long id) {
+	    	Log.d("onItemClick() from JP", "" + position);
+	        selectItem(position);
+	        
+	    }    
+	}
+
+	/** Swaps fragments in the main content view */
+	private void selectItem(int position) {
+	    // Create a new fragment and specify the planet to show based on position
+		Log.d("selectItem() from JP","" + position);
+	    switch(position)
+	    {
+	    	case 0:
+	    		startActivity(new Intent(getApplicationContext(), NearbyStops.class));
+	    		break;
+	    	case 1:
+	    		break;
+	    	default:
+	    		break;
+	    }
+
+	    // Highlight the selected item, update the title, and close the drawer
+	    //mDrawerList.setItemChecked(position, true);
+	    //setTitle(menuList[position]);
+	    //mDrawerLayout.closeDrawer(mDrawerList);
+	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+	
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+	    super.onPostCreate(savedInstanceState);
+	    // Sync the toggle state after onRestoreInstanceState has occurred.
+	    mDrawerToggle.syncState();
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+	    super.onConfigurationChanged(newConfig);
+	    mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 }
