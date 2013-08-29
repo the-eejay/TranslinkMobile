@@ -1,10 +1,7 @@
 package com.example.translinkmobile;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -16,6 +13,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class JSONRequest extends AsyncTask<String, Void, String>{
+	/**
+	 * An object oriented attempt at making requests to our web server
+	 */
 	
 		public interface NetworkListener {
 			void networkRequestCompleted(String result);

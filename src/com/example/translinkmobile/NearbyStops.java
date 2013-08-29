@@ -3,7 +3,6 @@ package com.example.translinkmobile;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -25,14 +23,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.support.SlideHolder;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -228,7 +223,7 @@ private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823)
 	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
-	    public void onItemClick(AdapterView parent, View view, int position, long id) {
+	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 	    	Log.d("onItemClick() from NS", "" + position);
 	        selectItem(position);
 	        

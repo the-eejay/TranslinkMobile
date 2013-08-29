@@ -1,13 +1,5 @@
 package com.example.translinkmobile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,20 +7,15 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class DisplayRoutesActivity extends Activity {
 	
 	private List<String> lines = new ArrayList<String>();
 	//private HashMap<Route, String> routeMap = new HashMap<Route, String>();
-	private static final String DEBUG_TAG = "HttpExample";
 	private ListView listView;
 	private ArrayList<Stop> stops;
 	private RouteDataLoader routeLoader;

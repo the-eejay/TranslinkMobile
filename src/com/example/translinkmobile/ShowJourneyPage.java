@@ -1,34 +1,20 @@
 package com.example.translinkmobile;
 
-import java.util.Calendar;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
-
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.DatePicker;
-import android.widget.TimePicker;
 
 public class ShowJourneyPage extends Activity implements
 		JSONRequest.NetworkListener {
-
+	/** Displays the Translink's Journey Planner results in a Web View */
 	String result;
 	WebView wv;
 	
@@ -75,6 +61,7 @@ public class ShowJourneyPage extends Activity implements
 		Object obj = JSONValue.parse(result);
 		String url = (String) ((JSONObject) obj).get("JourneyPlannerUrl");
 		Log.d("URL: ", url.toString());
+		/* Got the URL, time to load it into the web view */
 		wv.loadUrl(url);
 	}
 }

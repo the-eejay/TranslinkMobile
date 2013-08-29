@@ -1,6 +1,5 @@
 package com.example.translinkmobile;
 
-import java.util.Date;
 
 public class Route {
 	private String code;

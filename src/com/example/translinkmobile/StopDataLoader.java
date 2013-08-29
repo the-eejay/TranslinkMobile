@@ -96,11 +96,6 @@ public class StopDataLoader implements JSONRequest.NetworkListener{
 					}
 					
 				}
-				
-				//set the click events
-				for (Marker stopMarker : stopMarkers) {
-					//stopMarker.
-				}
 			} else {
 				Log.d("Location", "stops was null");
 			}

@@ -2,9 +2,6 @@ package com.example.translinkmobile;
 
 import java.util.ArrayList;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.android.gms.maps.model.LatLng;
 
 public class Stop {

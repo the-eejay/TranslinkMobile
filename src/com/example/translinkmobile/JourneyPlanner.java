@@ -1,23 +1,11 @@
 package com.example.translinkmobile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import com.example.support.SlideHolder;
-
-import android.app.ActionBar;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -26,30 +14,21 @@ import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.content.res.Configuration;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.text.Editable;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
@@ -58,27 +37,29 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.widget.TextView.OnEditorActionListener;
 
 public class JourneyPlanner extends Activity implements
 		JSONRequest.NetworkListener {
 	/**
 	 * Gets the location IDs from translink's resolve API and sends them to
-	 * JourneyMap class
+	 * ShowJourneyPage class, a view that displays translink's journey plan page
 	 */
 
+	// UI elements
 	private EditText fromText;
 	private EditText destText;
 	private Spinner spinner;
-
-	private LocationManager locManager;
-	private Location loc;
+	static Button dateButton;
+	static Button timeButton;
+	
+	// params/options
 	private List<String> paramList = new ArrayList<String>();
+	int leaveOption = 0;
 	int requests = 0;
 
+	// Date/Time Settings
 	static String date;
 	static String time;
 	final Calendar c = Calendar.getInstance();
@@ -87,18 +68,16 @@ public class JourneyPlanner extends Activity implements
 	static int day;
 	static int hour;
 	static int minute;
-	static Button dateButton;
-	static Button timeButton;
 	
-	int leaveOption = 0;
+	// Drawer
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     String[] menuList;
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -165,7 +144,7 @@ public class JourneyPlanner extends Activity implements
 		spinner = (Spinner) findViewById(R.id.leave_options_spinner);
 		// Create an ArrayAdapter using the string array and a default spinner layout
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-		        R.array.leave_options_array, android.R.layout.simple_spinner_item);
+				R.array.leave_options_array, android.R.layout.simple_spinner_item);
 		// Specify the layout to use when the list of choices appears
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// Apply the adapter to the spinner
@@ -173,6 +152,7 @@ public class JourneyPlanner extends Activity implements
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {           
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             	leaveOption = position;
+            	// We need to disable date/time in the right circumstance
     	        if (position > 1) {
     	        	// First or last services
     	        	timeButton.setEnabled(false);
@@ -232,8 +212,8 @@ public class JourneyPlanner extends Activity implements
 
 	private void getLocationId(String loc) {
 		
-		if(loc == null || loc.equalsIgnoreCase(""))
-		{
+		if (loc == null || loc.equalsIgnoreCase("")) {
+			// User did not enter a location
 			Toast.makeText(this, "Please enter the From & To location!", Toast.LENGTH_SHORT).show();
 		    return;
 		}
@@ -249,6 +229,7 @@ public class JourneyPlanner extends Activity implements
 	public void networkRequestCompleted(String result) {
 		paramList.add(result);
 		if (paramList.size() == 2) {
+			// We need to make two calls to resolve.php before we can continue
 			Intent intent = new Intent(getApplicationContext(),
 					ShowJourneyPage.class);
 			
@@ -262,14 +243,6 @@ public class JourneyPlanner extends Activity implements
 			intent.putExtra("locs", paramStrArray);
 			startActivity(intent);
 		}
-	}
-
-	public void nsClick(View view) {
-		startActivity(new Intent(getApplicationContext(), NearbyStops.class));
-	}
-
-	public void jpClick(View view) {
-		startActivity(new Intent(getApplicationContext(), JourneyPlanner.class));
 	}
 	
 	public void showTimePickerDialog(View v) {
@@ -337,7 +310,7 @@ public class JourneyPlanner extends Activity implements
 	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
-	    public void onItemClick(AdapterView parent, View view, int position, long id) {
+	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 	    	Log.d("onItemClick() from JP", "" + position);
 	        selectItem(position);
 	        
@@ -346,7 +319,7 @@ public class JourneyPlanner extends Activity implements
 
 	/** Swaps fragments in the main content view */
 	private void selectItem(int position) {
-	    // Create a new fragment and specify the planet to show based on position
+	    // Create a new fragment and specify the activity to show based on position
 		Log.d("selectItem() from JP","" + position);
 	    switch(position)
 	    {
@@ -358,11 +331,6 @@ public class JourneyPlanner extends Activity implements
 	    	default:
 	    		break;
 	    }
-
-	    // Highlight the selected item, update the title, and close the drawer
-	    //mDrawerList.setItemChecked(position, true);
-	    //setTitle(menuList[position]);
-	    //mDrawerLayout.closeDrawer(mDrawerList);
 	}
 	
 	@Override
