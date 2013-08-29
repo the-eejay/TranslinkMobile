@@ -21,12 +21,12 @@ import android.widget.ArrayAdapter;
  */
 public class RouteDataLoader implements JSONRequest.NetworkListener {
 
-	private boolean isLoading;
+	private boolean isLoading; //isLoading - if currently performing async task
 	private String result;
 	private ArrayList<Stop> stops;
-	private List<String> list;
+	private List<String> list; //list - a list of Strings for use by the ArrayAdapter
 	private ArrayList<StopRoute> stopRoutes;
-	private ArrayAdapter<String> adapter;
+	private ArrayAdapter<String> adapter; 
 
 	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter) {
 		isLoading = false;
@@ -42,6 +42,8 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      * @param stops ArrayList containing all the nearby stops.
      */
 	public void requestRouteTimes(ArrayList<Stop> stops) {
+		
+		//Build the retreive route schedule URL
 		this.stops = stops;
 		String stopString = "";
 		boolean isFirst = true;
@@ -80,6 +82,10 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		addTimesToList();
 	}
 
+	/**
+	 * 
+	 * @return boolean if RouteDataLoader is performing an asynchronous task
+	 */
 	public boolean isLoading() {
 		return isLoading;
 	}
@@ -90,6 +96,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      */
 	public void setStopRouteTimes() {
 
+		/* Parse the JSON received from the server. The format is shown below for the parts used:
+		 * {StopTimetables: [Trips:[DepartureTime, Route: {Code}]]}
+		 */
 		Object obj = JSONValue.parse(result);
 		JSONArray timetables = (JSONArray) ((JSONObject) obj)
 				.get("StopTimetables");
@@ -105,6 +114,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 						.get("Code");
 				Log.d("RESULT=", timestr);
 
+				//Create each StopRoute relationship and give them the times from the JSON
 				for (Stop stop : stops) {
 					ArrayList<Route> routes = stop.getRoutes();
 
@@ -147,8 +157,8 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				if (line.contains(sr.getRoute().getCode())) {
 
 					ArrayList<Date> times = sr.getTimes();
+					
 					// Find the closest scheduled time after the current time
-
 					for (int j = 0; j < times.size(); j++) {
 						Long time = times.get(j).getTime();
 						Log.d("Route", "time=" + time + " currTime=" + currTime

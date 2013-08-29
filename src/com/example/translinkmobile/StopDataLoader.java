@@ -80,6 +80,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 		this.result = result;
 
 		if (state == State.STOPS_NEAR) {
+			
 			// Remove old stops from map
 			for (Marker stopMarker : stopMarkers) {
 				Log.d("Location", "removing marker");
@@ -88,6 +89,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 
 			}
 			stopMarkers.clear();
+			
 			// Add new stop markers to map
 			stops = getStopsNear();
 			ArrayList<String> usedParentIds = new ArrayList<String>();
@@ -95,6 +97,8 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 				for (Stop stop : stops) {
 
 					if (stop.hasParent()) {
+						//stops with parent must only be added as markers if not
+						//there's not already a stop added for that position
 						boolean isAlreadyUsed = false;
 						for (String str : usedParentIds) {
 							if (str.equals(stop.getParentId())) {
@@ -102,6 +106,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 								break;
 							}
 						}
+						
 						if (!isAlreadyUsed) {
 							Marker m = map.addMarker(new MarkerOptions()
 									.position(stop.getParentPosition())
@@ -109,28 +114,29 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 									.snippet("Click here for more"));
 							stopMarkers.add(m);
 							stopMarkersMap.put(m, stop);
-							Log.d("Location", "!alreadyused");
-						} else {
-							Log.d("Location", "ISalreadyused");
+							
 						}
 					} else {
+						
+						//the stop doesn't have parent. Simply add to map.
 						Marker m = map.addMarker(new MarkerOptions()
 								.position(stop.getPosition())
 								.title(stop.getDescription())
 								.snippet("Click here for more"));
 						stopMarkers.add(m);
 						stopMarkersMap.put(m, stop);
-						Log.d("Location", "no parent");
+						
 					}
 
 				}
-			} else {
-				Log.d("Location", "stops was null");
-			}
+			} 
 		}
 
 	}
 
+	/**
+	* @return if waiting for response from server
+	**/
 	public boolean isLoading() {
 		return isLoading;
 	}
@@ -144,38 +150,42 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
      */
 	public ArrayList<Stop> getStopsNear() {
 		ArrayList<Stop> output = new ArrayList<Stop>();
+		//check the correct request was sent in the first place
 		if (state == State.STOPS_NEAR) {
+	
+			/*Use JSON-simple to parse the result. The format (of parts used) is below:
+			* {Stops: [StopId, Description, Position: {Lat, Lng}, HasParentLocation,
+			* ParentLocation: {Id, Position: {Lat, Lng}}, Routes: [Code, Name]]}
+			*/
 			Object obj = JSONValue.parse(result);
-		
-			JSONArray array = (JSONArray) ((JSONObject) obj).get("Stops");
-			for (int i = 0; i < array.size(); i++) {
-				JSONObject obj2 = (JSONObject) array.get(i);
-				Log.d("RESULT=", obj2.toJSONString());
-				JSONObject pos = (JSONObject) obj2.get("Position");
-				Stop stop = new Stop((String) obj2.get("StopId"),
-						(String) obj2.get("Description"),
-						((Long) obj2.get("ServiceType")).toString(),
-						new LatLng((Double) pos.get("Lat"), (Double) pos
-								.get("Lng")));
-				if ((Boolean) obj2.get("HasParentLocation")) {
-					JSONObject parent = (JSONObject) obj2.get("ParentLocation");
-					JSONObject parentPosJSON = (JSONObject) parent
-							.get("Position");
-					LatLng parentPos = new LatLng(
-							(Double) parentPosJSON.get("Lat"),
-							(Double) parentPosJSON.get("Lng"));
-					stop.setParentPosition((String) parent.get("Id"), parentPos);
+			//try {
+				
+				JSONArray array = (JSONArray)((JSONObject)obj).get("Stops");
+				for (int i=0; i<array.size(); i++) {
+					JSONObject obj2 = (JSONObject)array.get(i);
+					Log.d("RESULT=", obj2.toJSONString());
+					JSONObject pos = (JSONObject)obj2.get("Position");
+					Stop stop = new Stop((String)obj2.get("StopId"), (String)obj2.get("Description"), ((Long)obj2.get("ServiceType")).toString(),
+							new LatLng((Double)pos.get("Lat"), (Double)pos.get("Lng")));
+					if ((Boolean)obj2.get("HasParentLocation")) {
+						JSONObject parent = (JSONObject)obj2.get("ParentLocation");
+						JSONObject parentPosJSON = (JSONObject)parent.get("Position");
+						LatLng parentPos = new LatLng((Double)parentPosJSON.get("Lat"), (Double)parentPosJSON.get("Lng"));
+						stop.setParentPosition((String)parent.get("Id"), parentPos);
+					}
+					JSONArray routes = (JSONArray)((JSONObject)obj2).get("Routes");
+					for (int j=0; j<routes.size(); j++) {
+						JSONObject route = (JSONObject)routes.get(j);
+						stop.addRoute(new Route((String)route.get("Code"), (String)route.get("Name")));
+					}
+					output.add(stop);
 				}
-				JSONArray routes = (JSONArray) ((JSONObject) obj2)
-						.get("Routes");
-				for (int j = 0; j < routes.size(); j++) {
-					JSONObject route = (JSONObject) routes.get(j);
-					stop.addRoute(new Route((String) route.get("Code"),
-							(String) route.get("Name")));
-				}
-				output.add(stop);
-			}
-			return output;
+				return output;
+			/*} catch (Exception e) {
+				//No stops were found for the given location, or there was some network error
+				Log.d("Location", e.toString());
+				return null;
+			}*/
 		} else {
 			return null;
 		}
