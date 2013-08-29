@@ -12,11 +12,17 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
 
+/**
+ * The background thread that will handle the request to the 
+ * PHP web service. An object oriented attempt at making 
+ * requests to our web services.
+ * 
+ * @author Transponders
+ * @version 1.0
+ */
 public class JSONRequest extends AsyncTask<String, Void, String>{
-	/**
-	 * An object oriented attempt at making requests to our web server
-	 */
-	
+
+		// The interface that will be implemented by other class
 		public interface NetworkListener {
 			void networkRequestCompleted(String result);
 		}

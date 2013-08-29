@@ -12,7 +12,8 @@
     <string name="currentDate">Current Date</string>
     <string name="currentTime">Current Time</string>
     <string name="drawer_open">drawer open</string>
-     <string name="drawer_close">drawer close</string>
+    <string name="drawer_close">drawer close</string>
+    <string name="splashdesc">Splash Screen</string>
     <string name="fromLocation">Where are you leaving from?</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
 

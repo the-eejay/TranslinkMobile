@@ -40,12 +40,16 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+/**
+ * The Activity class that displays the input form for the journey planner.
+ * This class gets the location IDs from translink's resolve API and sends them to
+ * ShowJourneyPage class, a view that displays translink's journey plan page.
+ * 
+ * @author Transponders
+ * @version 1.0
+ */
 public class JourneyPlanner extends Activity implements
 		JSONRequest.NetworkListener {
-	/**
-	 * Gets the location IDs from translink's resolve API and sends them to
-	 * ShowJourneyPage class, a view that displays translink's journey plan page
-	 */
 
 	// UI elements
 	private EditText fromText;
@@ -69,7 +73,7 @@ public class JourneyPlanner extends Activity implements
 	static int hour;
 	static int minute;
 	
-	// Drawer
+	// Navigation drawer
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;

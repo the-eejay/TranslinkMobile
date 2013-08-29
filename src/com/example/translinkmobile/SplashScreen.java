@@ -7,8 +7,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
 
+/**
+ * The activity that will show the splash screen when the
+ * application first loads.
+ * 
+ * @author Transponders
+ * @version 1.0
+ */
 public class SplashScreen extends Activity {
 
+	// The time that sets how long should the splash screen be displayed.
 	private final int SPLASH_TIME_OUT = 3000;
 	
 	@Override
@@ -16,16 +24,12 @@ public class SplashScreen extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
 		
+		// Hide the actionBar for the splash screen.
 		ActionBar actionBar = getActionBar();
 		actionBar.hide();
 		
 		new Handler().postDelayed(new Runnable() {
        	 
-            /*
-             * Showing splash screen with a timer. This will be useful when you
-             * want to show case your app logo / company
-             */
- 
             @Override
             public void run() {
                 // This method will be executed once the timer is over

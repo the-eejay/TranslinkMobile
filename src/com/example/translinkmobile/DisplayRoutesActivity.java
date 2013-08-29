@@ -12,6 +12,13 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+/**
+ * This class is the activity that shows the service codes and estimated
+ *	arrival time for each service in a stop.
+ *
+ * @author Transponders
+ * @version 1.0
+ */
 public class DisplayRoutesActivity extends Activity {
 	
 	private List<String> lines = new ArrayList<String>();
@@ -20,7 +27,6 @@ public class DisplayRoutesActivity extends Activity {
 	private ArrayList<Stop> stops;
 	private RouteDataLoader routeLoader;
 	private ArrayAdapter<String> adapter; 
-	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,19 +38,19 @@ public class DisplayRoutesActivity extends Activity {
 		listView.setCacheColorHint(Color.TRANSPARENT);
 		
 		MainApplication app = (MainApplication)getApplicationContext();
-		stops = app.getSelectedStops();
-		
+		stops = app.getSelectedStops();	
 		
 		makeLines();
 		showLines();
 		
 		routeLoader = new RouteDataLoader(lines, adapter);
 		routeLoader.requestRouteTimes(stops);
-	}
+	}	
 	
-	
-	
-	
+	/**
+     * A method to set the the content of the list into the ListView. 
+     *
+     */
     public void showLines() 
     {
         adapter = new ArrayAdapter<String>(
@@ -53,6 +59,11 @@ public class DisplayRoutesActivity extends Activity {
         listView.setAdapter(adapter);
     }
     
+    /**
+     * A method to initialize the content of the list, that is the route code and
+     * the estimated time of arrival for each route.
+     * 
+     */
     private void makeLines()
     {
     	if (stops.size()>1) {
@@ -84,6 +95,14 @@ public class DisplayRoutesActivity extends Activity {
     	}
     
     }
+    
+    /**
+     * The ArrayAdapter class for the container of the route and estimated
+     * time of arrival data.
+     *
+     * @author Transponders
+     * @version 1.0
+     */
 	public class CustomArrayAdapter extends ArrayAdapter<String> {
 
 	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
@@ -91,7 +110,6 @@ public class DisplayRoutesActivity extends Activity {
 	    public CustomArrayAdapter(Context context, int textViewResourceId,
 	    			List<String> objects) {
 	    	super(context, textViewResourceId, objects);
-	    	//this.setNotifyOnChange(true);
 	    	for (int i = 0; i < objects.size(); ++i) {
 	    		mIdMap.put(objects.get(i), i);
 	    	}

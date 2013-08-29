@@ -12,13 +12,19 @@ import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+/**
+ * The Android activity that shows the result of the journey planner
+ * in a Web View.
+ * 
+ * @author Transponders
+ * @version 1.0
+ */
 public class ShowJourneyPage extends Activity implements
 		JSONRequest.NetworkListener {
-	/** Displays the Translink's Journey Planner results in a Web View */
+
 	String result;
 	WebView wv;
 	
-
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
