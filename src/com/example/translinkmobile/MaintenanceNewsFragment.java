@@ -3,6 +3,7 @@ package com.example.translinkmobile;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,11 +46,6 @@ public class MaintenanceNewsFragment extends Fragment {
 	TableLayout newsTable;
 	Context tableContext;
 	
-	public MaintenanceNewsFragment()
-	{
-		
-	}
-	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) {
@@ -77,8 +73,17 @@ public class MaintenanceNewsFragment extends Fragment {
         else 
         {
         	Context context = parent.getApplicationContext();
-			Toast toast = Toast.makeText(context, "No network connection, showing previous news...", Toast.LENGTH_LONG);
-			toast.show();
+        	try 
+        	{
+				readXMLFile(getActivity().openFileInput(FILENAME));
+				Toast toast = Toast.makeText(context, "No network connection, showing previous news...", Toast.LENGTH_LONG);
+    			toast.show();
+			} 
+        	catch (FileNotFoundException e) 
+        	{
+        		Toast toast = Toast.makeText(context, "No connection and no previous news found...", Toast.LENGTH_LONG);
+    			toast.show();
+			}
         }
     }
 	
@@ -101,49 +106,7 @@ public class MaintenanceNewsFragment extends Fragment {
         @Override
         protected void onPostExecute(FileInputStream result) 
         {
-        	try
-        	{
-	        	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-				Document doc = dBuilder.parse(result);
-				
-				doc.getDocumentElement().normalize();
-				NodeList nList = doc.getElementsByTagName("item");
-				
-				for (int temp = 0; temp < nList.getLength(); temp++) {
-					
-					Node nNode = nList.item(temp);
-			 
-					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-			 
-						Element eElement = (Element) nNode;
-			 
-						String link = eElement.getElementsByTagName("link").item(0).getTextContent();
-						String title = eElement.getElementsByTagName("title").item(0).getTextContent();
-						
-						TableRow newRow = new TableRow(tableContext);
-		            	Context rowContext = newRow.getContext();
-		            	TextView text1 = new TextView(rowContext);
-		            	
-		            	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
-		                param1.column = 0;
-		                param1.span = 5;
-		                text1.setLayoutParams(param1);
-		                
-		                text1.setText(title);
-		                text1.setTextSize(14);
-		                text1.setOnClickListener(new NewsListener(link));
-	            		newRow.setPadding(20, 15, 5, 15);
-	            		newRow.addView(text1);
-	            		newsTable.addView(newRow);
-					}
-				}
-        	}
-        	catch(Exception e)
-        	{
-        		Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Exception occured.", Toast.LENGTH_LONG);
-    			toast.show();
-        	}
+        	readXMLFile(result);
         }
         
         private FileInputStream downloadUrl(String myurl) throws IOException 
@@ -202,6 +165,53 @@ public class MaintenanceNewsFragment extends Fragment {
         }
     }
 	
+	public void readXMLFile(FileInputStream fis)
+	{
+		try
+    	{
+        	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fis);
+			
+			doc.getDocumentElement().normalize();
+			NodeList nList = doc.getElementsByTagName("item");
+			
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				
+				Node nNode = nList.item(temp);
+		 
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+		 
+					Element eElement = (Element) nNode;
+		 
+					String link = eElement.getElementsByTagName("link").item(0).getTextContent();
+					String title = eElement.getElementsByTagName("title").item(0).getTextContent();
+					
+					TableRow newRow = new TableRow(tableContext);
+	            	Context rowContext = newRow.getContext();
+	            	TextView text1 = new TextView(rowContext);
+	            	
+	            	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
+	                param1.column = 0;
+	                param1.span = 5;
+	                text1.setLayoutParams(param1);
+	                
+	                text1.setText(title);
+	                text1.setTextSize(14);
+	                text1.setOnClickListener(new NewsListener(link));
+            		newRow.setPadding(20, 15, 5, 15);
+            		newRow.addView(text1);
+            		newsTable.addView(newRow);
+				}
+			}
+    	}
+    	catch(Exception e)
+    	{
+    		Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Exception occured.", Toast.LENGTH_LONG);
+			toast.show();
+    	}
+	}
+	
 	private class NewsListener implements OnClickListener
     {
 		String linkURL;
@@ -225,5 +235,4 @@ public class MaintenanceNewsFragment extends Fragment {
     	    fragmentTransaction.commit();
 		}
     }
-
 }

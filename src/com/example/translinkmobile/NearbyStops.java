@@ -1,11 +1,8 @@
 package com.example.translinkmobile;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.app.FragmentManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -286,10 +283,12 @@ public class NearbyStops extends FragmentActivity {
 		case 0:
 			break;
 		case 1:
+			// Wrong way, should use Fragment instead
 			startActivity(new Intent(getApplicationContext(),
 					JourneyPlanner.class));
 			break;
 		case 2:
+			// The correct way of swapping a new fragment into the FragmentActivity
 			MaintenanceNewsFragment fragment = new MaintenanceNewsFragment();
     		
 			FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

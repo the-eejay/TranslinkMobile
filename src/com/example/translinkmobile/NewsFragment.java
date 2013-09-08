@@ -12,11 +12,6 @@ public class NewsFragment extends Fragment {
 	
 	public final static String ARG_NEWS_URL = "NEWSURL";
 	
-	public NewsFragment()
-	{
-		
-	}
-	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) {
