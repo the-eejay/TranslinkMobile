@@ -15,8 +15,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-sdk
-        android:minSdkVersion="11"
-        android:targetSdkVersion="14" />
+        android:minSdkVersion="10"
+        android:targetSdkVersion="18" />
 
     <application
         android:name="com.example.translinkmobile.MainApplication"
@@ -55,7 +55,7 @@
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCXVBaCTYhOLBtj0Sa731w1irBgjVbAYT0" />
+            android:value="AIzaSyAab-Uu6KnXV3sZ-Pj_x8y1B1VdegZQjKA" />
 
     </application>
 

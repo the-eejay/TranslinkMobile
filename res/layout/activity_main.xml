@@ -5,19 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-          android:id="@+id/map"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:name="com.google.android.gms.maps.MapFragment"/>
-
-<ListView
-        android:id="@+id/left_drawer_ns"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:background="#111"/>
+	<FrameLayout
+	 android:id="@+id/content_frame"
+	 android:layout_width="match_parent"
+	 android:layout_height="match_parent" >
+	    
+		<fragment 
+		 android:id="@+id/map"
+		 android:layout_width="match_parent"
+		 android:layout_height="match_parent"
+		 class="com.google.android.gms.maps.SupportMapFragment" />
+		
+	</FrameLayout>
+	
+	<ListView
+	        android:id="@+id/left_drawer_ns"
+	        android:layout_width="240dp"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="start"
+	        android:choiceMode="singleChoice"
+	        android:divider="@android:color/transparent"
+	        android:dividerHeight="0dp"
+	        android:background="#111"/>
 </android.support.v4.widget.DrawerLayout>

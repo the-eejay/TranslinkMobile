@@ -1,9 +1,12 @@
 package com.example.translinkmobile;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.app.FragmentManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -14,6 +17,8 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.app.FragmentActivity;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +32,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -41,7 +46,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * @author Transponders
  * @version 1.0
  */
-public class NearbyStops extends Activity {
+public class NearbyStops extends FragmentActivity {
 	
 	/**
 	 * Set the default location in case the application cannot detect
@@ -75,7 +80,7 @@ public class NearbyStops extends Activity {
 		// Set the title and the content of the navigation drawer.
 		mTitle = "Nearby Stops & Service ETA";
 		mDrawerTitle = "Translink Mobile";
-		String[] temp = { "Nearby Stops", "Journey Planner" };
+		String[] temp = { "Nearby Stops", "Journey Planner", "Maintenance News"};
 		menuList = temp;
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_ns);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer_ns);
@@ -113,7 +118,12 @@ public class NearbyStops extends Activity {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 		LatLng center = DEFAULT_LOCATION;
-		mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+		
+		SupportMapFragment mapFrag = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+		
+		mMap = mapFrag.getMap();
+		//mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 	
 		while (mMap == null) {
 			// The application is still unable to load the map.
@@ -278,6 +288,17 @@ public class NearbyStops extends Activity {
 		case 1:
 			startActivity(new Intent(getApplicationContext(),
 					JourneyPlanner.class));
+			break;
+		case 2:
+			MaintenanceNewsFragment fragment = new MaintenanceNewsFragment();
+    		
+			FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.content_frame, fragment);
+			transaction.addToBackStack(null);
+            transaction.commit();
+
+			setTitle("Maintenance News");
+			mDrawerLayout.closeDrawer(mDrawerList);
 			break;
 		default:
 			break;
