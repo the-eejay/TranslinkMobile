@@ -5,10 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -19,7 +27,7 @@ import android.widget.ListView;
  * @author Transponders
  * @version 1.0
  */
-public class DisplayRoutesActivity extends Activity {
+public class DisplayRoutesFragment extends Fragment {
 	
 	private List<String> lines = new ArrayList<String>();
 	//private HashMap<Route, String> routeMap = new HashMap<Route, String>();
@@ -27,24 +35,29 @@ public class DisplayRoutesActivity extends Activity {
 	private ArrayList<Stop> stops;
 	private RouteDataLoader routeLoader;
 	private ArrayAdapter<String> adapter; 
+	private HashMap<Integer, String> positionRouteMap;
+	FragmentManager manager;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	        Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_timetable);
+		 manager = getActivity().getSupportFragmentManager();
+		View view = inflater.inflate(R.layout.activity_timetable, container, false);
 		
-		listView = (ListView) findViewById(R.id.listview);
+		listView = (ListView) view.findViewById(R.id.listview);
 		listView.setBackgroundColor(Color.BLACK);
 		listView.setCacheColorHint(Color.TRANSPARENT);
 		
-		MainApplication app = (MainApplication)getApplicationContext();
-		stops = app.getSelectedStops();	
+		stops = ((NearbyStops) getActivity()).getSelectedStops();	
 		
 		makeLines();
 		showLines();
 		
 		routeLoader = new RouteDataLoader(lines, adapter);
 		routeLoader.requestRouteTimes(stops);
+		
+		return view;
 	}	
 	
 	/**
@@ -54,9 +67,21 @@ public class DisplayRoutesActivity extends Activity {
     public void showLines() 
     {
         adapter = new ArrayAdapter<String>(
-        		getApplicationContext(), android.R.layout.simple_list_item_1, lines);
+        		getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, lines);
         
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new OnItemClickListener() {
+        	@Override
+        	public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
+        		//Set selected route in NearbyStops then change view back to it
+        		String routeCode = positionRouteMap.get(pos);
+        		((NearbyStops)getActivity()).setSelectedRoute(routeCode);
+        		manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        			
+        	}
+
+			
+        });
     }
     
     /**
@@ -82,6 +107,7 @@ public class DisplayRoutesActivity extends Activity {
 	    			if (!foundRouteIdMatch) {
 	    				routeIdsAlready.add(route.getCode());
 	    				lines.add(route.getCode() + "\t\t");
+	    				positionRouteMap.put(lines.size()-1, route.getCode());
 	    			}
     			}
     		}
@@ -90,6 +116,7 @@ public class DisplayRoutesActivity extends Activity {
     		for (int i=0; i<routes.size(); i++) {
     			String code = routes.get(i).getCode();
     			lines.add(code + "\t\t");
+    			positionRouteMap.put(lines.size()-1, code);
     			//routeMap.put(routes.get(i), code);
     		}
     	}

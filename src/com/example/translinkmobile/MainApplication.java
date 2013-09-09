@@ -14,23 +14,23 @@ import android.app.Application;
 public class MainApplication extends Application{
 
 	// The selected stops that want to have the routes generated.
-	private ArrayList<Stop> selectedStops;
+	//private ArrayList<Stop> selectedStops;
 	
 	/**
      * Getter method of the selected stops object.
      *
      * @return ArrayList<Stop> The list of selected stops.
      */
-	public ArrayList<Stop> getSelectedStops() {
+	/*public ArrayList<Stop> getSelectedStops() {
 		return selectedStops;
-	}
+	}/
 	
 	/**
      * Setter method of the selected stops object.
      *
      * @param stops the ArrayList of selected stops.
      */
-	public void setSelectedStops(ArrayList<Stop> stops) {
+	/*public void setSelectedStops(ArrayList<Stop> stops) {
 		this.selectedStops = stops;
-	}
+	}*/
 }

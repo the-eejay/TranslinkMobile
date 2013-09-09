@@ -62,6 +62,8 @@ public class NearbyStops extends FragmentActivity {
 	private StopDataLoader stopLoader;
 	private SupportMapFragment mapFrag;
 	private boolean updatedOnce;
+	private ArrayList<Stop> selectedStops;
+	private String selectedRoute;
 
 	// Navigation drawer
 	private DrawerLayout mDrawerLayout;
@@ -70,6 +72,7 @@ public class NearbyStops extends FragmentActivity {
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
 	String[] menuList;
+	
 
 	@SuppressLint("NewApi")
 	@Override
@@ -155,11 +158,9 @@ public class NearbyStops extends FragmentActivity {
 						stops = new ArrayList<Stop>();
 						stops.add(stop);
 					}
-					app.setSelectedStops(stops);
+					setSelectedStops(stops);
 
-					Intent intent = new Intent(getApplicationContext(),
-							DisplayRoutesActivity.class);
-					startActivity(intent);
+					openTimetableFragment();
 				}
 
 			}
@@ -328,11 +329,54 @@ public class NearbyStops extends FragmentActivity {
 		super.onConfigurationChanged(newConfig);
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
-	
+		
 	@SuppressLint("NewApi")
 	@Override
     public void setTitle(CharSequence title) {
         mTitle = title;
         getActionBar().setTitle(mTitle);
     }
+	
+	public void openTimetableFragment() {
+		Fragment fragment = new Fragment();
+		FragmentManager manager = getSupportFragmentManager();
+		fragment = new DisplayRoutesFragment();
+		//manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+        transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+		transaction.addToBackStack(null);
+        transaction.commit();
+
+        //update selected item and title, then close the drawer
+        setTitle("Timetable");
+       
+	
+	}
+	
+	/**
+     * Getter method of the selected stops object.
+     *
+     * @return ArrayList<Stop> The list of selected stops.
+     */
+	public ArrayList<Stop> getSelectedStops() {
+		return selectedStops;
+	}
+	
+	/**
+     * Setter method of the selected stops object.
+     *
+     * @param stops the ArrayList of selected stops.
+     */
+	public void setSelectedStops(ArrayList<Stop> stops) {
+		this.selectedStops = stops;
+	}
+	
+	public String getSelectedRoute() {
+		return selectedRoute;
+	}
+	
+	public void setSelectedRoute(String route) {
+		selectedRoute = route;
+	}
 }
