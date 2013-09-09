@@ -1,14 +1,8 @@
-<!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_layout_jp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent" 
+    android:background="@drawable/background_others">
 
     <EditText
         android:id="@+id/fromLocation"
@@ -38,6 +32,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/toLocation"
         android:textSize="18sp"
+        android:textColor="@color/black"
         android:layout_marginTop="20dp"
         android:layout_marginRight="22dp"
         android:layout_marginLeft="22dp"/>
@@ -77,14 +72,3 @@
 
 </RelativeLayout>
 
-<ListView
-        android:id="@+id/left_drawer_jp"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:background="#111"/>
-
-</android.support.v4.widget.DrawerLayout>

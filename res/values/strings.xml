@@ -17,5 +17,11 @@
     <string name="splashdesc">Splash Screen</string>
     <string name="fromLocation">Where are you leaving from?</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+    
+    <string-array name="menu_array">
+        <item>Nearby Stops</item>
+        <item>Journey Planner</item>
+        <item>Maintenance News</item>
+    </string-array>
 
 </resources>

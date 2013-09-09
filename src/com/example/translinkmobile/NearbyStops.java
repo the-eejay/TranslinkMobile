@@ -3,6 +3,8 @@ package com.example.translinkmobile;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -51,12 +53,14 @@ public class NearbyStops extends FragmentActivity {
 	 */
 	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,
 			153.017823);
+	private final String TITLE = "Nearby Stops & Service ETA";
 
 	// Map and markers
 	private GoogleMap mMap;
 	private Marker userPos;
 	private Marker clickPos;
 	private StopDataLoader stopLoader;
+	private SupportMapFragment mapFrag;
 	private boolean updatedOnce;
 
 	// Navigation drawer
@@ -71,14 +75,12 @@ public class NearbyStops extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.activity_main);
 		
 		// Set the title and the content of the navigation drawer.
-		mTitle = "Nearby Stops & Service ETA";
-		mDrawerTitle = "Translink Mobile";
-		String[] temp = { "Nearby Stops", "Journey Planner", "Maintenance News"};
-		menuList = temp;
+		mTitle = TITLE;
+		mDrawerTitle = getTitle();
+		menuList = getResources().getStringArray(R.array.menu_array);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_ns);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer_ns);
 
@@ -86,16 +88,15 @@ public class NearbyStops extends FragmentActivity {
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
 		
 		// set up the drawer's list view with items and click listener
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, menuList));
-		
+		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, menuList));	
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		int position = 0;
 		mDrawerList.setItemChecked(position, true);
-		setTitle(mTitle);
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
+		getActionBar().setTitle(TITLE);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
 		mDrawerLayout, /* DrawerLayout object */
@@ -116,8 +117,7 @@ public class NearbyStops extends FragmentActivity {
 
 		LatLng center = DEFAULT_LOCATION;
 		
-		SupportMapFragment mapFrag = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+		mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 		
 		mMap = mapFrag.getMap();
 		//mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
@@ -279,29 +279,35 @@ public class NearbyStops extends FragmentActivity {
      * @param pos the position of the menu item that is clicked.
      */
 	private void selectItem(int pos) {
+		Fragment fragment = new Fragment();
+		FragmentManager manager = getSupportFragmentManager();
+		
 		switch (pos) {
 		case 0:
-			break;
+			manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			mDrawerList.setItemChecked(pos, true);
+	        setTitle(TITLE);
+	        mDrawerLayout.closeDrawer(mDrawerList);
+			return;
 		case 1:
-			// Wrong way, should use Fragment instead
-			startActivity(new Intent(getApplicationContext(),
-					JourneyPlanner.class));
+			fragment = new JourneyPlanner();
 			break;
 		case 2:
-			// The correct way of swapping a new fragment into the FragmentActivity
-			MaintenanceNewsFragment fragment = new MaintenanceNewsFragment();
-    		
-			FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.content_frame, fragment);
-			transaction.addToBackStack(null);
-            transaction.commit();
-
-			setTitle("Maintenance News");
-			mDrawerLayout.closeDrawer(mDrawerList);
+			fragment = new MaintenanceNewsFragment();
 			break;
 		default:
 			break;
 		}
+		
+		FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+		transaction.addToBackStack(null);
+        transaction.commit();
+
+        //update selected item and title, then close the drawer
+        mDrawerList.setItemChecked(pos, true);
+        setTitle(menuList[pos]);
+        mDrawerLayout.closeDrawer(mDrawerList);
 	}
 
 	@Override
@@ -323,5 +329,11 @@ public class NearbyStops extends FragmentActivity {
 		super.onConfigurationChanged(newConfig);
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
-
+	
+	@SuppressLint("NewApi")
+	@Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
+    }
 }
