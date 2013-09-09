@@ -123,4 +123,9 @@ public class Stop {
 	public String getDescription() {
 		return description;
 	}
+	
+	public int getServiceType()
+	{
+		return serviceType;
+	}
 }

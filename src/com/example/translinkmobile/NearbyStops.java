@@ -132,9 +132,8 @@ public class NearbyStops extends FragmentActivity {
 		userPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
 				.title("Your Position")
-				.visible(false)
-				.icon(BitmapDescriptorFactory
-						.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+				.visible(false));
+		
 		clickPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
 				.title("Your Selected Position")

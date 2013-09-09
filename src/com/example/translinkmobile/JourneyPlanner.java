@@ -12,17 +12,19 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -43,7 +45,7 @@ import android.widget.Toast;
  * @version 1.0
  */
 public class JourneyPlanner extends Fragment implements
-		JSONRequest.NetworkListener {
+		JSONRequest.NetworkListener, OnClickListener {
 
 	// UI elements
 	private EditText fromText;
@@ -92,6 +94,8 @@ public class JourneyPlanner extends Fragment implements
 		timeButton = (Button) view.findViewById(R.id.timeSpinner);
 		dateButton.setText(date);
 		timeButton.setText(time);
+		dateButton.setOnClickListener(this);
+		timeButton.setOnClickListener(this);
 		
 		spinner = (Spinner) view.findViewById(R.id.leave_options_spinner);
 		// Create an ArrayAdapter using the string array and a default spinner layout
@@ -184,8 +188,6 @@ public class JourneyPlanner extends Fragment implements
 		paramList.add(result);
 		if (paramList.size() == 2) {
 			// We need to make two calls to resolve.php before we can continue
-			Intent intent = new Intent(getActivity().getApplicationContext(),
-					ShowJourneyPage.class);
 			
 			paramList.add(date + " " + time);
 			paramList.add("" + leaveOption);
@@ -194,21 +196,37 @@ public class JourneyPlanner extends Fragment implements
 			String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length,
 					String[].class);
 			
-			intent.putExtra("locs", paramStrArray);
-			startActivity(intent);
+			Fragment fragment2 = new ShowJourneyPage();
+    		Bundle args = new Bundle();
+            args.putStringArray(ShowJourneyPage.ARGS_JOURNEY, paramStrArray);
+            fragment2.setArguments(args);
+    		
+    	    FragmentManager fragmentManager = getFragmentManager();
+    	    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    	    fragmentTransaction.replace(R.id.content_frame, fragment2);
+    	    fragmentTransaction.addToBackStack(null);
+    	    fragmentTransaction.commit();
 		}
 	}
 	
-	public void showTimePickerDialog(View v) {
-	    DialogFragment newFragment = new TimePickerFragment();
-	    newFragment.show(getFragmentManager(), "timePicker");
-	}
+	@Override
+    public void onClick(View v) 
+	{
+		DialogFragment newFragment;
+		
+        switch (v.getId()) 
+        {
+	        case R.id.dateSpinner:
+	        	newFragment = new DatePickerFragment();
+	    	    newFragment.show(getFragmentManager(), "datePicker");
+	            break;
+	        case R.id.timeSpinner:
+	        	newFragment = new TimePickerFragment();
+	    	    newFragment.show(getFragmentManager(), "timePicker");
+	    	    break;	
+        }
+    }
 	
-	public void showDatePickerDialog(View v) {
-	    DialogFragment newFragment = new DatePickerFragment();
-	    newFragment.show(getFragmentManager(), "datePicker");
-	}
-
 	public static class DatePickerFragment extends DialogFragment implements
 			DatePickerDialog.OnDateSetListener {
 

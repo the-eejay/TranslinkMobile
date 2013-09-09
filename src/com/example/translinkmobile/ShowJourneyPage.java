@@ -4,11 +4,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -19,28 +21,29 @@ import android.webkit.WebViewClient;
  * @author Transponders
  * @version 1.0
  */
-public class ShowJourneyPage extends Activity implements
-		JSONRequest.NetworkListener {
+public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkListener {
 
+	public final static String ARGS_JOURNEY = "JOURNEY_PARAMETERS";
 	String result;
 	WebView wv;
 	
 	@SuppressLint("NewApi")
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.journey_page);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
+	{
+		View view = inflater.inflate(R.layout.journey_page, container, false);
 
-		wv = (WebView) findViewById(R.id.webView);
+		wv = (WebView) view.findViewById(R.id.webView);
 		wv.setWebViewClient(new WebViewClient());
 
-		Intent intent = getIntent();
-		String[] ids = intent.getStringArrayExtra("locs");
+		String[] ids = getArguments().getStringArray(ARGS_JOURNEY);
 		String fromId = ids[0];
 		String destId = ids[1];
 		String date = ids[2];
 		String leaveOption = ids[3];
 		requestPlan(fromId, destId, date, leaveOption);
+		
+		return view;
 	}
 
 	private void requestPlan(String fromId, String destId, String date, String leaveOption) {

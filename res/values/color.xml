@@ -3,6 +3,8 @@
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="FireBrick">#B22222</color>
+    <color name="drawer_background">#f3f3f4</color>
+    <color name="separator_line">#dadadc</color>
     <drawable name="transparent_color">#00000000</drawable>    
 
 

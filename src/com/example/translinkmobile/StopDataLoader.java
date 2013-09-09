@@ -10,6 +10,7 @@ import org.json.simple.JSONValue;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -35,6 +36,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 	private ArrayList<Stop> stops;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
+	private int[] markerIcons = {R.drawable.bus_geo, R.drawable.train_geo, R.drawable.ferry_geo};
 
 	public StopDataLoader(GoogleMap map) {
 		isLoading = false;
@@ -95,7 +97,9 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 			ArrayList<String> usedParentIds = new ArrayList<String>();
 			if (stops != null) {
 				for (Stop stop : stops) {
-
+					int serviceType = stop.getServiceType();
+					Log.d("serviceType", "" + serviceType);
+					
 					if (stop.hasParent()) {
 						//stops with parent must only be added as markers if not
 						//there's not already a stop added for that position
@@ -111,7 +115,8 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 							Marker m = map.addMarker(new MarkerOptions()
 									.position(stop.getParentPosition())
 									.title(stop.getParentId())
-									.snippet("Click here for more"));
+									.snippet("Click here for more")
+									.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
 							stopMarkers.add(m);
 							stopMarkersMap.put(m, stop);
 							
@@ -122,7 +127,8 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 						Marker m = map.addMarker(new MarkerOptions()
 								.position(stop.getPosition())
 								.title(stop.getDescription())
-								.snippet("Click here for more"));
+								.snippet("Click here for more")
+								.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
 						stopMarkers.add(m);
 						stopMarkersMap.put(m, stop);
 						

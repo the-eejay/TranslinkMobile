@@ -46,8 +46,7 @@
        	android:layout_below="@id/leave_options_spinner"
         android:text="@string/currentDate" 
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="22dp"
-        android:onClick="showDatePickerDialog"/>
+        android:layout_marginLeft="22dp" />
 
     <Button
         android:id="@+id/sendDestButton"
@@ -67,7 +66,6 @@
         android:layout_above="@+id/sendDestButton"
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@+id/dateSpinner"
-        android:onClick="showTimePickerDialog"
         android:text="@string/currentTime" />
 
 </RelativeLayout>
