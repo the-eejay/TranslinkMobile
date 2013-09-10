@@ -45,6 +45,7 @@ public class MaintenanceNewsFragment extends Fragment {
 	private final String FILENAME = "MaintenanceNews.xml";
 	TableLayout newsTable;
 	Context tableContext;
+	private final String TITLE = "Maintenance News";
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,6 +58,13 @@ public class MaintenanceNewsFragment extends Fragment {
 		
         return view;
     }
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		getActivity().getActionBar().setTitle(TITLE);
+	}
 	
 	public void checkConnection() 
     {

@@ -112,9 +112,13 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 						}
 						
 						if (!isAlreadyUsed) {
+							
+							// Get just the parent stop name, without the "LM:" thing
+							String stopName = stop.getParentId().split(":")[2];
+							
 							Marker m = map.addMarker(new MarkerOptions()
 									.position(stop.getParentPosition())
-									.title(stop.getParentId())
+									.title(stopName)
 									.snippet("Click here for more")
 									.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
 							stopMarkers.add(m);

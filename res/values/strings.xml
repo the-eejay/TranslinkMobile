@@ -15,13 +15,22 @@
     <string name="drawer_open">drawer open</string>
     <string name="drawer_close">drawer close</string>
     <string name="splashdesc">Splash Screen</string>
-    <string name="fromLocation">Where are you leaving from?</string>
+    <string name="fromLocation">Default: Your current location</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="from">From:</string>
+    <string name="to">To:</string>
     
     <string-array name="menu_array">
         <item>Nearby Stops</item>
         <item>Journey Planner</item>
         <item>Maintenance News</item>
+    </string-array>
+    
+    <string-array name="leave_options_array">
+        <item>Leave after</item>
+        <item>Leave before</item>
+        <item>First services</item>
+        <item>Last services</item>
     </string-array>
 
 </resources>

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.content.Context;
@@ -13,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -21,7 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 /**
- * This class is the activity that shows the service codes and estimated
+ * This class is the fragment that shows the service codes and estimated
  *	arrival time for each service in a stop.
  *
  * @author Transponders
@@ -29,6 +27,7 @@ import android.widget.ListView;
  */
 public class DisplayRoutesFragment extends Fragment {
 	
+	public final static String ARGS_SELECTED_STOPS = "SELECTED_STOPS";
 	private List<String> lines = new ArrayList<String>();
 	//private HashMap<Route, String> routeMap = new HashMap<Route, String>();
 	private ListView listView;
@@ -46,9 +45,10 @@ public class DisplayRoutesFragment extends Fragment {
 		View view = inflater.inflate(R.layout.activity_timetable, container, false);
 		
 		listView = (ListView) view.findViewById(R.id.listview);
-		listView.setBackgroundColor(Color.BLACK);
+		listView.setBackgroundColor(Color.WHITE);
 		listView.setCacheColorHint(Color.TRANSPARENT);
 		
+		positionRouteMap = new HashMap<Integer, String>();
 		stops = ((NearbyStops) getActivity()).getSelectedStops();	
 		
 		makeLines();
@@ -67,7 +67,7 @@ public class DisplayRoutesFragment extends Fragment {
     public void showLines() 
     {
         adapter = new ArrayAdapter<String>(
-        		getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, lines);
+        		getActivity().getApplicationContext(), R.layout.route_list_item, lines);
         
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new OnItemClickListener() {
@@ -76,11 +76,7 @@ public class DisplayRoutesFragment extends Fragment {
         		//Set selected route in NearbyStops then change view back to it
         		String routeCode = positionRouteMap.get(pos);
         		((NearbyStops)getActivity()).setSelectedRoute(routeCode);
-        		manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        			
         	}
-
-			
         });
     }
     

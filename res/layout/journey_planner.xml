@@ -4,26 +4,48 @@
     android:layout_height="match_parent" 
     android:background="@drawable/background_others">
 
+    <TextView
+        android:id="@+id/from_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/from" 
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="22dp"
+        android:textSize="18sp"/>
+    
     <EditText
         android:id="@+id/fromLocation"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="@string/fromLocation"
         android:inputType="text" 
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"/>
+        android:layout_below="@id/from_label" 
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="22dp"/>
 
+    <TextView
+        android:id="@+id/to_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/to" 
+        android:layout_below="@id/fromLocation"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="22dp"
+        android:textSize="18sp"/>
+    
     <EditText
         android:id="@+id/toLocation"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/fromLocation"        
+        android:layout_below="@id/to_label"        
         android:hint="@string/toLocation"
         android:inputType="text" 
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="22dp" />
 
     <Spinner
         android:id="@+id/leave_options_spinner"
@@ -55,8 +77,8 @@
         android:layout_below="@id/dateSpinner"
         android:text="@string/sendDest" 
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="22dp" />
 
     <Button
         android:id="@+id/timeSpinner"
@@ -64,9 +86,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/sendDestButton"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="22dp"
         android:layout_toRightOf="@+id/dateSpinner"
         android:text="@string/currentTime" />
+
+    
 
 </RelativeLayout>
 

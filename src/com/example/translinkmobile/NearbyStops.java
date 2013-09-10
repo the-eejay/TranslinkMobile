@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,7 +16,6 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.app.FragmentActivity;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,6 +62,7 @@ public class NearbyStops extends FragmentActivity {
 	private boolean updatedOnce;
 	private ArrayList<Stop> selectedStops;
 	private String selectedRoute;
+	private LatLng userLatLng;
 
 	// Navigation drawer
 	private DrawerLayout mDrawerLayout;
@@ -91,7 +90,8 @@ public class NearbyStops extends FragmentActivity {
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
 		
 		// set up the drawer's list view with items and click listener
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, menuList));	
+		ArrayAdapter<String> adapter = new MenuAdapter(this, menuList);
+		mDrawerList.setAdapter(adapter);	
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		int position = 0;
@@ -117,7 +117,7 @@ public class NearbyStops extends FragmentActivity {
 		};
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
+		
 		LatLng center = DEFAULT_LOCATION;
 		
 		mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -135,14 +135,14 @@ public class NearbyStops extends FragmentActivity {
 		userPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
 				.title("Your Position")
-				.visible(false));
+				.visible(false)
+				.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_geo)));
 		
 		clickPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
 				.title("Your Selected Position")
 				.visible(false)
-				.icon(BitmapDescriptorFactory
-						.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+				.icon(BitmapDescriptorFactory.fromResource(R.drawable.chosen_geo)));
 
 		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 
@@ -150,7 +150,6 @@ public class NearbyStops extends FragmentActivity {
 			public void onInfoWindowClick(Marker marker) {
 				Stop stop = stopLoader.getIdOfMarker(marker);
 				if (stop != null) {
-					MainApplication app = (MainApplication) getApplicationContext();
 					ArrayList<Stop> stops;
 					if (stop.hasParent()) {
 						stops = stopLoader.getStopsFromParent(stop);
@@ -187,7 +186,7 @@ public class NearbyStops extends FragmentActivity {
 			public void onLocationChanged(Location location) {
 				// Called when a new location is found by the network location
 				// provider.
-				LatLng userLatLng = new LatLng(location.getLatitude(),
+				userLatLng = new LatLng(location.getLatitude(),
 						location.getLongitude());
 				userPos.setVisible(true);
 				userPos.setPosition(userLatLng);
@@ -291,6 +290,10 @@ public class NearbyStops extends FragmentActivity {
 			return;
 		case 1:
 			fragment = new JourneyPlanner();
+			Bundle args = new Bundle();
+			double[] userLoc = {userLatLng.latitude, userLatLng.longitude};
+            args.putDoubleArray(JourneyPlanner.ARGS_USER_LOC, userLoc);
+            fragment.setArguments(args);
 			break;
 		case 2:
 			fragment = new MaintenanceNewsFragment();
@@ -341,7 +344,7 @@ public class NearbyStops extends FragmentActivity {
 		Fragment fragment = new Fragment();
 		FragmentManager manager = getSupportFragmentManager();
 		fragment = new DisplayRoutesFragment();
-		//manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		
 		FragmentTransaction transaction = manager.beginTransaction();
         transaction.replace(R.id.content_frame, fragment);
         transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
@@ -349,9 +352,7 @@ public class NearbyStops extends FragmentActivity {
         transaction.commit();
 
         //update selected item and title, then close the drawer
-        setTitle("Timetable");
-       
-	
+        setTitle("Timetable");       
 	}
 	
 	/**

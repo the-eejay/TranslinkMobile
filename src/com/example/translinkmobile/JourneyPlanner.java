@@ -47,13 +47,15 @@ import android.widget.Toast;
 public class JourneyPlanner extends Fragment implements
 		JSONRequest.NetworkListener, OnClickListener {
 
+	public static final String ARGS_USER_LOC = "USER_LOCATION";
+	
 	// UI elements
 	private EditText fromText;
 	private EditText destText;
 	private Spinner spinner;
 	static Button dateButton;
 	static Button timeButton;
-	
+	private final String TITLE = "Journey Planner";
 	// params/options
 	private List<String> paramList = new ArrayList<String>();
 	int leaveOption = 0;
@@ -68,12 +70,15 @@ public class JourneyPlanner extends Fragment implements
 	static int day;
 	static int hour;
 	static int minute;
+	
+	double[] userLoc;
 
 	@SuppressLint("NewApi")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 
 		View view = inflater.inflate(R.layout.journey_planner, container, false);
+		userLoc = getArguments().getDoubleArray(ARGS_USER_LOC);
 		
 		year = c.get(Calendar.YEAR);
 		month = c.get(Calendar.MONTH);
@@ -132,6 +137,7 @@ public class JourneyPlanner extends Fragment implements
 
 			@Override
 			public void onClick(View v) {
+				paramList.clear();
 				if (isNetworkAvailable()) {
 					getLocIds();
 				} else {
@@ -155,6 +161,13 @@ public class JourneyPlanner extends Fragment implements
 		
 		return view;
 	}
+	
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		getActivity().getActionBar().setTitle(TITLE);
+	}
 
 	private boolean isNetworkAvailable() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -164,16 +177,25 @@ public class JourneyPlanner extends Fragment implements
 	}
 
 	private void getLocIds() {
-		getLocationId(fromText.getText().toString());
-		getLocationId(destText.getText().toString());                                                                                     
+		getLocationId(fromText.getText().toString(), true);
+		getLocationId(destText.getText().toString(), false);                                                                                     
 	}
 
-	private void getLocationId(String loc) {
+	private void getLocationId(String loc, boolean from) {
 		
 		if (loc == null || loc.equalsIgnoreCase("")) {
-			// User did not enter a location
-			Toast.makeText(getActivity().getApplicationContext(), "Please enter the From & To location!", Toast.LENGTH_SHORT).show();
-		    return;
+			
+			if(from)
+			{
+				// User did not input the from location, so use current location
+				loc = userLoc[0] + ", " + userLoc[1];
+			}
+			else
+			{
+				// User did not enter the destination
+				Toast.makeText(getActivity().getApplicationContext(), "Please enter the destination!", Toast.LENGTH_SHORT).show();
+			    return;
+			}	
 		}
 			
 		String url = "http://deco3801-010.uqcloud.net/resolve.php?input="
@@ -185,6 +207,7 @@ public class JourneyPlanner extends Fragment implements
 
 	@Override
 	public void networkRequestCompleted(String result) {
+		
 		paramList.add(result);
 		if (paramList.size() == 2) {
 			// We need to make two calls to resolve.php before we can continue
