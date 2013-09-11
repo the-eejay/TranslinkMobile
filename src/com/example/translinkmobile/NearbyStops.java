@@ -136,13 +136,13 @@ public class NearbyStops extends FragmentActivity {
 				.position(DEFAULT_LOCATION)
 				.title("Your Position")
 				.visible(false)
-				.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_geo)));
+				.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_geo_border)));
 		
 		clickPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
 				.title("Your Selected Position")
 				.visible(false)
-				.icon(BitmapDescriptorFactory.fromResource(R.drawable.chosen_geo)));
+				.icon(BitmapDescriptorFactory.fromResource(R.drawable.chosen_geo_border)));
 
 		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 

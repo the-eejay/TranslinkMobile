@@ -2,6 +2,7 @@ package com.example.translinkmobile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -13,6 +14,9 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -22,6 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -43,9 +48,12 @@ import android.widget.Toast;
 public class MaintenanceNewsFragment extends Fragment {
 
 	private final String FILENAME = "MaintenanceNews.xml";
+	private final String TITLE = "Maintenance News";
+	final Calendar calendar = Calendar.getInstance();
+	
 	TableLayout newsTable;
 	Context tableContext;
-	private final String TITLE = "Maintenance News";
+	TextView newsDate;
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,6 +62,7 @@ public class MaintenanceNewsFragment extends Fragment {
 		View view = inflater.inflate(R.layout.maintenance_news, container, false);
 		newsTable = (TableLayout) view.findViewById(R.id.newsTable);
 		tableContext = newsTable.getContext();
+		newsDate = (TextView) view.findViewById(R.id.newsDate);
 		checkConnection();
 		
         return view;
@@ -74,16 +83,24 @@ public class MaintenanceNewsFragment extends Fragment {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         String url = "http://jp.translink.com.au/travel-information/service-updates/rss";
         
+        Date date;
+        
         if (networkInfo != null && networkInfo.isConnected())
         {
         	new DownloadWebpageTask().execute(url);
+        	date = calendar.getTime();
+        	newsDate.setText("Last updated: " + date.toString().substring(0, 20));
         }
         else 
         {
         	Context context = parent.getApplicationContext();
         	try 
         	{
-				readXMLFile(getActivity().openFileInput(FILENAME));
+        		File file = new File(context.getFilesDir().getAbsolutePath() + "/" + FILENAME);
+        		date = new Date(file.lastModified());
+        		newsDate.setText("Last updated: " + date.toString().substring(0, 20));
+        		
+				readXMLFile(new FileInputStream(file));
 				Toast toast = Toast.makeText(context, "No network connection, showing previous news...", Toast.LENGTH_LONG);
     			toast.show();
 			} 
@@ -183,6 +200,7 @@ public class MaintenanceNewsFragment extends Fragment {
 			
 			doc.getDocumentElement().normalize();
 			NodeList nList = doc.getElementsByTagName("item");
+			Drawable arrow = getResources().getDrawable(R.drawable.show_more2);
 			
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				
@@ -201,15 +219,26 @@ public class MaintenanceNewsFragment extends Fragment {
 	            	
 	            	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
 	                param1.column = 0;
-	                param1.span = 5;
 	                text1.setLayoutParams(param1);
 	                
 	                text1.setText(title);
 	                text1.setTextSize(14);
 	                text1.setOnClickListener(new NewsListener(link));
-            		newRow.setPadding(20, 15, 5, 15);
+	                text1.setPadding(20, 15, 10, 15);
+	                text1.setCompoundDrawablePadding(0);
+	    			text1.setCompoundDrawablesWithIntrinsicBounds(null, null, arrow, null);
+	    			text1.setBackgroundResource(R.drawable.selector);
+
             		newRow.addView(text1);
             		newsTable.addView(newRow);
+            		
+            		View separatorLine = new View(tableContext);
+                    separatorLine.setBackgroundColor(getResources().getColor(R.color.separator_line));
+                    separatorLine.setPadding(0, 0, 0, 0);
+                    TableLayout.LayoutParams lineParam = new TableLayout.LayoutParams();
+                    lineParam.height = 2;
+                    separatorLine.setLayoutParams(lineParam);
+                    newsTable.addView(separatorLine);
 				}
 			}
     	}

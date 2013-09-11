@@ -7,7 +7,7 @@
     <string name="jpButtonString">Journey Planner</string>
     <string name="nsButtonString">Nearby Stops</string>
     <string name="toLocation">Enter your destination</string>
-    <string name="sendDest">Search</string>
+    <string name="sendDest">Find journey!</string>
     <string name="news">Maintenance News</string>
     <string name="leaveAfter">Leave after:</string>
     <string name="currentDate">Current Date</string>

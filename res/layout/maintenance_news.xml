@@ -1,34 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" 
+    android:orientation="vertical"
     android:background="@drawable/background_others" >
-	    
-    <TableLayout 
-	    android:id="@+id/newsTable"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content" 
-	    android:padding="15dp"
-	    android:stretchColumns="*">
- 
-	   <TableRow
-	        android:id="@+id/tableRow1"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:padding="5dp" >
+    
+    <TextView
+        android:id="@+id/newsDate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/editedbutton"
+        android:paddingLeft="10dp"
+        android:text="@string/news"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/white" />
+    
+	<ScrollView 
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent" >
+		    
+	    <TableLayout 
+		    android:id="@+id/newsTable"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:stretchColumns="0">
 	 
-	        <TextView
-	            android:id="@+id/menuTitle"
-	            android:text="@string/news"
-	            android:textColor="@color/white"
-	            android:layout_marginRight="2dp"
-	            android:background="@drawable/editedbutton"
-	            android:layout_span="5"
-	            android:paddingLeft="10dp"
-	            android:textAppearance="?android:attr/textAppearanceLarge" />
-	        
-	    </TableRow>
-
-	</TableLayout>
-
-</ScrollView>
+		   <TableRow
+		        android:id="@+id/tableRow1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content">
+		        
+		     <TextView
+		        android:id="@+id/col1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:paddingLeft="10dp"
+		        android:text="@string/news"
+		        android:textAppearance="?android:attr/textAppearanceLarge" 
+		        android:visibility="gone" />
+  		        
+		    </TableRow>
+	
+		</TableLayout>
+	
+	</ScrollView>
+</LinearLayout>

@@ -36,7 +36,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 	private ArrayList<Stop> stops;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
-	private int[] markerIcons = {R.drawable.bus_geo, R.drawable.train_geo, R.drawable.ferry_geo};
+	private int[] markerIcons = {R.drawable.bus_geo_border, R.drawable.train_geo_border, R.drawable.ferry_geo_border};
 
 	public StopDataLoader(GoogleMap map) {
 		isLoading = false;
@@ -98,7 +98,6 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 			if (stops != null) {
 				for (Stop stop : stops) {
 					int serviceType = stop.getServiceType();
-					Log.d("serviceType", "" + serviceType);
 					
 					if (stop.hasParent()) {
 						//stops with parent must only be added as markers if not

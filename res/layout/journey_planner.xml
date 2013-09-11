@@ -1,97 +1,102 @@
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" 
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
     android:background="@drawable/background_others">
 
-    <TextView
-        android:id="@+id/from_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/from" 
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="22dp"
-        android:layout_marginRight="22dp"
-        android:textSize="18sp"/>
-    
-    <EditText
-        android:id="@+id/fromLocation"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/fromLocation"
-        android:inputType="text" 
-        android:layout_below="@id/from_label" 
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="22dp"
-        android:layout_marginRight="22dp"/>
-
-    <TextView
-        android:id="@+id/to_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/to" 
-        android:layout_below="@id/fromLocation"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="22dp"
-        android:layout_marginRight="22dp"
-        android:textSize="18sp"/>
-    
-    <EditText
-        android:id="@+id/toLocation"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/to_label"        
-        android:hint="@string/toLocation"
-        android:inputType="text" 
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="22dp"
-        android:layout_marginRight="22dp" />
-
-    <Spinner
-        android:id="@+id/leave_options_spinner"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/toLocation"
-        android:textSize="18sp"
-        android:textColor="@color/black"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="22dp"
-        android:layout_marginLeft="22dp"/>
-    
-    <Button
-        style="?android:attr/spinnerStyle"
-        android:id="@+id/dateSpinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-       	android:layout_below="@id/leave_options_spinner"
-        android:text="@string/currentDate" 
-        android:layout_marginTop="5dp"
-        android:layout_marginLeft="22dp" />
-
-    <Button
-        android:id="@+id/sendDestButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/dateSpinner"
-        android:text="@string/sendDest" 
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="22dp"
-        android:layout_marginRight="22dp" />
-
-    <Button
-        android:id="@+id/timeSpinner"
-        style="?android:attr/spinnerStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/sendDestButton"
-        android:layout_marginLeft="22dp"
-        android:layout_marginRight="22dp"
-        android:layout_toRightOf="@+id/dateSpinner"
-        android:text="@string/currentTime" />
-
-    
-
-</RelativeLayout>
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" >
+	
+	    <TextView
+	        android:id="@+id/from_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/from" 
+	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp"
+	        android:textSize="18sp"/>
+	    
+	    <EditText
+	        android:id="@+id/fromLocation"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="@string/fromLocation"
+	        android:inputType="text" 
+	        android:layout_below="@id/from_label" 
+	        android:layout_marginTop="5dp"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp"/>
+	
+	    <TextView
+	        android:id="@+id/to_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/to" 
+	        android:layout_below="@id/fromLocation"
+	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp"
+	        android:textSize="18sp"/>
+	    
+	    <EditText
+	        android:id="@+id/toLocation"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/to_label"        
+	        android:hint="@string/toLocation"
+	        android:inputType="text" 
+	        android:layout_marginTop="5dp"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp" />
+	
+	    <Spinner
+	        android:id="@+id/leave_options_spinner"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@+id/toLocation"
+	        android:textSize="18sp"
+	        android:textColor="@color/black"
+	        android:layout_marginTop="20dp"
+	        android:layout_marginRight="22dp"
+	        android:layout_marginLeft="22dp"/>
+	    
+	    <Button
+	        style="?android:attr/spinnerStyle"
+	        android:id="@+id/dateSpinner"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	       	android:layout_below="@id/leave_options_spinner"
+	        android:text="@string/currentDate" 
+	        android:layout_marginTop="5dp"
+	        android:layout_marginLeft="22dp" />
+	
+	    <Button
+	        android:id="@+id/sendDestButton"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/dateSpinner"
+	        android:text="@string/sendDest" 
+	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp" 
+	        android:background="@drawable/buttongreen"/>
+	
+	    <Button
+	        android:id="@+id/timeSpinner"
+	        style="?android:attr/spinnerStyle"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_above="@+id/sendDestButton"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp"
+	        android:layout_toRightOf="@+id/dateSpinner"
+	        android:text="@string/currentTime" />
+	    
+	</RelativeLayout>
+	
+</ScrollView>
 
