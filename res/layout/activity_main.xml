@@ -16,15 +16,20 @@
 		 android:layout_height="match_parent"
 		 class="com.google.android.gms.maps.SupportMapFragment" />
 		
+		<android.support.v4.view.ViewPager
+	     android:id="@+id/pager"
+	     android:layout_width="match_parent"
+	     android:layout_height="match_parent" />
+		
 	</FrameLayout>
 	
 	<ListView
-	        android:id="@+id/left_drawer_ns"
-	        android:layout_width="240dp"
-	        android:layout_height="match_parent"
-	        android:layout_gravity="start"
-	        android:choiceMode="singleChoice"
-	        android:divider="@color/separator_line"
-	        android:dividerHeight="1dp"
-	        android:background="@color/drawer_background"/>
+     android:id="@+id/left_drawer_ns"
+     android:layout_width="240dp"
+     android:layout_height="match_parent"
+     android:layout_gravity="start"
+     android:choiceMode="singleChoice"
+     android:divider="@color/separator_line"
+     android:dividerHeight="1dp"
+     android:background="@color/drawer_background"/>
 </android.support.v4.widget.DrawerLayout>

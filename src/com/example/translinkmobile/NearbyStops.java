@@ -7,8 +7,10 @@ import android.annotation.SuppressLint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
@@ -16,6 +18,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -52,9 +56,11 @@ public class NearbyStops extends FragmentActivity {
 	 * Set the default location in case the application cannot detect
 	 * the current location of the device.
 	 */
-	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,
-			153.017823);
+	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037, 153.017823);
 	private final String TITLE = "Nearby Stops & Service ETA";
+	public static final int NUM_PAGES = 2;
+	public static final String PREFS_NAME = "MyPrefsFile";
+	public static final String TUTORIAL_SETTING = "SHOW_TUTORIAL";
 
 	public enum StackState {
 		NearbyStops, ShowRoute
@@ -86,7 +92,9 @@ public class NearbyStops extends FragmentActivity {
 	private CharSequence mTitle;
 	String[] menuList;
 	
-
+	private ViewPager mPager;
+    private PagerAdapter mPagerAdapter;
+		
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -283,9 +291,7 @@ public class NearbyStops extends FragmentActivity {
 
 					openTimetableFragment();
 				}
-
 			}
-
 		});
 
 		mMap.setOnMapClickListener(new OnMapClickListener() {
@@ -296,8 +302,8 @@ public class NearbyStops extends FragmentActivity {
 				clickPos.setPosition(arg0);
 				locationChanged(arg0);
 			}
-
 		});
+		
 		updatedOnce = false;
 		// Acquire a reference to the system Location Manager
 		LocationManager locationManager = (LocationManager) this
@@ -346,8 +352,35 @@ public class NearbyStops extends FragmentActivity {
 			Log.d("Location", "cannot find user location");
 			locationChanged(new LatLng(-27.498037, 153.017823));
 		}
-
+		
 		//map2Fragment = new ShowRouteFragment();
+		
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+	    boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
+
+	    //For debugging, uncomment this line below so that the tutorial doesn't show at all.
+	    //showTut = false;
+	    
+		if(showTut)
+			showFirstTimeTutorial();
+
+	}
+	
+	public void showFirstTimeTutorial()
+	{
+		mPager = (ViewPager) findViewById(R.id.pager);
+        mPagerAdapter = new TutorialPagerAdapter(getSupportFragmentManager(), mPager);
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                // When changing pages, reset the action bar actions since they are dependent
+                // on which page is currently active. An alternative approach is to have each
+                // fragment expose actions itself (rather than the activity exposing actions),
+                // but for simplicity, the activity provides the actions in this sample.
+                invalidateOptionsMenu();
+            }
+        });
 	}
 	
 	public void showRoute() {
@@ -477,5 +510,29 @@ public class NearbyStops extends FragmentActivity {
 	
 	public void setMap2Fragment(ShowRouteFragment map2Fragment) {
 		this.map2Fragment= map2Fragment; 
+<<<<<<< HEAD
 	}*/
+=======
+	}
+	
+	private class TutorialPagerAdapter extends FragmentStatePagerAdapter 
+	{
+		private View pagerView;
+		
+        public TutorialPagerAdapter(FragmentManager fm, View parent) {
+            super(fm);
+            pagerView = parent;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return TutorialFragment.create(position, pagerView);
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_PAGES;
+        }
+    }
+>>>>>>> Added Tutorial Screen
 }
