@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.annotation.SuppressLint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -63,6 +64,7 @@ public class NearbyStops extends FragmentActivity {
 	private ArrayList<Stop> selectedStops;
 	private Route selectedRoute;
 	private LatLng userLatLng;
+	private ShowRouteFragment map2Fragment;
 
 	// Navigation drawer
 	private DrawerLayout mDrawerLayout;
@@ -225,6 +227,7 @@ public class NearbyStops extends FragmentActivity {
 			locationChanged(new LatLng(-27.498037, 153.017823));
 		}
 
+		//map2Fragment = new ShowRouteFragment();
 	}
 
 	/**
@@ -280,6 +283,7 @@ public class NearbyStops extends FragmentActivity {
 	private void selectItem(int pos) {
 		Fragment fragment = new Fragment();
 		FragmentManager manager = getSupportFragmentManager();
+		//manager.addOnBackStackChangedListener(getBackListener());
 		
 		switch (pos) {
 		case 0:
@@ -343,6 +347,7 @@ public class NearbyStops extends FragmentActivity {
 	public void openTimetableFragment() {
 		Fragment fragment = new Fragment();
 		FragmentManager manager = getSupportFragmentManager();
+		//manager.addOnBackStackChangedListener(getBackListener());
 		fragment = new DisplayRoutesFragment();
 		
 		FragmentTransaction transaction = manager.beginTransaction();
@@ -353,6 +358,28 @@ public class NearbyStops extends FragmentActivity {
 
         //update selected item and title, then close the drawer
         setTitle("Timetable");       
+	}
+	
+	public OnBackStackChangedListener getBackListener() {
+		 OnBackStackChangedListener result = new OnBackStackChangedListener()
+	        {
+	            public void onBackStackChanged() 
+	            {                   
+	                FragmentManager manager = getSupportFragmentManager();
+
+	                if (manager != null)	{
+	                	if (manager.getBackStackEntryCount() == 0) {
+	                		finish();
+	                	}
+	                    Fragment currFrag = (Fragment)manager.getFragments().
+	                    get(manager.getBackStackEntryCount());
+
+	                    currFrag.onResume();
+	                }                   
+	            }
+	        };
+
+	        return result;
 	}
 	
 	/**
@@ -379,5 +406,13 @@ public class NearbyStops extends FragmentActivity {
 	
 	public void setSelectedRoute(Route route) {
 		selectedRoute = route;
+	}
+	
+	public ShowRouteFragment getMap2Fragment() {
+		return map2Fragment;
+	}
+	
+	public void setMap2Fragment(ShowRouteFragment map2Fragment) {
+		this.map2Fragment= map2Fragment; 
 	}
 }

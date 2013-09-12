@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,26 +32,43 @@ public class ShowRouteFragment extends Fragment {
 		private RouteStopsLoader routeStopsLoader;
 		private SupportMapFragment mapFrag;
 
-		@SuppressLint("NewApi")
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-		        Bundle savedInstanceState) {
+		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			
-			View view = inflater.inflate(R.layout.route_fragment, container, false);
-			
-			
-
-			LatLng center = DEFAULT_LOCATION;
-			
-			mapFrag = (SupportMapFragment) (getActivity().getSupportFragmentManager().findFragmentById(R.id.map2));
+			/*mapFrag = (SupportMapFragment) (getActivity().getSupportFragmentManager().findFragmentById(R.id.map2));
 			
 			mMap2 = mapFrag.getMap();
 			//mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 		
 			while (mMap2 == null) {
 				// The application is still unable to load the map.
+			}*/
+			Log.d("Drawer", "End onCreate");
+		}
+		
+		@SuppressLint("NewApi")
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+		        Bundle savedInstanceState) {
+			//super.onCreate(savedInstanceState);
+			Log.d("Drawer", "Starting onCreateView");
+			View view = inflater.inflate(R.layout.route_fragment, container, false);
+			
+			Log.d("Drawer", "Inflation Completed");
+			if (mapFrag == null) {
+				mapFrag = (SupportMapFragment) (getActivity().getSupportFragmentManager().findFragmentById(R.id.map2));
+			//if (mapFrag.)	
+				mMap2 = mapFrag.getMap();
+				//mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+			
+				while (mMap2 == null) {
+					// The application is still unable to load the map.
+				}
 			}
+
+			LatLng center = DEFAULT_LOCATION;
+			
+			
 			mMap2.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
 
 			routeStopsLoader = new RouteStopsLoader(mMap2);

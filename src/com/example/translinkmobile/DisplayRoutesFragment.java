@@ -39,9 +39,18 @@ public class DisplayRoutesFragment extends Fragment {
 	FragmentManager manager;
 	
 	@Override
+	public void onCreate(Bundle bundle) {
+		Log.d("Drawer", "DisplayRoutes: onCreate started");
+		super.onCreate(bundle);
+		init();
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	        Bundle savedInstanceState) {
+		Log.d("Drawer", "DisplayRoutes: onCreateView started");
 		super.onCreate(savedInstanceState);
+		
 		 manager = getActivity().getSupportFragmentManager();
 		View view = inflater.inflate(R.layout.activity_timetable, container, false);
 		
@@ -49,17 +58,40 @@ public class DisplayRoutesFragment extends Fragment {
 		listView.setBackgroundColor(Color.WHITE);
 		listView.setCacheColorHint(Color.TRANSPARENT);
 		
-		positionRouteMap = new HashMap<Integer, Route>();
-		stops = ((NearbyStops) getActivity()).getSelectedStops();	
 		
-		makeLines();
+		
 		showLines();
 		
-		routeLoader = new RouteDataLoader(lines, adapter);
-		routeLoader.requestRouteTimes(stops);
+		
 		
 		return view;
 	}	
+	
+	private void init() {
+		stops = ((NearbyStops) getActivity()).getSelectedStops();	
+		positionRouteMap = new HashMap<Integer, Route>();
+		makeLines();
+		
+		
+		
+		
+		adapter = new ArrayAdapter<String>(
+        		getActivity().getApplicationContext(), R.layout.route_list_item, lines);
+        
+        
+		
+		
+		
+		
+		routeLoader = new RouteDataLoader(lines, adapter);
+		routeLoader.requestRouteTimes(stops);
+	}
+	
+	@Override
+	public void onResume() {
+		Log.d("Drawer", "DisplayRoutes: onResume started");
+		super.onResume();
+	}
 	
 	/**
      * A method to set the the content of the list into the ListView. 
@@ -67,23 +99,45 @@ public class DisplayRoutesFragment extends Fragment {
      */
     public void showLines() 
     {
-        adapter = new ArrayAdapter<String>(
-        		getActivity().getApplicationContext(), R.layout.route_list_item, lines);
-        
-        listView.setAdapter(adapter);
+    	listView.setAdapter(adapter);
         listView.setOnItemClickListener(new OnItemClickListener() {
         	@Override
         	public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
         		//Set selected route in NearbyStops then change view back to it
         		Route routeCode = positionRouteMap.get(pos);
-        		((NearbyStops)getActivity()).setSelectedRoute(routeCode);
-        		Fragment fragment = new ShowRouteFragment();
+        		NearbyStops act = (NearbyStops)getActivity();
+        		act.setSelectedRoute(routeCode);
+        		Fragment fragment = null;
+        		if (act.getMap2Fragment() == null) {
+        			Log.d("Drawer", "map2 is NULL");
+        			fragment = new ShowRouteFragment();
+        			act.setMap2Fragment((ShowRouteFragment)fragment);
+        		} else {
+        			Log.d("Drawer", "map2 already exists");
+        			fragment = act.getMap2Fragment();
+        		}
+        		
+        		
         		FragmentTransaction transaction = manager.beginTransaction();
+        		Log.d("Drawer", "a");
                 transaction.replace(R.id.content_frame, fragment);
+                Log.d("Drawer", "b");
         		transaction.addToBackStack(null);
+        		Log.d("Drawer", "c");
                 transaction.commit();
+                Log.d("Drawer", "d");
+        		/*
+        		FragmentTransaction transaction = manager.beginTransaction();
+        		transaction.remove(manager.findFragmentById(R.id.content_frame));
+        		transaction.commit();
+        		manager.executePendingTransactions();
+        		transaction = manager.beginTransaction();
+        		transaction.add(R.id.content_frame, fragment);
+        		transaction.addToBackStack(null);
+        		transaction.commit();*/
         	}
         });
+    	adapter.notifyDataSetChanged();
     }
     
     /**

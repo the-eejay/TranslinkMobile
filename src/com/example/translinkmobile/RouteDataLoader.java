@@ -112,7 +112,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				String timestr = (String) time.get("DepartureTime");
 				String routecode = (String) ((JSONObject) time.get("Route"))
 						.get("Code");
-				Log.d("RESULT=", timestr);
+				//Log.d("RESULT=", timestr);
 
 				//Create each StopRoute relationship and give them the times from the JSON
 				for (Stop stop : stops) {
@@ -122,8 +122,8 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 						if (r.getCode().equals(routecode)) {
 							try {
 								StopRoute sr = new StopRoute(stop, r);
-								Log.d("Route",
-										"longstr=" + timestr.substring(6, 18));
+								//Log.d("Route",
+								//		"longstr=" + timestr.substring(6, 18));
 								sr.addTime(new Date(Long.parseLong(timestr
 										.substring(6, 18))));
 								stopRoutes.add(sr);
@@ -161,8 +161,8 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 					// Find the closest scheduled time after the current time
 					for (int j = 0; j < times.size(); j++) {
 						Long time = times.get(j).getTime();
-						Log.d("Route", "time=" + time + " currTime=" + currTime
-								+ " min=" + min);
+						//Log.d("Route", "time=" + time + " currTime=" + currTime
+						//		+ " min=" + min);
 						if (time > currTime && time < min) {
 							minTimeIndex = j;
 							minStopRouteIndex = k;
