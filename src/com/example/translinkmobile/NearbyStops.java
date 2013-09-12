@@ -61,7 +61,7 @@ public class NearbyStops extends FragmentActivity {
 	private SupportMapFragment mapFrag;
 	private boolean updatedOnce;
 	private ArrayList<Stop> selectedStops;
-	private String selectedRoute;
+	private Route selectedRoute;
 	private LatLng userLatLng;
 
 	// Navigation drawer
@@ -373,11 +373,11 @@ public class NearbyStops extends FragmentActivity {
 		this.selectedStops = stops;
 	}
 	
-	public String getSelectedRoute() {
+	public Route getSelectedRoute() {
 		return selectedRoute;
 	}
 	
-	public void setSelectedRoute(String route) {
+	public void setSelectedRoute(Route route) {
 		selectedRoute = route;
 	}
 }

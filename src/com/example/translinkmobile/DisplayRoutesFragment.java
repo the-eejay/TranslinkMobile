@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -34,7 +35,7 @@ public class DisplayRoutesFragment extends Fragment {
 	private ArrayList<Stop> stops;
 	private RouteDataLoader routeLoader;
 	private ArrayAdapter<String> adapter; 
-	private HashMap<Integer, String> positionRouteMap;
+	private HashMap<Integer, Route> positionRouteMap;
 	FragmentManager manager;
 	
 	@Override
@@ -48,7 +49,7 @@ public class DisplayRoutesFragment extends Fragment {
 		listView.setBackgroundColor(Color.WHITE);
 		listView.setCacheColorHint(Color.TRANSPARENT);
 		
-		positionRouteMap = new HashMap<Integer, String>();
+		positionRouteMap = new HashMap<Integer, Route>();
 		stops = ((NearbyStops) getActivity()).getSelectedStops();	
 		
 		makeLines();
@@ -74,8 +75,13 @@ public class DisplayRoutesFragment extends Fragment {
         	@Override
         	public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
         		//Set selected route in NearbyStops then change view back to it
-        		String routeCode = positionRouteMap.get(pos);
+        		Route routeCode = positionRouteMap.get(pos);
         		((NearbyStops)getActivity()).setSelectedRoute(routeCode);
+        		Fragment fragment = new ShowRouteFragment();
+        		FragmentTransaction transaction = manager.beginTransaction();
+                transaction.replace(R.id.content_frame, fragment);
+        		transaction.addToBackStack(null);
+                transaction.commit();
         	}
         });
     }
@@ -103,7 +109,7 @@ public class DisplayRoutesFragment extends Fragment {
 	    			if (!foundRouteIdMatch) {
 	    				routeIdsAlready.add(route.getCode());
 	    				lines.add(route.getCode() + "\t\t");
-	    				positionRouteMap.put(lines.size()-1, route.getCode());
+	    				positionRouteMap.put(lines.size()-1, route);
 	    			}
     			}
     		}
@@ -112,7 +118,7 @@ public class DisplayRoutesFragment extends Fragment {
     		for (int i=0; i<routes.size(); i++) {
     			String code = routes.get(i).getCode();
     			lines.add(code + "\t\t");
-    			positionRouteMap.put(lines.size()-1, code);
+    			positionRouteMap.put(lines.size()-1, routes.get(i));
     			//routeMap.put(routes.get(i), code);
     		}
     	}

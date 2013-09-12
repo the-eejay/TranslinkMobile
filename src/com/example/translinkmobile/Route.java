@@ -8,14 +8,21 @@ package com.example.translinkmobile;
  * @version 1.0
  */
 public class Route {
+	static class TransportType {
+		public static final int BUS = 2;
+		public static final int FERRY = 4;
+		public static final int TRAIN = 8;
+	};
 	
 	// A service route will have a code and a name.
 	private String code;
 	private String name;
+	private long type;
 
-	public Route(String code, String name) {
+	public Route(String code, String name, long type) {
 		this.code = code;
-		this.name = name;		
+		this.name = name;
+		this.type = type;
 	}
 
 	/**
@@ -34,5 +41,9 @@ public class Route {
      */
 	public String getDescription() {
 		return name;
+	}
+	
+	public long getType() {
+		return type;
 	}
 }

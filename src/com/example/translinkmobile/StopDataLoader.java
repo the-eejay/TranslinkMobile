@@ -167,7 +167,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 			* ParentLocation: {Id, Position: {Lat, Lng}}, Routes: [Code, Name]]}
 			*/
 			Object obj = JSONValue.parse(result);
-			try {
+			//try {
 				
 				JSONArray array = (JSONArray)((JSONObject)obj).get("Stops");
 				for (int i=0; i<array.size(); i++) {
@@ -185,16 +185,16 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 					JSONArray routes = (JSONArray)((JSONObject)obj2).get("Routes");
 					for (int j=0; j<routes.size(); j++) {
 						JSONObject route = (JSONObject)routes.get(j);
-						stop.addRoute(new Route((String)route.get("Code"), (String)route.get("Name")));
+						stop.addRoute(new Route((String)route.get("Code"), (String)route.get("Name"), (Long)route.get("Vehicle")));
 					}
 					output.add(stop);
 				}
 				return output;
-			} catch (Exception e) {
+			//} catch (Exception e) {
 				//No stops were found for the given location, or there was some network error
-				Log.d("Location", e.toString());
-				return null;
-			}
+				//Log.d("Location", e.toString());
+				//return null;
+			//}/
 		} else {
 			return null;
 		}
