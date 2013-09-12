@@ -38,11 +38,11 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 	private HashMap<Marker, Stop> stopMarkersMap;
 	private int[] markerIcons = {R.drawable.bus_geo_border, R.drawable.train_geo_border, R.drawable.ferry_geo_border};
 
-	public StopDataLoader(GoogleMap map) {
+	public StopDataLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap) {
 		isLoading = false;
 		this.map = map;
-		stopMarkers = new ArrayList<Marker>();
-		stopMarkersMap = new HashMap<Marker, Stop>();
+		this.stopMarkers = stopMarkers;
+		this.stopMarkersMap = stopMarkersMap;
 	}
 
 	/**

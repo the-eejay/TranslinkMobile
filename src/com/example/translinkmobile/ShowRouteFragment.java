@@ -71,7 +71,7 @@ public class ShowRouteFragment extends Fragment {
 			
 			mMap2.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
 
-			routeStopsLoader = new RouteStopsLoader(mMap2);
+			//routeStopsLoader = new RouteStopsLoader(mMap2);
 
 			userPos = mMap2.addMarker(new MarkerOptions()
 					.position(DEFAULT_LOCATION)

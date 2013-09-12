@@ -33,13 +33,15 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private HashMap<Marker, Stop> stopMarkersMap;
 	private int[] markerIcons = {R.drawable.bus_geo, R.drawable.train_geo, R.drawable.ferry_geo};
 	private Route route2;
+	private Polyline polyline;
 
-	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap) {
+	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline) {
 		isLoading = false;
 		this.map = map;
 		this.stopMarkers = stopMarkers;
 		this.stopMarkersMap = stopMarkersMap;
 		route2= null;
+		this.polyline = polyline;
 	}
 
 	/**
@@ -94,7 +96,9 @@ public void requestRouteLine(Route route) {
 		if (state == State.POLYLINE) {
 			//get the line from JSON and add to map
 			String line = parseJSONToLine();
-			addLineToMap(line);
+			if (line != null) {
+				addLineToMap(line);
+			}
 		} else if (state == State.STOPS){ 
 			ArrayList<Stop> stops = parseJSONToStops();
 			addMarkersToMap(stops);
@@ -120,6 +124,9 @@ public void requestRouteLine(Route route) {
 			* {Stops: [StopId, Description, Position: {Lat, Lng}, HasParentLocation,
 			* ParentLocation: {Id, Position: {Lat, Lng}}, Routes: [Code, Name]]}
 			*/
+		if(state != State.STOPS){
+			return output;
+		}
 			Object obj = JSONValue.parse(result);
 			//try {
 				Log.d("Location", "result="+result);
@@ -187,9 +194,13 @@ public void requestRouteLine(Route route) {
 	}
 	
 	public String parseJSONToLine() {
+		if (state != State.POLYLINE) {
+			return null;
+		}
 		
 		Object obj = JSONValue.parse(result);
 		String output = null;
+		
 		//try {
 			
 			JSONArray array = (JSONArray)((JSONObject)obj).get("Paths");
@@ -202,10 +213,14 @@ public void requestRouteLine(Route route) {
 	}
 	
 	public void addLineToMap(String line) {
+		if (polyline != null) {
+			polyline.setVisible(false);
+		}
 		PolylineOptions polylineOptions = new PolylineOptions();
 		polylineOptions.width(5).color(Color.RED);
 		polylineOptions.addAll(PolylineDecoder.decodePoly(line));
-		map.addPolyline(polylineOptions);
+		polyline = map.addPolyline(polylineOptions);
+		
 		
 		//Debug
 		List<LatLng> test = PolylineDecoder.decodePoly(line);

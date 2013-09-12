@@ -1,6 +1,7 @@
 package com.example.translinkmobile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 
 /**
  * The Android activity that shows the map with the current location of the
@@ -69,6 +71,10 @@ public class NearbyStops extends FragmentActivity {
 	private ArrayList<Stop> selectedStops;
 	private Route selectedRoute;
 	private LatLng userLatLng;
+	private ArrayList<Marker> stopMarkers;
+	private HashMap<Marker,Stop> stopMarkersMap;
+	private Polyline polyline;
+	
 	//private ShowRouteFragment map2Fragment;
 	private ArrayList<StackState> stackStates;
 
@@ -86,6 +92,9 @@ public class NearbyStops extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		stopMarkers = new ArrayList<Marker>();
+		stopMarkersMap = new HashMap<Marker,Stop>();
 		
 		//Set the fragment manager so it will pop elements from the stackStates
 		FragmentManager manager = getSupportFragmentManager();
@@ -238,8 +247,8 @@ public class NearbyStops extends FragmentActivity {
 			// The application is still unable to load the map.
 		}
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
-		stopLoader = new StopDataLoader(mMap);
-		routeStopsLoader = new RouteStopsLoader(mMap);
+		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
+		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers, stopMarkersMap, polyline);
 	}
 	
 	public void showNearbyStops() {
@@ -398,25 +407,26 @@ public class NearbyStops extends FragmentActivity {
 
 	                if (manager != null)	{
 	                	if (manager.getBackStackEntryCount() == 0) {
-	                		finish();
+	                		//finish();
+	                	} else {
+		                    Fragment currFrag = (Fragment)manager.getFragments().
+		                    get(manager.getBackStackEntryCount()-1);
+	
+		                    currFrag.onResume();
+		                    //Log.d("Drawer", "First backstatefragment is called " + (Fragment)manager.getFragments().get(0));
+		                    if (currFrag.getClass() == SupportMapFragment.class) {
+		                    	// assume seeing NearbyStops
+		                    	StackState state = stackStates.get(stackStates.size()-1);
+		                    	if (state == StackState.NearbyStops) {
+		                    		//Should check if need to refresh or not
+		                    		showNearbyStops();
+		                    	} else if (state == StackState.ShowRoute){
+		                    		//Should check if need to refresh or not
+		                    		showRoute();
+		                    	}
+		                    	stackStates.remove(state);
+		                    }
 	                	}
-	                    Fragment currFrag = (Fragment)manager.getFragments().
-	                    get(manager.getBackStackEntryCount()-1);
-
-	                    currFrag.onResume();
-	                    Log.d("Drawer", "First backstatefragment is called " + (Fragment)manager.getFragments().get(0));
-	                    if (currFrag.getClass() != DisplayRoutesFragment.class) {
-	                    	// assume seeing NearbyStops
-	                    	StackState state = stackStates.get(stackStates.size()-1);
-	                    	if (state == StackState.NearbyStops) {
-	                    		//Should check if need to refresh or not
-	                    		showNearbyStops();
-	                    	} else if (state == StackState.ShowRoute){
-	                    		//Should check if need to refresh or not
-	                    		showRoute();
-	                    	}
-	                    	stackStates.remove(state);
-	                    }
 	                }                   
 	            }
 	        };
@@ -452,6 +462,13 @@ public class NearbyStops extends FragmentActivity {
 	
 	public void addStateToStack(StackState state) {
 		stackStates.add(state);
+	}
+	
+	public void removeAllMarkers() {
+		for (Marker m : stopMarkers) {
+			m.setVisible(false);
+			m.remove();
+		}
 	}
 	
 	/*public ShowRouteFragment getMap2Fragment() {

@@ -130,8 +130,12 @@ public class DisplayRoutesFragment extends Fragment {
         		Log.d("Drawer", "c");
                 transaction.commit();
                 Log.d("Drawer", "d");
-                ((NearbyStops)getActivity()).showRoute();
-                ((NearbyStops)getActivity()).addStateToStack(StackState.ShowRoute);
+                NearbyStops nearbyStops =  (NearbyStops)getActivity();
+                // Should move these steps to NearbyStops itself and add check whether need to refresh or not
+                nearbyStops.removeAllMarkers();
+                nearbyStops.showRoute();
+                nearbyStops.addStateToStack(StackState.ShowRoute);
+                
         		/*
         		FragmentTransaction transaction = manager.beginTransaction();
         		transaction.remove(manager.findFragmentById(R.id.content_frame));
