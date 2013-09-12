@@ -54,17 +54,23 @@ public class NearbyStops extends FragmentActivity {
 			153.017823);
 	private final String TITLE = "Nearby Stops & Service ETA";
 
+	public enum StackState {
+		NearbyStops, ShowRoute
+	}
+	
 	// Map and markers
 	private GoogleMap mMap;
 	private Marker userPos;
 	private Marker clickPos;
 	private StopDataLoader stopLoader;
+	private RouteStopsLoader routeStopsLoader;
 	private SupportMapFragment mapFrag;
 	private boolean updatedOnce;
 	private ArrayList<Stop> selectedStops;
 	private Route selectedRoute;
 	private LatLng userLatLng;
-	private ShowRouteFragment map2Fragment;
+	//private ShowRouteFragment map2Fragment;
+	private ArrayList<StackState> stackStates;
 
 	// Navigation drawer
 	private DrawerLayout mDrawerLayout;
@@ -80,6 +86,13 @@ public class NearbyStops extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		//Set the fragment manager so it will pop elements from the stackStates
+		FragmentManager manager = getSupportFragmentManager();
+		manager.addOnBackStackChangedListener(getBackListener());
+		stackStates = new ArrayList<StackState>();
+		stackStates.add(StackState.NearbyStops);
+		
 		
 		// Set the title and the content of the navigation drawer.
 		mTitle = TITLE;
@@ -120,7 +133,101 @@ public class NearbyStops extends FragmentActivity {
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		
-		LatLng center = DEFAULT_LOCATION;
+		mapInit();
+        showNearbyStops();
+	}
+
+	/**
+     * A method to move the camera when the user touch the map to set a new
+     * location that will have the nearby stops generated around.
+     *
+     * @param location the latitude and longitude of the new location.
+     */
+	public void locationChanged(LatLng location) {
+		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+		stopLoader
+				.requestStopsNear(location.latitude, location.longitude, 1000);
+	}
+
+	/**
+     * A method to set the action bar. The action bar home/up action 
+     * should open or close the drawer. ActionBarDrawerToggle will 
+     * take care of this.
+     *
+     * @param item the MenuItem that is selected.
+     */
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (mDrawerToggle.onOptionsItemSelected(item)) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	/**
+     * A listener class that handles what will happen when the item inside
+     * the navigation drawer is clicked.
+     *
+     * @author Transponders
+     * @version 1.0
+     */
+	private class DrawerItemClickListener implements
+			ListView.OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			selectItem(position);
+
+		}
+	}
+
+	/**
+     * A method that defines what will happen when the user clicks
+     * a specific menu item in the navigation drawer. The method
+     * will start a new activity according to the selected menu.
+     *
+     * @param pos the position of the menu item that is clicked.
+     */
+	private void selectItem(int pos) {
+		Fragment fragment = new Fragment();
+		FragmentManager manager = getSupportFragmentManager();
+		//manager.addOnBackStackChangedListener(getBackListener());
+		
+		switch (pos) {
+		case 0:
+			manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			mDrawerList.setItemChecked(pos, true);
+	        setTitle(TITLE);
+	        mDrawerLayout.closeDrawer(mDrawerList);
+			return;
+		case 1:
+			fragment = new JourneyPlanner();
+			Bundle args = new Bundle();
+			double[] userLoc = {userLatLng.latitude, userLatLng.longitude};
+            args.putDoubleArray(JourneyPlanner.ARGS_USER_LOC, userLoc);
+            fragment.setArguments(args);
+			break;
+		case 2:
+			fragment = new MaintenanceNewsFragment();
+			break;
+		default:
+			break;
+		}
+		
+		FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.content_frame, fragment);
+		transaction.addToBackStack(null);
+        transaction.commit();
+
+        //update selected item and title, then close the drawer
+        mDrawerList.setItemChecked(pos, true);
+        setTitle(menuList[pos]);
+        mDrawerLayout.closeDrawer(mDrawerList);
+        
+        
+	}
+
+	public void mapInit() {
+			LatLng center = DEFAULT_LOCATION;
 		
 		mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 		
@@ -131,8 +238,12 @@ public class NearbyStops extends FragmentActivity {
 			// The application is still unable to load the map.
 		}
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
-
 		stopLoader = new StopDataLoader(mMap);
+		routeStopsLoader = new RouteStopsLoader(mMap);
+	}
+	
+	public void showNearbyStops() {
+		
 
 		userPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
@@ -229,94 +340,12 @@ public class NearbyStops extends FragmentActivity {
 
 		//map2Fragment = new ShowRouteFragment();
 	}
-
-	/**
-     * A method to move the camera when the user touch the map to set a new
-     * location that will have the nearby stops generated around.
-     *
-     * @param location the latitude and longitude of the new location.
-     */
-	public void locationChanged(LatLng location) {
-		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
-		stopLoader
-				.requestStopsNear(location.latitude, location.longitude, 1000);
-	}
-
-	/**
-     * A method to set the action bar. The action bar home/up action 
-     * should open or close the drawer. ActionBarDrawerToggle will 
-     * take care of this.
-     *
-     * @param item the MenuItem that is selected.
-     */
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (mDrawerToggle.onOptionsItemSelected(item)) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-     * A listener class that handles what will happen when the item inside
-     * the navigation drawer is clicked.
-     *
-     * @author Transponders
-     * @version 1.0
-     */
-	private class DrawerItemClickListener implements
-			ListView.OnItemClickListener {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
-			selectItem(position);
-
-		}
-	}
-
-	/**
-     * A method that defines what will happen when the user clicks
-     * a specific menu item in the navigation drawer. The method
-     * will start a new activity according to the selected menu.
-     *
-     * @param pos the position of the menu item that is clicked.
-     */
-	private void selectItem(int pos) {
-		Fragment fragment = new Fragment();
-		FragmentManager manager = getSupportFragmentManager();
-		//manager.addOnBackStackChangedListener(getBackListener());
+	
+	public void showRoute() {
 		
-		switch (pos) {
-		case 0:
-			manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-			mDrawerList.setItemChecked(pos, true);
-	        setTitle(TITLE);
-	        mDrawerLayout.closeDrawer(mDrawerList);
-			return;
-		case 1:
-			fragment = new JourneyPlanner();
-			Bundle args = new Bundle();
-			double[] userLoc = {userLatLng.latitude, userLatLng.longitude};
-            args.putDoubleArray(JourneyPlanner.ARGS_USER_LOC, userLoc);
-            fragment.setArguments(args);
-			break;
-		case 2:
-			fragment = new MaintenanceNewsFragment();
-			break;
-		default:
-			break;
-		}
-		
-		FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.content_frame, fragment);
-		transaction.addToBackStack(null);
-        transaction.commit();
-
-        //update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(pos, true);
-        setTitle(menuList[pos]);
-        mDrawerLayout.closeDrawer(mDrawerList);
+		routeStopsLoader.requestRouteStops(selectedRoute);
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -372,9 +401,22 @@ public class NearbyStops extends FragmentActivity {
 	                		finish();
 	                	}
 	                    Fragment currFrag = (Fragment)manager.getFragments().
-	                    get(manager.getBackStackEntryCount());
+	                    get(manager.getBackStackEntryCount()-1);
 
 	                    currFrag.onResume();
+	                    Log.d("Drawer", "First backstatefragment is called " + (Fragment)manager.getFragments().get(0));
+	                    if (currFrag.getClass() != DisplayRoutesFragment.class) {
+	                    	// assume seeing NearbyStops
+	                    	StackState state = stackStates.get(stackStates.size()-1);
+	                    	if (state == StackState.NearbyStops) {
+	                    		//Should check if need to refresh or not
+	                    		showNearbyStops();
+	                    	} else if (state == StackState.ShowRoute){
+	                    		//Should check if need to refresh or not
+	                    		showRoute();
+	                    	}
+	                    	stackStates.remove(state);
+	                    }
 	                }                   
 	            }
 	        };
@@ -408,11 +450,15 @@ public class NearbyStops extends FragmentActivity {
 		selectedRoute = route;
 	}
 	
-	public ShowRouteFragment getMap2Fragment() {
+	public void addStateToStack(StackState state) {
+		stackStates.add(state);
+	}
+	
+	/*public ShowRouteFragment getMap2Fragment() {
 		return map2Fragment;
 	}
 	
 	public void setMap2Fragment(ShowRouteFragment map2Fragment) {
 		this.map2Fragment= map2Fragment; 
-	}
+	}*/
 }

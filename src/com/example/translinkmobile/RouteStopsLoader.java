@@ -34,11 +34,11 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private int[] markerIcons = {R.drawable.bus_geo, R.drawable.train_geo, R.drawable.ferry_geo};
 	private Route route2;
 
-	public RouteStopsLoader(GoogleMap map) {
+	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap) {
 		isLoading = false;
 		this.map = map;
-		stopMarkers = new ArrayList<Marker>();
-		stopMarkersMap = new HashMap<Marker, Stop>();
+		this.stopMarkers = stopMarkers;
+		this.stopMarkersMap = stopMarkersMap;
 		route2= null;
 	}
 

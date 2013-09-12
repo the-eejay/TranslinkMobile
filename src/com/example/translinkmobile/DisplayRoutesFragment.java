@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.translinkmobile.NearbyStops.StackState;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -36,13 +38,15 @@ public class DisplayRoutesFragment extends Fragment {
 	private RouteDataLoader routeLoader;
 	private ArrayAdapter<String> adapter; 
 	private HashMap<Integer, Route> positionRouteMap;
-	FragmentManager manager;
+	private FragmentManager manager;
+	private DisplayRoutesFragment thisVar;
 	
 	@Override
 	public void onCreate(Bundle bundle) {
 		Log.d("Drawer", "DisplayRoutes: onCreate started");
 		super.onCreate(bundle);
 		init();
+		thisVar = this;
 	}
 	
 	@Override
@@ -107,25 +111,27 @@ public class DisplayRoutesFragment extends Fragment {
         		Route routeCode = positionRouteMap.get(pos);
         		NearbyStops act = (NearbyStops)getActivity();
         		act.setSelectedRoute(routeCode);
-        		Fragment fragment = null;
-        		if (act.getMap2Fragment() == null) {
+        		//Fragment fragment = null;
+        		/*if (act.getMap2Fragment() == null) {
         			Log.d("Drawer", "map2 is NULL");
         			fragment = new ShowRouteFragment();
         			act.setMap2Fragment((ShowRouteFragment)fragment);
         		} else {
         			Log.d("Drawer", "map2 already exists");
         			fragment = act.getMap2Fragment();
-        		}
+        		}*/
         		
         		
         		FragmentTransaction transaction = manager.beginTransaction();
         		Log.d("Drawer", "a");
-                transaction.replace(R.id.content_frame, fragment);
+                transaction.remove(thisVar);
                 Log.d("Drawer", "b");
         		transaction.addToBackStack(null);
         		Log.d("Drawer", "c");
                 transaction.commit();
                 Log.d("Drawer", "d");
+                ((NearbyStops)getActivity()).showRoute();
+                ((NearbyStops)getActivity()).addStateToStack(StackState.ShowRoute);
         		/*
         		FragmentTransaction transaction = manager.beginTransaction();
         		transaction.remove(manager.findFragmentById(R.id.content_frame));
