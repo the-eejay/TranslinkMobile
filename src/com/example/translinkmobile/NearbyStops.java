@@ -51,12 +51,13 @@ import com.google.android.gms.maps.model.Polyline;
  * @version 1.0
  */
 public class NearbyStops extends FragmentActivity {
-	
+
 	/**
-	 * Set the default location in case the application cannot detect
-	 * the current location of the device.
+	 * Set the default location in case the application cannot detect the
+	 * current location of the device.
 	 */
-	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037, 153.017823);
+	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,
+			153.017823);
 	private final String TITLE = "Nearby Stops & Service ETA";
 	public static final int NUM_PAGES = 2;
 	public static final String PREFS_NAME = "MyPrefsFile";
@@ -65,7 +66,7 @@ public class NearbyStops extends FragmentActivity {
 	public enum StackState {
 		NearbyStops, ShowRoute
 	}
-	
+
 	// Map and markers
 	private GoogleMap mMap;
 	private Marker userPos;
@@ -78,10 +79,10 @@ public class NearbyStops extends FragmentActivity {
 	private Route selectedRoute;
 	private LatLng userLatLng;
 	private ArrayList<Marker> stopMarkers;
-	private HashMap<Marker,Stop> stopMarkersMap;
+	private HashMap<Marker, Stop> stopMarkersMap;
 	private Polyline polyline;
-	
-	//private ShowRouteFragment map2Fragment;
+
+	// private ShowRouteFragment map2Fragment;
 	private ArrayList<StackState> stackStates;
 
 	// Navigation drawer
@@ -91,26 +92,25 @@ public class NearbyStops extends FragmentActivity {
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
 	String[] menuList;
-	
+
 	private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
-		
+	private PagerAdapter mPagerAdapter;
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		stopMarkers = new ArrayList<Marker>();
-		stopMarkersMap = new HashMap<Marker,Stop>();
-		
-		//Set the fragment manager so it will pop elements from the stackStates
+		stopMarkersMap = new HashMap<Marker, Stop>();
+
+		// Set the fragment manager so it will pop elements from the stackStates
 		FragmentManager manager = getSupportFragmentManager();
 		manager.addOnBackStackChangedListener(getBackListener());
 		stackStates = new ArrayList<StackState>();
 		stackStates.add(StackState.NearbyStops);
-		
-		
+
 		// Set the title and the content of the navigation drawer.
 		mTitle = TITLE;
 		mDrawerTitle = getTitle();
@@ -118,12 +118,14 @@ public class NearbyStops extends FragmentActivity {
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_ns);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer_ns);
 
-		// set a custom shadow that overlays the main content when the drawer opens
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
-		
+		// set a custom shadow that overlays the main content when the drawer
+		// opens
+		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+				GravityCompat.START);
+
 		// set up the drawer's list view with items and click listener
 		ArrayAdapter<String> adapter = new MenuAdapter(this, menuList);
-		mDrawerList.setAdapter(adapter);	
+		mDrawerList.setAdapter(adapter);
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		int position = 0;
@@ -149,17 +151,18 @@ public class NearbyStops extends FragmentActivity {
 		};
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-		
+
 		mapInit();
-        showNearbyStops();
+		showNearbyStops();
 	}
 
 	/**
-     * A method to move the camera when the user touch the map to set a new
-     * location that will have the nearby stops generated around.
-     *
-     * @param location the latitude and longitude of the new location.
-     */
+	 * A method to move the camera when the user touch the map to set a new
+	 * location that will have the nearby stops generated around.
+	 * 
+	 * @param location
+	 *            the latitude and longitude of the new location.
+	 */
 	public void locationChanged(LatLng location) {
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
 		stopLoader
@@ -167,12 +170,12 @@ public class NearbyStops extends FragmentActivity {
 	}
 
 	/**
-     * A method to set the action bar. The action bar home/up action 
-     * should open or close the drawer. ActionBarDrawerToggle will 
-     * take care of this.
-     *
-     * @param item the MenuItem that is selected.
-     */
+	 * A method to set the action bar. The action bar home/up action should open
+	 * or close the drawer. ActionBarDrawerToggle will take care of this.
+	 * 
+	 * @param item
+	 *            the MenuItem that is selected.
+	 */
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
 			return true;
@@ -181,12 +184,12 @@ public class NearbyStops extends FragmentActivity {
 	}
 
 	/**
-     * A listener class that handles what will happen when the item inside
-     * the navigation drawer is clicked.
-     *
-     * @author Transponders
-     * @version 1.0
-     */
+	 * A listener class that handles what will happen when the item inside the
+	 * navigation drawer is clicked.
+	 * 
+	 * @author Transponders
+	 * @version 1.0
+	 */
 	private class DrawerItemClickListener implements
 			ListView.OnItemClickListener {
 		@Override
@@ -198,30 +201,31 @@ public class NearbyStops extends FragmentActivity {
 	}
 
 	/**
-     * A method that defines what will happen when the user clicks
-     * a specific menu item in the navigation drawer. The method
-     * will start a new activity according to the selected menu.
-     *
-     * @param pos the position of the menu item that is clicked.
-     */
+	 * A method that defines what will happen when the user clicks a specific
+	 * menu item in the navigation drawer. The method will start a new activity
+	 * according to the selected menu.
+	 * 
+	 * @param pos
+	 *            the position of the menu item that is clicked.
+	 */
 	private void selectItem(int pos) {
 		Fragment fragment = new Fragment();
 		FragmentManager manager = getSupportFragmentManager();
-		//manager.addOnBackStackChangedListener(getBackListener());
-		
+		// manager.addOnBackStackChangedListener(getBackListener());
+
 		switch (pos) {
 		case 0:
 			manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			mDrawerList.setItemChecked(pos, true);
-	        setTitle(TITLE);
-	        mDrawerLayout.closeDrawer(mDrawerList);
+			setTitle(TITLE);
+			mDrawerLayout.closeDrawer(mDrawerList);
 			return;
 		case 1:
 			fragment = new JourneyPlanner();
 			Bundle args = new Bundle();
-			double[] userLoc = {userLatLng.latitude, userLatLng.longitude};
-            args.putDoubleArray(JourneyPlanner.ARGS_USER_LOC, userLoc);
-            fragment.setArguments(args);
+			double[] userLoc = { userLatLng.latitude, userLatLng.longitude };
+			args.putDoubleArray(JourneyPlanner.ARGS_USER_LOC, userLoc);
+			fragment.setArguments(args);
 			break;
 		case 2:
 			fragment = new MaintenanceNewsFragment();
@@ -229,50 +233,53 @@ public class NearbyStops extends FragmentActivity {
 		default:
 			break;
 		}
-		
-		FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.content_frame, fragment);
-		transaction.addToBackStack(null);
-        transaction.commit();
 
-        //update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(pos, true);
-        setTitle(menuList[pos]);
-        mDrawerLayout.closeDrawer(mDrawerList);
-        
-        
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.replace(R.id.content_frame, fragment);
+		transaction.addToBackStack(null);
+		transaction.commit();
+
+		// update selected item and title, then close the drawer
+		mDrawerList.setItemChecked(pos, true);
+		setTitle(menuList[pos]);
+		mDrawerLayout.closeDrawer(mDrawerList);
+
 	}
 
 	public void mapInit() {
-			LatLng center = DEFAULT_LOCATION;
-		
-		mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-		
+		LatLng center = DEFAULT_LOCATION;
+
+		mapFrag = (SupportMapFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.map);
+
 		mMap = mapFrag.getMap();
-		//mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-	
+		// mMap = ((MapFragment)
+		// getFragmentManager().findFragmentById(R.id.map)).getMap();
+
 		while (mMap == null) {
 			// The application is still unable to load the map.
 		}
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
-		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers, stopMarkersMap, polyline);
+		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
+				stopMarkersMap, polyline);
 	}
-	
+
 	public void showNearbyStops() {
-		
 
 		userPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
 				.title("Your Position")
 				.visible(false)
-				.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_geo_border)));
-		
+				.icon(BitmapDescriptorFactory
+						.fromResource(R.drawable.location_geo_border)));
+
 		clickPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
 				.title("Your Selected Position")
 				.visible(false)
-				.icon(BitmapDescriptorFactory.fromResource(R.drawable.chosen_geo_border)));
+				.icon(BitmapDescriptorFactory
+						.fromResource(R.drawable.chosen_geo_border)));
 
 		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 
@@ -303,7 +310,7 @@ public class NearbyStops extends FragmentActivity {
 				locationChanged(arg0);
 			}
 		});
-		
+
 		updatedOnce = false;
 		// Acquire a reference to the system Location Manager
 		LocationManager locationManager = (LocationManager) this
@@ -335,7 +342,8 @@ public class NearbyStops extends FragmentActivity {
 			}
 		};
 
-		// Register the listener with the Location Manager to receive location updates
+		// Register the listener with the Location Manager to receive location
+		// updates
 		// Check every 1 minute and only if location has changed by 50 meters.
 		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 			Log.d("Location", "using network");
@@ -352,42 +360,47 @@ public class NearbyStops extends FragmentActivity {
 			Log.d("Location", "cannot find user location");
 			locationChanged(new LatLng(-27.498037, 153.017823));
 		}
-		
-		//map2Fragment = new ShowRouteFragment();
-		
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-	    boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
 
-	    //For debugging, uncomment this line below so that the tutorial doesn't show at all.
-	    //showTut = false;
-	    
-		if(showTut)
+		// map2Fragment = new ShowRouteFragment();
+
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
+
+		// For debugging, uncomment this line below so that the tutorial doesn't
+		// show at all.
+		// showTut = false;
+
+		if (showTut)
 			showFirstTimeTutorial();
 
 	}
-	
-	public void showFirstTimeTutorial()
-	{
+
+	public void showFirstTimeTutorial() {
 		mPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new TutorialPagerAdapter(getSupportFragmentManager(), mPager);
-        mPager.setAdapter(mPagerAdapter);
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                // When changing pages, reset the action bar actions since they are dependent
-                // on which page is currently active. An alternative approach is to have each
-                // fragment expose actions itself (rather than the activity exposing actions),
-                // but for simplicity, the activity provides the actions in this sample.
-                invalidateOptionsMenu();
-            }
-        });
+		mPagerAdapter = new TutorialPagerAdapter(getSupportFragmentManager(),
+				mPager);
+		mPager.setAdapter(mPagerAdapter);
+		mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+			@Override
+			public void onPageSelected(int position) {
+				// When changing pages, reset the action bar actions since they
+				// are dependent
+				// on which page is currently active. An alternative approach is
+				// to have each
+				// fragment expose actions itself (rather than the activity
+				// exposing actions),
+				// but for simplicity, the activity provides the actions in this
+				// sample.
+				invalidateOptionsMenu();
+			}
+		});
 	}
-	
+
 	public void showRoute() {
-		
+
 		routeStopsLoader.requestRouteStops(selectedRoute);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -407,132 +420,128 @@ public class NearbyStops extends FragmentActivity {
 		super.onConfigurationChanged(newConfig);
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
-		
+
 	@SuppressLint("NewApi")
 	@Override
-    public void setTitle(CharSequence title) {
-        mTitle = title;
-        getActionBar().setTitle(mTitle);
-    }
-	
+	public void setTitle(CharSequence title) {
+		mTitle = title;
+		getActionBar().setTitle(mTitle);
+	}
+
 	public void openTimetableFragment() {
 		Fragment fragment = new Fragment();
 		FragmentManager manager = getSupportFragmentManager();
-		//manager.addOnBackStackChangedListener(getBackListener());
+		// manager.addOnBackStackChangedListener(getBackListener());
 		fragment = new DisplayRoutesFragment();
-		
+
 		FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.content_frame, fragment);
-        transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+		transaction.replace(R.id.content_frame, fragment);
+		transaction.setCustomAnimations(android.R.anim.slide_in_left,
+				android.R.anim.slide_out_right);
 		transaction.addToBackStack(null);
-        transaction.commit();
+		transaction.commit();
 
-        //update selected item and title, then close the drawer
-        setTitle("Timetable");       
+		// update selected item and title, then close the drawer
+		setTitle("Timetable");
 	}
-	
+
 	public OnBackStackChangedListener getBackListener() {
-		 OnBackStackChangedListener result = new OnBackStackChangedListener()
-	        {
-	            public void onBackStackChanged() 
-	            {                   
-	                FragmentManager manager = getSupportFragmentManager();
+		OnBackStackChangedListener result = new OnBackStackChangedListener() {
+			public void onBackStackChanged() {
+				FragmentManager manager = getSupportFragmentManager();
 
-	                if (manager != null)	{
-	                	if (manager.getBackStackEntryCount() == 0) {
-	                		//finish();
-	                	} else {
-		                    Fragment currFrag = (Fragment)manager.getFragments().
-		                    get(manager.getBackStackEntryCount()-1);
-	
-		                    currFrag.onResume();
-		                    //Log.d("Drawer", "First backstatefragment is called " + (Fragment)manager.getFragments().get(0));
-		                    if (currFrag.getClass() == SupportMapFragment.class) {
-		                    	// assume seeing NearbyStops
-		                    	StackState state = stackStates.get(stackStates.size()-1);
-		                    	if (state == StackState.NearbyStops) {
-		                    		//Should check if need to refresh or not
-		                    		showNearbyStops();
-		                    	} else if (state == StackState.ShowRoute){
-		                    		//Should check if need to refresh or not
-		                    		showRoute();
-		                    	}
-		                    	stackStates.remove(state);
-		                    }
-	                	}
-	                }                   
-	            }
-	        };
+				if (manager != null) {
+					if (manager.getBackStackEntryCount() == 0) {
+						// finish();
+					} else {
+						Fragment currFrag = (Fragment) manager.getFragments()
+								.get(manager.getBackStackEntryCount() - 1);
 
-	        return result;
+						currFrag.onResume();
+						// Log.d("Drawer", "First backstatefragment is called "
+						// + (Fragment)manager.getFragments().get(0));
+						if (currFrag.getClass() == SupportMapFragment.class) {
+							// assume seeing NearbyStops
+							StackState state = stackStates.get(stackStates
+									.size() - 1);
+							if (state == StackState.NearbyStops) {
+								// Should check if need to refresh or not
+								showNearbyStops();
+							} else if (state == StackState.ShowRoute) {
+								// Should check if need to refresh or not
+								showRoute();
+							}
+							stackStates.remove(state);
+						}
+					}
+				}
+			}
+		};
+
+		return result;
 	}
-	
+
 	/**
-     * Getter method of the selected stops object.
-     *
-     * @return ArrayList<Stop> The list of selected stops.
-     */
+	 * Getter method of the selected stops object.
+	 * 
+	 * @return ArrayList<Stop> The list of selected stops.
+	 */
 	public ArrayList<Stop> getSelectedStops() {
 		return selectedStops;
 	}
-	
+
 	/**
-     * Setter method of the selected stops object.
-     *
-     * @param stops the ArrayList of selected stops.
-     */
+	 * Setter method of the selected stops object.
+	 * 
+	 * @param stops
+	 *            the ArrayList of selected stops.
+	 */
 	public void setSelectedStops(ArrayList<Stop> stops) {
 		this.selectedStops = stops;
 	}
-	
+
 	public Route getSelectedRoute() {
 		return selectedRoute;
 	}
-	
+
 	public void setSelectedRoute(Route route) {
 		selectedRoute = route;
 	}
-	
+
 	public void addStateToStack(StackState state) {
 		stackStates.add(state);
 	}
-	
+
 	public void removeAllMarkers() {
 		for (Marker m : stopMarkers) {
 			m.setVisible(false);
 			m.remove();
 		}
 	}
-	
-	/*public ShowRouteFragment getMap2Fragment() {
-		return map2Fragment;
-	}
-	
-	public void setMap2Fragment(ShowRouteFragment map2Fragment) {
-		this.map2Fragment= map2Fragment; 
-<<<<<<< HEAD
-	}*/
-=======
-	}
-	
-	private class TutorialPagerAdapter extends FragmentStatePagerAdapter 
-	{
+
+	/*
+	 * public ShowRouteFragment getMap2Fragment() { return map2Fragment; }
+	 * public void setMap2Fragment(ShowRouteFragment map2Fragment) {
+	 * this.map2Fragment= map2Fragment; <<<<<<< HEAD }
+	 */
+
+	private class TutorialPagerAdapter extends FragmentStatePagerAdapter {
 		private View pagerView;
-		
-        public TutorialPagerAdapter(FragmentManager fm, View parent) {
-            super(fm);
-            pagerView = parent;
-        }
 
-        @Override
-        public Fragment getItem(int position) {
-            return TutorialFragment.create(position, pagerView);
-        }
+		public TutorialPagerAdapter(FragmentManager fm, View parent) {
+			super(fm);
+			pagerView = parent;
+		}
 
-        @Override
-        public int getCount() {
-            return NUM_PAGES;
-        }
-    }
->>>>>>> Added Tutorial Screen
+		@Override
+		public Fragment getItem(int position) {
+			return TutorialFragment.create(position, pagerView);
+		}
+
+		@Override
+		public int getCount() {
+			return NUM_PAGES;
+		}
+	}
+
 }
