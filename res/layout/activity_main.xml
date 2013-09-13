@@ -1,5 +1,4 @@
-<!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
-<android.support.v4.widget.DrawerLayout
+<!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. --><android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout_ns"
     android:layout_width="match_parent"
@@ -8,10 +7,6 @@
    	<FrameLayout
 		 android:id="@+id/content_frame"
 		 android:layout_width="match_parent"
-<<<<<<< HEAD
-
-=======
->>>>>>> Fixed the activity_main.xml
 		 android:layout_height="match_parent" >
 		    
 			<fragment 
@@ -24,20 +19,8 @@
 		     android:id="@+id/pager"
 		     android:layout_width="match_parent"
 		     android:layout_height="match_parent" />
-<<<<<<< HEAD
-			
+
 		</FrameLayout>
-	
-	
-
-		 
-		
-		
-
-=======
-				     	
-	</FrameLayout>
->>>>>>> Fixed the activity_main.xml
 
 	<ListView
      android:id="@+id/left_drawer_ns"
