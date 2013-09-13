@@ -56,8 +56,7 @@ public class NearbyStops extends FragmentActivity {
 	 * Set the default location in case the application cannot detect the
 	 * current location of the device.
 	 */
-	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,
-			153.017823);
+	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823);
 	private final String TITLE = "Nearby Stops & Service ETA";
 	public static final int NUM_PAGES = 2;
 	public static final String PREFS_NAME = "MyPrefsFile";
@@ -95,8 +94,7 @@ public class NearbyStops extends FragmentActivity {
 
 	private ViewPager mPager;
 	private PagerAdapter mPagerAdapter;
-
-	@SuppressLint("NewApi")
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -111,6 +109,23 @@ public class NearbyStops extends FragmentActivity {
 		stackStates = new ArrayList<StackState>();
 		stackStates.add(StackState.NearbyStops);
 
+		initializeNavigationDrawer();
+
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
+
+		// For debugging, uncomment this line below so that the tutorial doesn't show at all.
+		// showTut = false;
+
+		if (showTut)
+			showFirstTimeTutorial();
+		
+		mapInit();
+		showNearbyStops();
+	}
+	
+	public void initializeNavigationDrawer()
+	{
 		// Set the title and the content of the navigation drawer.
 		mTitle = TITLE;
 		mDrawerTitle = getTitle();
@@ -132,7 +147,6 @@ public class NearbyStops extends FragmentActivity {
 		mDrawerList.setItemChecked(position, true);
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
 		getActionBar().setTitle(TITLE);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
@@ -151,9 +165,6 @@ public class NearbyStops extends FragmentActivity {
 		};
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-		mapInit();
-		showNearbyStops();
 	}
 
 	/**
@@ -245,8 +256,9 @@ public class NearbyStops extends FragmentActivity {
 		mDrawerLayout.closeDrawer(mDrawerList);
 
 	}
-
-	public void mapInit() {
+	
+	public void mapInit() 
+	{
 		LatLng center = DEFAULT_LOCATION;
 
 		mapFrag = (SupportMapFragment) getSupportFragmentManager()
@@ -265,8 +277,8 @@ public class NearbyStops extends FragmentActivity {
 				stopMarkersMap, polyline);
 	}
 
-	public void showNearbyStops() {
-
+	public void showNearbyStops() 
+	{
 		userPos = mMap.addMarker(new MarkerOptions()
 				.position(DEFAULT_LOCATION)
 				.title("Your Position")
@@ -362,42 +374,24 @@ public class NearbyStops extends FragmentActivity {
 		}
 
 		// map2Fragment = new ShowRouteFragment();
-
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
-
-		// For debugging, uncomment this line below so that the tutorial doesn't
-		// show at all.
-		// showTut = false;
-
-		if (showTut)
-			showFirstTimeTutorial();
-
 	}
 
-	public void showFirstTimeTutorial() {
+	public void showFirstTimeTutorial() 
+	{
 		mPager = (ViewPager) findViewById(R.id.pager);
-		mPagerAdapter = new TutorialPagerAdapter(getSupportFragmentManager(),
-				mPager);
+		mPagerAdapter = new TutorialPagerAdapter(getSupportFragmentManager(), mPager);
 		mPager.setAdapter(mPagerAdapter);
+		
 		mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 			@Override
 			public void onPageSelected(int position) {
-				// When changing pages, reset the action bar actions since they
-				// are dependent
-				// on which page is currently active. An alternative approach is
-				// to have each
-				// fragment expose actions itself (rather than the activity
-				// exposing actions),
-				// but for simplicity, the activity provides the actions in this
-				// sample.
 				invalidateOptionsMenu();
 			}
 		});
 	}
 
-	public void showRoute() {
-
+	public void showRoute() 
+	{
 		routeStopsLoader.requestRouteStops(selectedRoute);
 	}
 
@@ -462,8 +456,7 @@ public class NearbyStops extends FragmentActivity {
 						// + (Fragment)manager.getFragments().get(0));
 						if (currFrag.getClass() == SupportMapFragment.class) {
 							// assume seeing NearbyStops
-							StackState state = stackStates.get(stackStates
-									.size() - 1);
+							StackState state = stackStates.get(stackStates.size() - 1);
 							if (state == StackState.NearbyStops) {
 								// Should check if need to refresh or not
 								showNearbyStops();
@@ -522,26 +515,29 @@ public class NearbyStops extends FragmentActivity {
 	/*
 	 * public ShowRouteFragment getMap2Fragment() { return map2Fragment; }
 	 * public void setMap2Fragment(ShowRouteFragment map2Fragment) {
-	 * this.map2Fragment= map2Fragment; <<<<<<< HEAD }
+	 * this.map2Fragment= map2Fragment; }
 	 */
 
-	private class TutorialPagerAdapter extends FragmentStatePagerAdapter {
+	private class TutorialPagerAdapter extends FragmentStatePagerAdapter 
+	{
 		private View pagerView;
 
-		public TutorialPagerAdapter(FragmentManager fm, View parent) {
+		public TutorialPagerAdapter(FragmentManager fm, View parent) 
+		{
 			super(fm);
 			pagerView = parent;
 		}
 
 		@Override
-		public Fragment getItem(int position) {
+		public Fragment getItem(int position) 
+		{
 			return TutorialFragment.create(position, pagerView);
 		}
 
 		@Override
-		public int getCount() {
+		public int getCount()
+		{
 			return NUM_PAGES;
 		}
 	}
-
 }
