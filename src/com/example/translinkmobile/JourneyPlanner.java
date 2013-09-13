@@ -70,6 +70,8 @@ public class JourneyPlanner extends Fragment implements
 	static int day;
 	static int hour;
 	static int minute;
+	static Calendar currentDate = Calendar.getInstance();
+	static Calendar selectedDate = Calendar.getInstance();
 	
 	double[] userLoc;
 
@@ -85,6 +87,13 @@ public class JourneyPlanner extends Fragment implements
 		day = c.get(Calendar.DAY_OF_MONTH);
 		hour = c.get(Calendar.HOUR_OF_DAY);
 		minute = c.get(Calendar.MINUTE);
+		
+		currentDate.clear();
+		currentDate.set(year, month, day);
+		
+		selectedDate.clear();
+		selectedDate.set(year, month, day);
+		
 		date = (month+1) + "/" + day + "/" + year;
 		
 		String temp;
@@ -177,29 +186,37 @@ public class JourneyPlanner extends Fragment implements
 	}
 
 	private void getLocIds() {
-		getLocationId(fromText.getText().toString(), true);
-		getLocationId(destText.getText().toString(), false);                                                                                     
+		
+		String origin = fromText.getText().toString();
+		String destination = destText.getText().toString();
+		
+		if (destination == null || destination.equalsIgnoreCase(""))
+		{
+			// User did not enter the destination
+			Toast.makeText(getActivity().getApplicationContext(), "Please enter the destination!", Toast.LENGTH_SHORT).show();
+		    return;
+		}
+		
+		if(selectedDate.before(currentDate))
+		{
+			// The entered date has already passed
+			Toast.makeText(getActivity().getApplicationContext(), "The entered date has already passed!", Toast.LENGTH_SHORT).show();
+		    return;
+		}
+		
+		if (origin == null || origin.equalsIgnoreCase(""))
+		{
+			// User did not input the from location, so use current location
+			origin = userLoc[0] + ", " + userLoc[1];
+		}
+
+		getLocationId(origin);
+		getLocationId(destination);                                                                                     
 	}
 
-	private void getLocationId(String loc, boolean from) {
-		
-		if (loc == null || loc.equalsIgnoreCase("")) {
-			
-			if(from)
-			{
-				// User did not input the from location, so use current location
-				loc = userLoc[0] + ", " + userLoc[1];
-			}
-			else
-			{
-				// User did not enter the destination
-				Toast.makeText(getActivity().getApplicationContext(), "Please enter the destination!", Toast.LENGTH_SHORT).show();
-			    return;
-			}	
-		}
-			
-		String url = "http://deco3801-010.uqcloud.net/resolve.php?input="
-				+ Uri.encode(loc);
+	private void getLocationId(String loc) 
+	{
+		String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" + Uri.encode(loc);
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
 		request.execute(url);
@@ -254,14 +271,18 @@ public class JourneyPlanner extends Fragment implements
 			DatePickerDialog.OnDateSetListener {
 
 		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
+		public Dialog onCreateDialog(Bundle savedInstanceState) 
+		{
 			// Use the current date as the default date in the picker
-
 			// Create a new instance of DatePickerDialog and return it
 			return new DatePickerDialog(getActivity(), this, year, month, day);
 		}
 
-		public void onDateSet(DatePicker view, int year, int month, int day) {
+		public void onDateSet(DatePicker view, int year, int month, int day) 
+		{
+			selectedDate.clear();
+			selectedDate.set(year, month, day);
+			
 			// Do something with the date chosen by the user
 			date = (month+1) + "/" + day + "/" + year;
 			dateButton.setText(date);
