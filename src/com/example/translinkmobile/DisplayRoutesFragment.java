@@ -121,7 +121,12 @@ public class DisplayRoutesFragment extends Fragment {
         			fragment = act.getMap2Fragment();
         		}*/
         		
-        		
+        		 NearbyStops nearbyStops =  (NearbyStops)getActivity();
+                 // Should move these steps to NearbyStops itself and add check whether need to refresh or not
+                 nearbyStops.removeAllMarkers();
+                 nearbyStops.showRoute();
+                 nearbyStops.addStateToStack(StackState.ShowRoute);
+                 
         		FragmentTransaction transaction = manager.beginTransaction();
         		Log.d("Drawer", "a");
                 transaction.remove(thisVar);
@@ -130,11 +135,7 @@ public class DisplayRoutesFragment extends Fragment {
         		Log.d("Drawer", "c");
                 transaction.commit();
                 Log.d("Drawer", "d");
-                NearbyStops nearbyStops =  (NearbyStops)getActivity();
-                // Should move these steps to NearbyStops itself and add check whether need to refresh or not
-                nearbyStops.removeAllMarkers();
-                nearbyStops.showRoute();
-                nearbyStops.addStateToStack(StackState.ShowRoute);
+               
                 
         		/*
         		FragmentTransaction transaction = manager.beginTransaction();

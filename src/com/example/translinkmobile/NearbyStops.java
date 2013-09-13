@@ -83,7 +83,8 @@ public class NearbyStops extends FragmentActivity {
 	private Polyline polyline;
 
 	// private ShowRouteFragment map2Fragment;
-	private ArrayList<StackState> stackStates;
+	//private ArrayList<StackState> stackStates;
+	private HashMap<Integer, StackState> stackStatesMap;
 	private int previousBackStackPosition;
 	private boolean viewingMap;
 
@@ -112,8 +113,10 @@ public class NearbyStops extends FragmentActivity {
 		// Set the fragment manager so it will pop elements from the stackStates
 		FragmentManager manager = getSupportFragmentManager();
 		manager.addOnBackStackChangedListener(getBackListener());
-		stackStates = new ArrayList<StackState>();
-		stackStates.add(StackState.NearbyStops);
+		//stackStates = new ArrayList<StackState>();
+		//stackStates.add(StackState.NearbyStops);
+		stackStatesMap = new HashMap<Integer,StackState>();
+		stackStatesMap.put(0, StackState.NearbyStops);
 		previousBackStackPosition = 0;
 		viewingMap = true;
 
@@ -469,9 +472,9 @@ public class NearbyStops extends FragmentActivity {
 				FragmentManager manager = getSupportFragmentManager();
 
 				if (manager != null) {
-					for (int i=0; i<stackStates.size(); i++) {
-						Log.d("Drawer", "stackStates("+i+")="+stackStates.get(i));
-					}
+					//for (int i=0; i<stackStates.size(); i++) {
+					//	Log.d("Drawer", "stackStates("+i+")="+stackStates.get(i));
+					//}
 					int stackCount = manager.getBackStackEntryCount();
 					Log.d("Drawer", "previousStackCount=" + previousBackStackPosition + " stackCount=" + stackCount);
 					//if (stackCount == 0) {
@@ -479,14 +482,15 @@ public class NearbyStops extends FragmentActivity {
 					
 					if (previousBackStackPosition < stackCount){
 						//do nothing because back button was not actually pushed
-						if (manager.getFragments().get(stackCount-1).getClass() == SupportMapFragment.class) {
-							viewingMap = true;
-						}
+					//	if (manager.getFragments().get(stackCount-1).getClass() == SupportMapFragment.class) {
+					//		viewingMap = true;
+					//	}
 					} else {
 						
 						
 						Fragment currFrag = (Fragment) manager.getFragments()
 								.get(stackCount);
+						Log.d("Debug", "currFrag class is "+currFrag.getClass());
 						currFrag.onResume();
 						
 						// Log.d("Drawer", "First backstatefragment is called "
@@ -497,9 +501,10 @@ public class NearbyStops extends FragmentActivity {
 							StackState state;
 							
 							
-							state = stackStates.get(stackStates
-									.size() - 1);
+							//state = stackStates.get(stackStates
+							//		.size() - 1);
 							
+							state = stackStatesMap.get(stackCount);
 							
 							if (state == StackState.NearbyStops) {
 								// Should check if need to refresh or not
@@ -510,20 +515,20 @@ public class NearbyStops extends FragmentActivity {
 								Log.d("Drawer", "starting showroute");
 								showRoute();
 							}
-							stackStates.remove(stackStates.size()-1);
+							//stackStates.remove(stackStates.size()-1);
 						} else {
 							if (viewingMap) {
 								//remove the map state from fragment just viewing
-								stackStates.remove(stackStates.size()-1);
+								//stackStates.remove(stackStates.size()-1);
 							}
 							viewingMap = false;
 						}
 					}
 					previousBackStackPosition = stackCount;
 					//ensure NearbyStops is still on bottom of stateStack
-					if (stackStates.size() == 0) {
-						stackStates.add(StackState.NearbyStops);
-					}
+					//if (stackStates.size() == 0) {
+					//	stackStates.add(StackState.NearbyStops);
+					//}
 				}
 			}
 		};
@@ -561,7 +566,10 @@ public class NearbyStops extends FragmentActivity {
 	
 
 	public void addStateToStack(StackState state) {
-		stackStates.add(state);
+		FragmentManager manager = getSupportFragmentManager();
+		int stackCount = manager.getBackStackEntryCount();
+		stackStatesMap.put(stackCount+1, state);
+		Log.d("Drawer", "Put " + state+ " into " + (stackCount-1));
 	}
 
 	public void removeAllMarkers() {
