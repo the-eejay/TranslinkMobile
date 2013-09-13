@@ -7,7 +7,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -125,7 +127,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 			* ParentLocation: {Id, Position: {Lat, Lng}}, Routes: [Code, Name]]}
 			*/
 			Object obj = JSONValue.parse(result);
-			//try {
+			try {
 				
 				JSONArray array = (JSONArray)((JSONObject)obj).get("Stops");
 				for (int i=0; i<array.size(); i++) {
@@ -148,11 +150,10 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 					output.add(stop);
 				}
 				return output;
-			//} catch (Exception e) {
+			} catch (Exception e) {
 				//No stops were found for the given location, or there was some network error
-				//Log.d("Location", e.toString());
-				//return null;
-			//}/
+				return null;
+			}
 		} else {
 			return null;
 		}

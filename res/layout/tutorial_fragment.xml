@@ -20,39 +20,58 @@
     android:layout_height="match_parent"
     android:background="@color/transparent_black">
 
-    <!-- Dummy content. -->
-    <LinearLayout 
-     android:layout_width="300dp"
-     android:layout_height="700dp"
-     android:orientation="vertical"
-     android:padding="16dp"
-     android:background="@color/drawer_background"
-     android:layout_gravity="center">
-
-        <TextView 
-            android:id="@+id/tutorial_title"
-            style="?android:textAppearanceLarge"
-            android:textStyle="bold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-
-        <TextView 
-            style="?android:textAppearanceMedium"
-            android:lineSpacingMultiplier="1.2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/lorem_ipsum" />
-
-        <Button
-            android:id="@+id/finish_tut_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center"
-            android:text="@string/finish_tutorial" 
-            android:visibility="gone"/>
-
-    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/tut_container"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content" 
+	    android:layout_gravity="center"
+	    android:layout_marginLeft="25dp">
+	    
+	    <LinearLayout 
+	         android:id="@+id/tutorial_box"
+		     android:layout_width="wrap_content"
+		     android:layout_height="wrap_content"
+		     android:orientation="vertical"
+		     android:padding="12dp"
+		     android:background="@color/drawer_background"
+		     android:layout_gravity="center">
+	
+	        <TextView 
+	            android:id="@+id/tutorial_title"
+	            style="?android:textAppearanceLarge"
+	            android:textStyle="bold"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_marginBottom="16dp" />
+	       
+	 	   <ImageView
+	            android:id="@+id/tutorial_image"
+	            android:layout_width="250dp"
+	            android:layout_height="250dp"
+	            android:src="@drawable/tutorial1" 
+	            android:contentDescription="@string/tutorial_image_desc"/>
+	  
+	        <Button
+	            android:id="@+id/finish_tut_button"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginTop="20dp"
+	            android:layout_gravity="center"
+	            android:text="@string/finish_tutorial" 
+	            android:visibility="invisible"/>
+	
+	    </LinearLayout>
+	    
+	    <ImageView
+	            android:id="@+id/next_arrow"
+	            android:layout_width="50dp"
+	            android:layout_height="70dp"
+	            android:layout_toRightOf="@id/tutorial_box"
+	            android:layout_marginTop="150dp"
+	            android:gravity="center"
+	            android:src="@drawable/list_item_arrow" 
+	            android:contentDescription="@string/next_arrow_desc"/>
+    
+    </RelativeLayout>
 
 </ScrollView>

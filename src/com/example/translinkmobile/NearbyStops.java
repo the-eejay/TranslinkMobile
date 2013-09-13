@@ -59,7 +59,7 @@ public class NearbyStops extends FragmentActivity {
 	 */
 	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823);
 	private final String TITLE = "Nearby Stops & Service ETA";
-	public static final int NUM_PAGES = 2;
+	public static final int NUM_PAGES = 4;
 	public static final String PREFS_NAME = "MyPrefsFile";
 	public static final String TUTORIAL_SETTING = "SHOW_TUTORIAL";
 
@@ -128,7 +128,7 @@ public class NearbyStops extends FragmentActivity {
 		boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
 
 		// For debugging, uncomment this line below so that the tutorial doesn't show at all.
-		// showTut = false;
+		showTut = true;
 
 		if (showTut)
 			showFirstTimeTutorial();

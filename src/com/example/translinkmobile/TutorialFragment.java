@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -77,10 +78,33 @@ public class TutorialFragment extends Fragment implements OnClickListener {
         ((TextView) rootView.findViewById(R.id.tutorial_title)).setText(
                 getString(R.string.title_template_step, mPageNumber + 1));
         
+        ImageView tutorialImage = (ImageView) rootView.findViewById(R.id.tutorial_image);
+        
+        switch(mPageNumber+1)
+        {
+        	case 1:
+        		break;
+        	case 2:
+        		tutorialImage.setImageResource(R.drawable.tutorial2);
+        		break;
+        	case 3:
+        		tutorialImage.setImageResource(R.drawable.tutorial3);
+        		break;
+        	case 4:
+        		tutorialImage.setImageResource(R.drawable.tutorial4);
+        		break;
+        	default:
+        		break;
+        }
+        
         if(mPageNumber + 1 == NearbyStops.NUM_PAGES)
         {
         	Button button = (Button) rootView.findViewById(R.id.finish_tut_button);
         	button.setVisibility(View.VISIBLE);
+        	
+        	ImageView arrow = (ImageView) rootView.findViewById(R.id.next_arrow);
+        	arrow.setVisibility(View.INVISIBLE);
+        	
         	button.setOnClickListener(this);
         }
 

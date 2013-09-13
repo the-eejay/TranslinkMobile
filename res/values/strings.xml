@@ -21,9 +21,10 @@
     <string name="to">To:</string>
     <string name="tutorial">Tutorial</string>
     <string name="finish_tutorial">Okay, I get it!</string>
+    <string name="tutorial_image_desc">Tutorial image</string>
+    <string name="next_arrow_desc">Next Arrow</string>
     
-    <string name="title_template_step">Step <xliff:g id="step_number">%1$d</xliff:g>: Lorem
-        Ipsum</string>
+    <string name="title_template_step">Tutorial - Page <xliff:g id="step_number">%1$d</xliff:g></string>
     <string name="lorem_ipsum"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et magna ut erat elementum cursus in quis ipsum.]]></string>
     
     <string-array name="menu_array">
