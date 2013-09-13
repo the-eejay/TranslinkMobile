@@ -293,7 +293,7 @@ public class NearbyStops extends FragmentActivity {
 		mMap.setMyLocationEnabled(true);
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
 		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
-				stopMarkersMap, polyline);
+				stopMarkersMap, polyline, userLatLng);
 		userLatLng = new LatLng(0,0);
 		updatedOnce = false;
 	}
@@ -321,11 +321,7 @@ public class NearbyStops extends FragmentActivity {
 		//test
 		stopLoader.addSavedStopMarkersToMap(true);
 		routeStopsLoader.removeLineFromMap();
-		
-		
-
-	
-
+		getActionBar().setTitle(TITLE);
 
 		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 
@@ -360,13 +356,15 @@ public class NearbyStops extends FragmentActivity {
 		mMap.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
 
 			@Override
-			public boolean onMyLocationButtonClick() {
+			public boolean onMyLocationButtonClick() 
+			{
 				updatedOnce = false;
 				showNearbyStops();
 				if (userLatLng.latitude != 0 && userLatLng.longitude != 0) {
 					locationChanged(userLatLng);
 				}
-				return false;
+				
+				return true;
 			}
 			
 		});
@@ -401,8 +399,7 @@ public class NearbyStops extends FragmentActivity {
 			}
 		};
 
-		// Register the listener with the Location Manager to receive location
-		// updates
+		// Register the listener with the Location Manager to receive location updates
 		// Check every 1 minute and only if location has changed by 50 meters.
 		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
 			Log.d("Location", "using network");
@@ -432,10 +429,6 @@ public class NearbyStops extends FragmentActivity {
 
 		if (showTut)
 			showFirstTimeTutorial();
-		
-		
-
-
 	}
 
 	public void showFirstTimeTutorial() 

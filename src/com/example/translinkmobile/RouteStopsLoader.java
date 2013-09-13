@@ -9,7 +9,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -31,17 +33,19 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private State state;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
-	private int[] markerIcons = {R.drawable.bus_geo, R.drawable.train_geo, R.drawable.ferry_geo};
+	private int[] markerIcons = {R.drawable.bus_geo_border, R.drawable.train_geo_border, R.drawable.ferry_geo_border};
 	private Route route2;
 	private Polyline polyline;
+	private LatLng userLatLng;
 
-	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline) {
+	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline, LatLng loc) {
 		isLoading = false;
 		this.map = map;
 		this.stopMarkers = stopMarkers;
 		this.stopMarkersMap = stopMarkersMap;
 		route2= null;
 		this.polyline = polyline;
+		this.userLatLng = loc;
 	}
 
 	/**
@@ -171,8 +175,10 @@ public void requestRouteLine(Route route) {
 		stopMarkers.clear();*/
 		
 		// Add new stop markers to map
-		if (stops != null) {
-			for (Stop stop : stops) {
+		if (stops != null) 
+		{
+			for (Stop stop : stops)
+			{
 				int serviceType = stop.getServiceType();
 				Log.d("serviceType", "" + serviceType);
 				
@@ -184,13 +190,20 @@ public void requestRouteLine(Route route) {
 						.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
 				stopMarkers.add(m);
 				stopMarkersMap.put(m, stop);
-						
-					
-				
-
 			}
-		} 
+			
+			map.setOnInfoWindowClickListener(null);
+			map.setOnMapClickListener(null);
+			map.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
 
+				@Override
+				public boolean onMyLocationButtonClick() 
+				{
+					return false;
+				}
+				
+			});
+		} 
 	}
 	
 	public String parseJSONToLine() {
