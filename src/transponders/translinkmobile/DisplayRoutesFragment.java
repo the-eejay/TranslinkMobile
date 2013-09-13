@@ -1,10 +1,10 @@
-package com.example.translinkmobile;
+package transponders.translinkmobile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.example.translinkmobile.NearbyStops.StackState;
+import transponders.translinkmobile.NearbyStops.StackState;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

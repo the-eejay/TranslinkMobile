@@ -1,4 +1,4 @@
-package com.example.translinkmobile;
+package transponders.translinkmobile;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;

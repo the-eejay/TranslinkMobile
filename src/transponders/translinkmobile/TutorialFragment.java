@@ -1,4 +1,4 @@
-package com.example.translinkmobile;
+package transponders.translinkmobile;
 
 /*
  * Copyright 2012 The Android Open Source Project

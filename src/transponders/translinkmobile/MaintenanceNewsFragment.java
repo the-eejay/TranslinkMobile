@@ -1,4 +1,4 @@
-package com.example.translinkmobile;
+package transponders.translinkmobile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
