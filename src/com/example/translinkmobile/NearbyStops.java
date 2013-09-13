@@ -128,7 +128,7 @@ public class NearbyStops extends FragmentActivity {
 		boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
 
 		// For debugging, uncomment this line below so that the tutorial doesn't show at all.
-		showTut = true;
+		// showTut = false;
 
 		if (showTut)
 			showFirstTimeTutorial();
