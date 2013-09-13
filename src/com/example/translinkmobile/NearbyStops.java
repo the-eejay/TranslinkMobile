@@ -35,6 +35,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -187,7 +188,7 @@ public class NearbyStops extends FragmentActivity {
 	 *            the latitude and longitude of the new location.
 	 */
 	public void locationChanged(LatLng location) {
-		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+		mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
 		stopLoader
 				.requestStopsNear(location.latitude, location.longitude, 1000);
 	}
@@ -289,6 +290,7 @@ public class NearbyStops extends FragmentActivity {
 			// The application is still unable to load the map.
 		}
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
+		mMap.setMyLocationEnabled(true);
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
 		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
 				stopMarkersMap, polyline);
@@ -355,6 +357,19 @@ public class NearbyStops extends FragmentActivity {
 			}
 		});
 
+		mMap.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
+
+			@Override
+			public boolean onMyLocationButtonClick() {
+				updatedOnce = false;
+				showNearbyStops();
+				if (userLatLng.latitude != 0 && userLatLng.longitude != 0) {
+					locationChanged(userLatLng);
+				}
+				return false;
+			}
+			
+		});
 		
 		// Acquire a reference to the system Location Manager
 		LocationManager locationManager = (LocationManager) this
