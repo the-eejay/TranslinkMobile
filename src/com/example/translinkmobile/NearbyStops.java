@@ -242,6 +242,11 @@ public class NearbyStops extends FragmentActivity {
 			mDrawerList.setItemChecked(pos, true);
 			setTitle(TITLE);
 			mDrawerLayout.closeDrawer(mDrawerList);
+			updatedOnce = false;
+			showNearbyStops();
+			if (userLatLng.latitude != 0 && userLatLng.longitude != 0) {
+				locationChanged(userLatLng);
+			}
 			return;
 		case 1:
 			fragment = new JourneyPlanner();
