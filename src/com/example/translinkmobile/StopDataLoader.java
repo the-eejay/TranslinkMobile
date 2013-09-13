@@ -94,51 +94,9 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 			
 			// Add new stop markers to map
 			stops = getStopsNear();
-			ArrayList<String> usedParentIds = new ArrayList<String>();
-			if (stops != null) {
-				for (Stop stop : stops) {
-					int serviceType = stop.getServiceType();
-					
-					if (stop.hasParent()) {
-						//stops with parent must only be added as markers if not
-						//there's not already a stop added for that position
-						boolean isAlreadyUsed = false;
-						for (String str : usedParentIds) {
-							if (str.equals(stop.getParentId())) {
-								isAlreadyUsed = true;
-								break;
-							}
-						}
-						
-						if (!isAlreadyUsed) {
-							
-							// Get just the parent stop name, without the "LM:" thing
-							String stopName = stop.getParentId().split(":")[2];
-							
-							Marker m = map.addMarker(new MarkerOptions()
-									.position(stop.getParentPosition())
-									.title(stopName)
-									.snippet("Click here for more")
-									.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
-							stopMarkers.add(m);
-							stopMarkersMap.put(m, stop);
-							
-						}
-					} else {
-						
-						//the stop doesn't have parent. Simply add to map.
-						Marker m = map.addMarker(new MarkerOptions()
-								.position(stop.getPosition())
-								.title(stop.getDescription())
-								.snippet("Click here for more")
-								.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
-						stopMarkers.add(m);
-						stopMarkersMap.put(m, stop);
-						
-					}
-
-				}
-			} 
+			//((NearbyStops)getActivity()).setSavedStops(stops);
+			addStopMarkersToMap(stops);
+			
 		}
 
 	}
@@ -231,5 +189,67 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 			}
 		}
 		return output;
+	}
+	
+	public void addStopMarkersToMap(ArrayList<Stop> stops) {
+		ArrayList<String> usedParentIds = new ArrayList<String>();
+		if (stops != null) {
+			for (Stop stop : stops) {
+				int serviceType = stop.getServiceType();
+				
+				if (stop.hasParent()) {
+					//stops with parent must only be added as markers if not
+					//there's not already a stop added for that position
+					boolean isAlreadyUsed = false;
+					for (String str : usedParentIds) {
+						if (str.equals(stop.getParentId())) {
+							isAlreadyUsed = true;
+							break;
+						}
+					}
+					
+					if (!isAlreadyUsed) {
+						
+						// Get just the parent stop name, without the "LM:" thing
+						String stopName = stop.getParentId().split(":")[2];
+						
+						Marker m = map.addMarker(new MarkerOptions()
+								.position(stop.getParentPosition())
+								.title(stopName)
+								.snippet("Click here for more")
+								.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
+						stopMarkers.add(m);
+						stopMarkersMap.put(m, stop);
+						
+					}
+				} else {
+					
+					//the stop doesn't have parent. Simply add to map.
+					Marker m = map.addMarker(new MarkerOptions()
+							.position(stop.getPosition())
+							.title(stop.getDescription())
+							.snippet("Click here for more")
+							.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
+					stopMarkers.add(m);
+					stopMarkersMap.put(m, stop);
+					
+				}
+			}
+		}
+	}
+	
+	public void addSavedStopMarkersToMap(boolean clearOldMarkers) {
+		if (clearOldMarkers && stops != null) {
+			if (stops.size() > 0) {
+				for (Marker m: stopMarkers) {
+					m.setVisible(false);
+					m.remove();
+				}
+				
+				
+			}
+		}
+		addStopMarkersToMap(stops);
+		
 	}
 }

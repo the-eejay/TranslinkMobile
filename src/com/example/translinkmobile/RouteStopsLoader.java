@@ -228,4 +228,12 @@ public void requestRouteLine(Route route) {
 		Log.d("JSONRequest", "line(1)=" + test.get(1).toString());
 		Log.d("JSONRequest", "line(2)=" + test.get(2).toString());
 	}
+	
+	public void removeLineFromMap() {
+		if (polyline != null) {
+			polyline.setVisible(false);
+			polyline.remove();
+			polyline = null;
+		}
+	}
 }

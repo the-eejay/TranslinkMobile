@@ -84,6 +84,8 @@ public class NearbyStops extends FragmentActivity {
 
 	// private ShowRouteFragment map2Fragment;
 	private ArrayList<StackState> stackStates;
+	private int previousBackStackPosition;
+	private boolean viewingMap;
 
 	// Navigation drawer
 	private DrawerLayout mDrawerLayout;
@@ -95,6 +97,7 @@ public class NearbyStops extends FragmentActivity {
 
 	private ViewPager mPager;
 	private PagerAdapter mPagerAdapter;
+	
 
 	@SuppressLint("NewApi")
 	@Override
@@ -104,12 +107,15 @@ public class NearbyStops extends FragmentActivity {
 
 		stopMarkers = new ArrayList<Marker>();
 		stopMarkersMap = new HashMap<Marker, Stop>();
+		
 
 		// Set the fragment manager so it will pop elements from the stackStates
 		FragmentManager manager = getSupportFragmentManager();
 		manager.addOnBackStackChangedListener(getBackListener());
 		stackStates = new ArrayList<StackState>();
 		stackStates.add(StackState.NearbyStops);
+		previousBackStackPosition = 0;
+		viewingMap = true;
 
 		// Set the title and the content of the navigation drawer.
 		mTitle = TITLE;
@@ -263,24 +269,34 @@ public class NearbyStops extends FragmentActivity {
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
 		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
 				stopMarkersMap, polyline);
+		userLatLng = new LatLng(0,0);
+		updatedOnce = false;
 	}
 
 	public void showNearbyStops() {
+		if (userPos == null) {
+			userPos = mMap.addMarker(new MarkerOptions()
+					.position(DEFAULT_LOCATION)
+					.title("Your Position")
+					.visible(false)
+					.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.location_geo_border)));
+		}
+		if (clickPos == null) {
+			clickPos = mMap.addMarker(new MarkerOptions()
+					.position(DEFAULT_LOCATION)
+					.title("Your Selected Position")
+					.visible(false)
+					.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.chosen_geo_border)));
+		}
 
-		userPos = mMap.addMarker(new MarkerOptions()
-				.position(DEFAULT_LOCATION)
-				.title("Your Position")
-				.visible(false)
-				.icon(BitmapDescriptorFactory
-						.fromResource(R.drawable.location_geo_border)));
-
-		clickPos = mMap.addMarker(new MarkerOptions()
-				.position(DEFAULT_LOCATION)
-				.title("Your Selected Position")
-				.visible(false)
-				.icon(BitmapDescriptorFactory
-						.fromResource(R.drawable.chosen_geo_border)));
-
+		//Reload the stops if any from previous nearbystops
+		//test
+		stopLoader.addSavedStopMarkersToMap(true);
+		routeStopsLoader.removeLineFromMap();
+		
+		
 		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 
 			@Override
@@ -311,7 +327,7 @@ public class NearbyStops extends FragmentActivity {
 			}
 		});
 
-		updatedOnce = false;
+		
 		// Acquire a reference to the system Location Manager
 		LocationManager locationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
@@ -372,6 +388,8 @@ public class NearbyStops extends FragmentActivity {
 
 		if (showTut)
 			showFirstTimeTutorial();
+		
+		
 
 	}
 
@@ -451,28 +469,60 @@ public class NearbyStops extends FragmentActivity {
 				FragmentManager manager = getSupportFragmentManager();
 
 				if (manager != null) {
-					if (manager.getBackStackEntryCount() == 0) {
+					for (int i=0; i<stackStates.size(); i++) {
+						Log.d("Drawer", "stackStates("+i+")="+stackStates.get(i));
+					}
+					int stackCount = manager.getBackStackEntryCount();
+					Log.d("Drawer", "previousStackCount=" + previousBackStackPosition + " stackCount=" + stackCount);
+					//if (stackCount == 0) {
 						// finish();
+					
+					if (previousBackStackPosition < stackCount){
+						//do nothing because back button was not actually pushed
+						if (manager.getFragments().get(stackCount-1).getClass() == SupportMapFragment.class) {
+							viewingMap = true;
+						}
 					} else {
+						
+						
 						Fragment currFrag = (Fragment) manager.getFragments()
-								.get(manager.getBackStackEntryCount() - 1);
-
+								.get(stackCount);
 						currFrag.onResume();
+						
 						// Log.d("Drawer", "First backstatefragment is called "
 						// + (Fragment)manager.getFragments().get(0));
 						if (currFrag.getClass() == SupportMapFragment.class) {
 							// assume seeing NearbyStops
-							StackState state = stackStates.get(stackStates
+							Log.d("Drawer", "found the supportmapfragment");
+							StackState state;
+							
+							
+							state = stackStates.get(stackStates
 									.size() - 1);
+							
+							
 							if (state == StackState.NearbyStops) {
 								// Should check if need to refresh or not
+								Log.d("Drawer", "starting nearbyStops");
 								showNearbyStops();
 							} else if (state == StackState.ShowRoute) {
 								// Should check if need to refresh or not
+								Log.d("Drawer", "starting showroute");
 								showRoute();
 							}
-							stackStates.remove(state);
+							stackStates.remove(stackStates.size()-1);
+						} else {
+							if (viewingMap) {
+								//remove the map state from fragment just viewing
+								stackStates.remove(stackStates.size()-1);
+							}
+							viewingMap = false;
 						}
+					}
+					previousBackStackPosition = stackCount;
+					//ensure NearbyStops is still on bottom of stateStack
+					if (stackStates.size() == 0) {
+						stackStates.add(StackState.NearbyStops);
 					}
 				}
 			}
@@ -507,6 +557,8 @@ public class NearbyStops extends FragmentActivity {
 	public void setSelectedRoute(Route route) {
 		selectedRoute = route;
 	}
+	
+	
 
 	public void addStateToStack(StackState state) {
 		stackStates.add(state);
