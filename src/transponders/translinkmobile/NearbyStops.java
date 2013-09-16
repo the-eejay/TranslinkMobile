@@ -637,4 +637,9 @@ public class NearbyStops extends FragmentActivity {
 			return NUM_PAGES;
 		}
 	}
+	
+	/*Testing functions */
+	public StopDataLoader getStopDataLoader() {
+		return stopLoader;
+	}
 }

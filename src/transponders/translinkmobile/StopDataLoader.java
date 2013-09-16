@@ -80,7 +80,6 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
      */
 	@Override
 	public void networkRequestCompleted(String result) {
-		isLoading = false;
 		this.result = result;
 
 		if (state == State.STOPS_NEAR) {
@@ -98,7 +97,8 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 			stops = getStopsNear();
 			//((NearbyStops)getActivity()).setSavedStops(stops);
 			addStopMarkersToMap(stops);
-			
+			isLoading = false;
+				
 		}
 
 	}
@@ -252,5 +252,11 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 		}
 		addStopMarkersToMap(stops);
 		
+	}
+	
+	
+	/*Testing functions*/
+	public ArrayList<Stop> getStops() {
+		return stops;
 	}
 }
