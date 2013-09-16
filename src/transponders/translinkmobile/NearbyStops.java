@@ -99,7 +99,9 @@ public class NearbyStops extends FragmentActivity {
 	private ViewPager mPager;
 	private PagerAdapter mPagerAdapter;
 	
-
+	// For testing purposes
+	private JourneyPlanner jpFragment = null;
+	private MaintenanceNewsFragment mnFragment = null;
 
 	@SuppressLint("NewApi")
 
@@ -250,14 +252,16 @@ public class NearbyStops extends FragmentActivity {
 			}
 			return;
 		case 1:
-			fragment = new JourneyPlanner();
+			jpFragment = new JourneyPlanner();
+			fragment = jpFragment;
 			Bundle args = new Bundle();
 			double[] userLoc = { userLatLng.latitude, userLatLng.longitude };
 			args.putDoubleArray(JourneyPlanner.ARGS_USER_LOC, userLoc);
 			fragment.setArguments(args);
 			break;
 		case 2:
-			fragment = new MaintenanceNewsFragment();
+			mnFragment = new MaintenanceNewsFragment();
+			fragment = mnFragment;
 			break;
 		default:
 			break;
@@ -642,9 +646,23 @@ public class NearbyStops extends FragmentActivity {
 	public StopDataLoader getStopDataLoader() {
 		return stopLoader;
 	}
+<<<<<<< HEAD
 	public ArrayList<Marker> getStopMarkers() {
 		return stopMarkers;
 	}
 	
 	/*End of Testing functions */
+=======
+	
+	public JourneyPlanner getJourneyPlannerFragment()
+	{
+		return jpFragment;
+	}
+	
+	public MaintenanceNewsFragment getMaintenanceNewsFragment()
+	{
+		return mnFragment;
+	}
+	
+>>>>>>> cc819f096250ee5b419f2cd36d2ab141e532eb13
 }

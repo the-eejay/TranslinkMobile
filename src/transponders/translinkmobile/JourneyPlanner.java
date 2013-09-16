@@ -64,7 +64,7 @@ public class JourneyPlanner extends Fragment implements
 	// Date/Time Settings
 	static String date;
 	static String time;
-	final Calendar c = Calendar.getInstance();
+	final static Calendar c = Calendar.getInstance();
 	static int year;
 	static int month;
 	static int day;
@@ -313,5 +313,10 @@ public class JourneyPlanner extends Fragment implements
 			time = hourOfDay + ":" + temp;
 			timeButton.setText(time);
 		}
+	}
+	
+	public static Calendar getCurrentDate()
+	{
+		return c;
 	}
 }
