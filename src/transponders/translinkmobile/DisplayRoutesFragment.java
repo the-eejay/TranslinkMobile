@@ -128,14 +128,10 @@ public class DisplayRoutesFragment extends Fragment {
                  nearbyStops.addStateToStack(StackState.ShowRoute);
                  
         		FragmentTransaction transaction = manager.beginTransaction();
-        		Log.d("Drawer", "a");
-                transaction.remove(thisVar);
-                Log.d("Drawer", "b");
-        		transaction.addToBackStack(null);
-        		Log.d("Drawer", "c");
-                transaction.commit();
-                Log.d("Drawer", "d");
-               
+        		 transaction.remove(thisVar);
+                transaction.addToBackStack(null);
+        		transaction.commit();
+                
                 
         		/*
         		FragmentTransaction transaction = manager.beginTransaction();
