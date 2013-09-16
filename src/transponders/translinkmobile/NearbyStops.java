@@ -646,13 +646,16 @@ public class NearbyStops extends FragmentActivity {
 	public StopDataLoader getStopDataLoader() {
 		return stopLoader;
 	}
-<<<<<<< HEAD
+
 	public ArrayList<Marker> getStopMarkers() {
 		return stopMarkers;
 	}
+	public Fragment getContentFragment() {
+		FragmentManager manager = getSupportFragmentManager();
+		return manager.findFragmentById(R.id.content_frame);
+	}
 	
-	/*End of Testing functions */
-=======
+
 	
 	public JourneyPlanner getJourneyPlannerFragment()
 	{
@@ -663,6 +666,7 @@ public class NearbyStops extends FragmentActivity {
 	{
 		return mnFragment;
 	}
+	/*End of Testing functions */
 	
->>>>>>> cc819f096250ee5b419f2cd36d2ab141e532eb13
+
 }

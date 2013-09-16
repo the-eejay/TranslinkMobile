@@ -220,4 +220,15 @@ public class DisplayRoutesFragment extends Fragment {
 	    }
 	
 	}
+	
+	/*Testing methods*/
+	public ArrayAdapter<String> getAdapter() {
+		return adapter;
+	}
+	public RouteDataLoader getRouteDataLoader() {
+		return routeLoader;
+	}
+	public List<String> getLines() {
+		return lines;
+	}
 }
