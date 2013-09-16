@@ -646,6 +646,9 @@ public class NearbyStops extends FragmentActivity {
 	public StopDataLoader getStopDataLoader() {
 		return stopLoader;
 	}
+	public RouteStopsLoader getRouteStopsLoader() {
+		return routeStopsLoader;
+	}
 
 	public ArrayList<Marker> getStopMarkers() {
 		return stopMarkers;
