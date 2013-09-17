@@ -243,6 +243,9 @@ public void requestRouteLine(Route route) {
 		Log.d("JSONRequest", "line(0)=" + test.get(0).toString());
 		Log.d("JSONRequest", "line(1)=" + test.get(1).toString());
 		Log.d("JSONRequest", "line(2)=" + test.get(2).toString());
+		if (lock != null) {
+			lock.countDown();
+		}
 	}
 	
 	public void removeLineFromMap() {
