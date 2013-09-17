@@ -27,6 +27,10 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 	String result;
 	WebView wv;
 	
+	// For testing purposes
+	String URL = null;
+	private JSONRequest request;
+	
 	@SuppressLint("NewApi")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
@@ -54,7 +58,7 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 				+ Uri.encode(fromId) + "&destLocId=" + Uri.encode(destId) + "&date=" + Uri.encode(date)
 				+ "&leaveOption=" + Uri.encode(leaveOption);
 		Log.d("JourneyMap request: ", urlString);
-		JSONRequest request = new JSONRequest();
+		request = new JSONRequest();
 		request.setListener(this);
 		request.execute(urlString);
 	}
@@ -68,9 +72,23 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 
 	private void parseResult(String result) {
 		Object obj = JSONValue.parse(result);
-		String url = (String) ((JSONObject) obj).get("JourneyPlannerUrl");
-		Log.d("URL: ", url.toString());
+		URL = (String) ((JSONObject) obj).get("JourneyPlannerUrl");
+		Log.d("URL: ", URL.toString());
 		/* Got the URL, time to load it into the web view */
-		wv.loadUrl(url);
+		wv.loadUrl(URL);
 	}
+	
+	/*Testing functions */
+	
+	public String getResultURL()
+	{
+		return URL;
+	}
+	
+	public JSONRequest getJSONRequest()
+	{
+		return request;
+	}
+	
+	/*End of Testing functions */
 }

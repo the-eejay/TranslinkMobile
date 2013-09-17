@@ -74,6 +74,10 @@ public class JourneyPlanner extends Fragment implements
 	static Calendar selectedDate = Calendar.getInstance();
 	
 	double[] userLoc;
+	
+	// For testing purposes
+	static ShowJourneyPage showJPFragment = null;
+	private JSONRequest request;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -148,6 +152,7 @@ public class JourneyPlanner extends Fragment implements
 			public void onClick(View v) {
 				paramList.clear();
 				if (isNetworkAvailable()) {
+					Log.d("BUTTON ONCLICK", "this function is called");
 					getLocIds();
 				} else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(
@@ -186,7 +191,7 @@ public class JourneyPlanner extends Fragment implements
 	}
 
 	private void getLocIds() {
-		
+		Log.d("BUTTON ONCLICK", "getLocIDs is called");
 		String origin = fromText.getText().toString();
 		String destination = destText.getText().toString();
 		
@@ -216,15 +221,16 @@ public class JourneyPlanner extends Fragment implements
 
 	private void getLocationId(String loc) 
 	{
+		Log.d("BUTTON ONCLICK", "getLocationId is called");
 		String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" + Uri.encode(loc);
-		JSONRequest request = new JSONRequest();
+		request = new JSONRequest();
 		request.setListener(this);
 		request.execute(url);
 	}
 
 	@Override
 	public void networkRequestCompleted(String result) {
-		
+		Log.d("BUTTON ONCLICK", "networkRequestCompleted is called");
 		paramList.add(result);
 		if (paramList.size() == 2) {
 			// We need to make two calls to resolve.php before we can continue
@@ -236,7 +242,11 @@ public class JourneyPlanner extends Fragment implements
 			String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length,
 					String[].class);
 			
-			Fragment fragment2 = new ShowJourneyPage();
+			
+			showJPFragment = new ShowJourneyPage();
+			
+			Log.d("BUTTON ONCLICK", "ShowJourneyPage() is called");
+			Fragment fragment2 = showJPFragment;
     		Bundle args = new Bundle();
             args.putStringArray(ShowJourneyPage.ARGS_JOURNEY, paramStrArray);
             fragment2.setArguments(args);
@@ -245,7 +255,7 @@ public class JourneyPlanner extends Fragment implements
     	    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     	    fragmentTransaction.replace(R.id.content_frame, fragment2);
     	    fragmentTransaction.addToBackStack(null);
-    	    fragmentTransaction.commit();
+    	    fragmentTransaction.commitAllowingStateLoss();
 		}
 	}
 	
@@ -315,8 +325,44 @@ public class JourneyPlanner extends Fragment implements
 		}
 	}
 	
+	/*Testing functions */
 	public static Calendar getCurrentDate()
 	{
 		return c;
 	}
+	
+	public void setDate(int year, int month, int day)
+	{
+		selectedDate.clear();
+		selectedDate.set(year, month, day);
+		
+		date = (month+1) + "/" + day + "/" + year;
+	}
+	
+	public void setTime(int hourOfDay, int minute)
+	{
+		String temp;
+		if(minute < 10)
+			temp = "0" + minute;
+		else
+			temp = "" + minute;
+
+		time = hourOfDay + ":" + temp;
+	}
+	
+	public JSONRequest getJSONRequest()
+	{
+		return request;
+	}
+	
+	public List<String> getResolvedParameters()
+	{
+		return paramList;
+	}
+	
+	public ShowJourneyPage getShowJourneyPageFragment()
+	{
+		return showJPFragment;
+	}
+	/*End of Testing functions */
 }

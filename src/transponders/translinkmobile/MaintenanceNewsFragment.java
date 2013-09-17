@@ -54,6 +54,12 @@ public class MaintenanceNewsFragment extends Fragment {
 	TableLayout newsTable;
 	Context tableContext;
 	TextView newsDate;
+	FragmentActivity parent;
+	
+	// For testing purposes
+	private StringBuilder allTitles = new StringBuilder();
+	private StringBuilder allURLs = new StringBuilder();
+	private DownloadWebpageTask downloadTask = null;
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,7 +83,7 @@ public class MaintenanceNewsFragment extends Fragment {
 	
 	public void checkConnection() 
     {
-		FragmentActivity parent = getActivity();
+		parent = getActivity();
 		
         ConnectivityManager connMgr = (ConnectivityManager) parent.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -87,7 +93,8 @@ public class MaintenanceNewsFragment extends Fragment {
         
         if (networkInfo != null && networkInfo.isConnected())
         {
-        	new DownloadWebpageTask().execute(url);
+        	downloadTask = new DownloadWebpageTask();
+        	downloadTask.execute(url);
         	date = calendar.getTime();
         	newsDate.setText("Last updated: " + date.toString().substring(0, 20));
         }
@@ -112,7 +119,7 @@ public class MaintenanceNewsFragment extends Fragment {
         }
     }
 	
-	private class DownloadWebpageTask extends AsyncTask<String, Void, FileInputStream> 
+	public class DownloadWebpageTask extends AsyncTask<String, Void, FileInputStream> 
     {
         @Override
         protected FileInputStream doInBackground(String... urls) 
@@ -122,7 +129,7 @@ public class MaintenanceNewsFragment extends Fragment {
             	
                 return downloadUrl(urls[0]);
             } catch (IOException e) {
-            	Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Invalid URL.", Toast.LENGTH_LONG);
+            	Toast toast = Toast.makeText(parent.getApplicationContext(), "Invalid URL.", Toast.LENGTH_LONG);
     			toast.show();
     			return null;
             }
@@ -173,7 +180,7 @@ public class MaintenanceNewsFragment extends Fragment {
             String line;            
            
            
-        	FileOutputStream fos = getActivity().openFileOutput(FILENAME, Context.MODE_PRIVATE);
+        	FileOutputStream fos = parent.openFileOutput(FILENAME, Context.MODE_PRIVATE);
     		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
     		
     		while((line  = buf.readLine()) != null)
@@ -185,7 +192,7 @@ public class MaintenanceNewsFragment extends Fragment {
     		reader.close();
     		writer.close();
     		
-    		return getActivity().openFileInput(FILENAME);
+    		return parent.openFileInput(FILENAME);
             
         }
     }
@@ -212,6 +219,9 @@ public class MaintenanceNewsFragment extends Fragment {
 		 
 					String link = eElement.getElementsByTagName("link").item(0).getTextContent();
 					String title = eElement.getElementsByTagName("title").item(0).getTextContent();
+					
+					allTitles.append(title);
+					allURLs.append(link);
 					
 					TableRow newRow = new TableRow(tableContext);
 	            	Context rowContext = newRow.getContext();
@@ -244,7 +254,7 @@ public class MaintenanceNewsFragment extends Fragment {
     	}
     	catch(Exception e)
     	{
-    		Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Exception occured.", Toast.LENGTH_LONG);
+    		Toast toast = Toast.makeText(parent.getApplicationContext(), "Exception occured.", Toast.LENGTH_LONG);
 			toast.show();
     	}
 	}
@@ -272,4 +282,21 @@ public class MaintenanceNewsFragment extends Fragment {
     	    fragmentTransaction.commit();
 		}
     }
+	
+	/*Testing functions */
+	public String getAllTitles()
+	{
+		return allTitles.toString();
+	}
+	
+	public String getAllURLs()
+	{
+		return allURLs.toString();
+	}
+	
+	public DownloadWebpageTask getDownloadWebpageTask()
+	{
+		return downloadTask;
+	}
+	/*End of Testing functions */
 }

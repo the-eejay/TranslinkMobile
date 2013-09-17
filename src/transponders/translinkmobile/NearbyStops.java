@@ -221,6 +221,7 @@ public class NearbyStops extends FragmentActivity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
+
 			selectItem(position);
 
 		}
@@ -270,7 +271,7 @@ public class NearbyStops extends FragmentActivity {
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.content_frame, fragment);
 		transaction.addToBackStack(null);
-		transaction.commit();
+		transaction.commitAllowingStateLoss();
 
 		// update selected item and title, then close the drawer
 		mDrawerList.setItemChecked(pos, true);
@@ -492,7 +493,7 @@ public class NearbyStops extends FragmentActivity {
 		transaction.setCustomAnimations(android.R.anim.slide_in_left,
 				android.R.anim.slide_out_right);
 		transaction.addToBackStack(null);
-		transaction.commit();
+		transaction.commitAllowingStateLoss();
 
 		// update selected item and title, then close the drawer
 		setTitle("Timetable");
@@ -646,13 +647,10 @@ public class NearbyStops extends FragmentActivity {
 	public StopDataLoader getStopDataLoader() {
 		return stopLoader;
 	}
-<<<<<<< HEAD
+
 	public ArrayList<Marker> getStopMarkers() {
 		return stopMarkers;
 	}
-	
-	/*End of Testing functions */
-=======
 	
 	public JourneyPlanner getJourneyPlannerFragment()
 	{
@@ -664,5 +662,5 @@ public class NearbyStops extends FragmentActivity {
 		return mnFragment;
 	}
 	
->>>>>>> cc819f096250ee5b419f2cd36d2ab141e532eb13
+	/*End of Testing functions */
 }
