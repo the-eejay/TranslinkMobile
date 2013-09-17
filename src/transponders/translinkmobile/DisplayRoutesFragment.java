@@ -3,6 +3,7 @@ package transponders.translinkmobile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import transponders.translinkmobile.NearbyStops.StackState;
 
@@ -40,6 +41,8 @@ public class DisplayRoutesFragment extends Fragment {
 	private HashMap<Integer, Route> positionRouteMap;
 	private FragmentManager manager;
 	private DisplayRoutesFragment thisVar;
+	
+	private CountDownLatch lock;
 	
 	@Override
 	public void onCreate(Bundle bundle) {
@@ -89,6 +92,9 @@ public class DisplayRoutesFragment extends Fragment {
 		
 		routeLoader = new RouteDataLoader(lines, adapter);
 		routeLoader.requestRouteTimes(stops);
+		if (lock != null) {
+			lock.countDown();
+		}
 	}
 	
 	@Override
@@ -230,5 +236,8 @@ public class DisplayRoutesFragment extends Fragment {
 	}
 	public List<String> getLines() {
 		return lines;
+	}
+	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
+		this.lock =lock;
 	}
 }
