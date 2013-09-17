@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -37,6 +38,8 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private Route route2;
 	private Polyline polyline;
 	private LatLng userLatLng;
+	private CountDownLatch lock; //to perform unit tests
+	private ArrayList<Stop> stops;
 
 	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline, LatLng loc) {
 		isLoading = false;
@@ -104,7 +107,7 @@ public void requestRouteLine(Route route) {
 				addLineToMap(line);
 			}
 		} else if (state == State.STOPS){ 
-			ArrayList<Stop> stops = parseJSONToStops();
+			stops = parseJSONToStops();
 			addMarkersToMap(stops);
 			requestRouteLine(route2);
 		}
@@ -240,6 +243,9 @@ public void requestRouteLine(Route route) {
 		Log.d("JSONRequest", "line(0)=" + test.get(0).toString());
 		Log.d("JSONRequest", "line(1)=" + test.get(1).toString());
 		Log.d("JSONRequest", "line(2)=" + test.get(2).toString());
+		if (lock != null) {
+			lock.countDown();
+		}
 	}
 	
 	public void removeLineFromMap() {
@@ -248,5 +254,14 @@ public void requestRouteLine(Route route) {
 			polyline.remove();
 			polyline = null;
 		}
+	}
+	
+	
+	/*Test methods*/
+	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
+		this.lock =lock;
+	}
+	public ArrayList<Stop> getStops() {
+		return stops;
 	}
 }

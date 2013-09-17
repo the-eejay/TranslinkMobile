@@ -647,11 +647,26 @@ public class NearbyStops extends FragmentActivity {
 	public StopDataLoader getStopDataLoader() {
 		return stopLoader;
 	}
+<<<<<<< HEAD
+=======
+	public RouteStopsLoader getRouteStopsLoader() {
+		return routeStopsLoader;
+	}
+>>>>>>> 9eafc6185c41c579e10bcc75f66b4d6b3a27a352
 
 	public ArrayList<Marker> getStopMarkers() {
 		return stopMarkers;
 	}
+	public Fragment getContentFragment() {
+		FragmentManager manager = getSupportFragmentManager();
+		return manager.findFragmentById(R.id.content_frame);
+	}
 	
+<<<<<<< HEAD
+=======
+
+	
+>>>>>>> 9eafc6185c41c579e10bcc75f66b4d6b3a27a352
 	public JourneyPlanner getJourneyPlannerFragment()
 	{
 		return jpFragment;
@@ -661,6 +676,11 @@ public class NearbyStops extends FragmentActivity {
 	{
 		return mnFragment;
 	}
-	
 	/*End of Testing functions */
+	
+<<<<<<< HEAD
+	/*End of Testing functions */
+=======
+
+>>>>>>> 9eafc6185c41c579e10bcc75f66b4d6b3a27a352
 }

@@ -3,6 +3,7 @@ package transponders.translinkmobile;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,6 +28,8 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	private List<String> list; //list - a list of Strings for use by the ArrayAdapter
 	private ArrayList<StopRoute> stopRoutes;
 	private ArrayAdapter<String> adapter; 
+	
+	private CountDownLatch lock; //to perform unit tests
 
 	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter) {
 		isLoading = false;
@@ -42,7 +45,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      * @param stops ArrayList containing all the nearby stops.
      */
 	public void requestRouteTimes(ArrayList<Stop> stops) {
-		
+		isLoading = true;
 		//Build the retreive route schedule URL
 		this.stops = stops;
 		String stopString = "";
@@ -62,7 +65,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
 		request.execute(urlString);
-		isLoading = true;
+		
 
 	}
 
@@ -75,11 +78,12 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      */
 	@Override
 	public void networkRequestCompleted(String result) {
-		isLoading = false;
+		
 		this.result = result;
 
 		setStopRouteTimes();
 		addTimesToList();
+		isLoading = false;
 	}
 
 	/**
@@ -102,11 +106,11 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		Object obj = JSONValue.parse(result);
 		JSONArray timetables = (JSONArray) ((JSONObject) obj)
 				.get("StopTimetables");
-		
+		Log.d("Route", "Found "+timetables.size()+" timetables.");
 		for (int h = 0; h < timetables.size(); h++) {
 			JSONArray trips = (JSONArray) ((JSONObject) timetables.get(h))
 					.get("Trips");
-			
+			Log.d("Route", "Found "+trips.size()+" trips.");
 			for (int i = 0; i < trips.size(); i++) {
 				JSONObject time = (JSONObject) trips.get(i);
 				String timestr = (String) time.get("DepartureTime");
@@ -115,9 +119,10 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				//Log.d("RESULT=", timestr);
 
 				//Create each StopRoute relationship and give them the times from the JSON
+				Log.d("Route", "Found "+stops.size()+" stops.");
 				for (Stop stop : stops) {
 					ArrayList<Route> routes = stop.getRoutes();
-
+					
 					for (Route r : routes) {
 						if (r.getCode().equals(routecode)) {
 							try {
@@ -144,7 +149,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      *
      */
 	public void addTimesToList() {
-		
+		Log.d("Route", "adding times to list");
 		for (int i = 0; i < list.size(); i++) {
 			String line = list.get(i);
 			ArrayList<StopRoute> matching = new ArrayList<StopRoute>();
@@ -181,7 +186,15 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 			}
 			Log.d("Route", "list(" + i + ")=" + list.get(i));
 			adapter.notifyDataSetChanged();
+			
+		}
+		if (lock != null) {
+			lock.countDown();
 		}
 	}
 
+	/*Test methods*/
+	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
+		this.lock =lock;
+	}
 }
