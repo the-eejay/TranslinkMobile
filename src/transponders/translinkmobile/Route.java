@@ -1,5 +1,7 @@
 package transponders.translinkmobile;
 
+import android.util.Log;
+
 /**
  * The java class that represents a service route object. 
  * A Route can either be a bus service, ferry service, or a train service.
@@ -18,11 +20,13 @@ public class Route {
 	private String code;
 	private String name;
 	private long type;
+	private long direction;
 
-	public Route(String code, String name, long type) {
+	public Route(String code, String name, long type, long direction) {
 		this.code = code;
 		this.name = name;
 		this.type = type;
+		this.direction = direction;
 	}
 
 	/**
@@ -45,5 +49,30 @@ public class Route {
 	
 	public long getType() {
 		return type;
+	}
+	
+	public long getDirection() {
+		return direction;
+	}
+	
+	public String getDirectionAsString() {
+		String directionStr = "";
+		if (direction == 0) directionStr="North";
+		else if (direction == 1) directionStr = "South";
+		else if (direction == 2) directionStr = "East";
+		else if (direction == 3) directionStr = "West";
+		else if (direction == 4) directionStr = "Inbound";
+		else if (direction == 5) directionStr = "Outbound";
+		else if (direction == 6) directionStr = "Inward";
+		else if (direction == 7) directionStr = "Outward";
+		else if (direction == 8) directionStr = "Upward";
+		else if (direction == 9) directionStr = "Downward";
+		else if (direction == 10) directionStr = "Clockwise";
+		else if (direction == 11) directionStr = "Counterclockwise";
+		else if (direction == 12) directionStr = "Direction1";
+		else if (direction == 13) directionStr = "Direction2";
+		else directionStr = "Null";
+		Log.d("Route", "Direction:" + direction+ " = "+directionStr);
+		return directionStr;
 	}
 }

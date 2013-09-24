@@ -90,7 +90,7 @@ public class DisplayRoutesFragment extends Fragment {
 		
 		
 		
-		routeLoader = new RouteDataLoader(lines, adapter);
+		routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
 		routeLoader.requestRouteTimes(stops);
 		if (lock != null) {
 			lock.countDown();
@@ -166,7 +166,7 @@ public class DisplayRoutesFragment extends Fragment {
     		for (Stop stop: stops) {
     			ArrayList<Route> routes = stop.getRoutes();
     			for (Route route: routes) {
-	    			boolean foundRouteIdMatch = false;
+	    			/*boolean foundRouteIdMatch = false;
 	    			for (String routeIdAlready: routeIdsAlready) {
 	    				if (routeIdAlready.equals(route.getCode())) {
 	    					foundRouteIdMatch = true;
@@ -177,14 +177,18 @@ public class DisplayRoutesFragment extends Fragment {
 	    				routeIdsAlready.add(route.getCode());
 	    				lines.add(route.getCode() + "\t\t");
 	    				positionRouteMap.put(lines.size()-1, route);
-	    			}
+	    			}*/
+    				String directionStr = route.getDirectionAsString();
+    				lines.add(route.getCode()+"\t"+directionStr);
+    				positionRouteMap.put(lines.size()-1, route);
     			}
     		}
     	} else {
     		ArrayList<Route> routes = stops.get(0).getRoutes();
     		for (int i=0; i<routes.size(); i++) {
     			String code = routes.get(i).getCode();
-    			lines.add(code + "\t\t");
+    			String directionStr = routes.get(i).getDirectionAsString();
+    			lines.add(code + "\t"+directionStr);
     			positionRouteMap.put(lines.size()-1, routes.get(i));
     			//routeMap.put(routes.get(i), code);
     		}

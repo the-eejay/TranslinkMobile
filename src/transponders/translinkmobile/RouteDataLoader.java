@@ -2,6 +2,7 @@ package transponders.translinkmobile;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -28,14 +29,16 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	private List<String> list; //list - a list of Strings for use by the ArrayAdapter
 	private ArrayList<StopRoute> stopRoutes;
 	private ArrayAdapter<String> adapter; 
+	private HashMap<Integer, Route> positionRouteMap;
 	
 	private CountDownLatch lock; //to perform unit tests
 
-	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter) {
+	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, HashMap<Integer,Route> positionRouteMap) {
 		isLoading = false;
 		this.list = list;
 		stopRoutes = new ArrayList<StopRoute>();
 		this.adapter = adapter;
+		this.positionRouteMap = positionRouteMap;
 	}
 
 	/**
@@ -106,16 +109,18 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		Object obj = JSONValue.parse(result);
 		JSONArray timetables = (JSONArray) ((JSONObject) obj)
 				.get("StopTimetables");
-		Log.d("Route", "Found "+timetables.size()+" timetables.");
+		//Log.d("Route", "Found "+timetables.size()+" timetables.");
 		for (int h = 0; h < timetables.size(); h++) {
 			JSONArray trips = (JSONArray) ((JSONObject) timetables.get(h))
 					.get("Trips");
-			Log.d("Route", "Found "+trips.size()+" trips.");
+			//Log.d("Route", "Found "+trips.size()+" trips.");
 			for (int i = 0; i < trips.size(); i++) {
 				JSONObject time = (JSONObject) trips.get(i);
 				String timestr = (String) time.get("DepartureTime");
 				String routecode = (String) ((JSONObject) time.get("Route"))
 						.get("Code");
+				long direction = (((Long) ((JSONObject) time.get("Route"))
+						.get("Direction")));
 				//Log.d("RESULT=", timestr);
 
 				//Create each StopRoute relationship and give them the times from the JSON
@@ -124,7 +129,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 					ArrayList<Route> routes = stop.getRoutes();
 					
 					for (Route r : routes) {
-						if (r.getCode().equals(routecode)) {
+						if (r.getCode().equals(routecode) && direction == r.getDirection()) {
 							try {
 								StopRoute sr = new StopRoute(stop, r);
 								//Log.d("Route",
@@ -154,17 +159,21 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 			String line = list.get(i);
 			ArrayList<StopRoute> matching = new ArrayList<StopRoute>();
 			int minTimeIndex = 0;
+			int minTimeIndex2 = 0;
 			int minStopRouteIndex = 0;
+			int minStopRouteIndex2 = 0;
 			Long min = 9999999999999l;
+			Long min2 = 9999999999999l;
 			Long currTime = System.currentTimeMillis() / 10;
 			for (int k = 0; k < stopRoutes.size(); k++) {
 				StopRoute sr = stopRoutes.get(k);
-				if (line.contains(sr.getRoute().getCode())) {
+				//if (line.contains(sr.getRoute().getCode())) {
+				if (positionRouteMap.get(i) == sr.getRoute()) {
 
 					ArrayList<Date> times = sr.getTimes();
 					
 					// Find the closest scheduled time after the current time
-					for (int j = 0; j < times.size(); j++) {
+					/*for (int j = 0; j < times.size(); j++) {
 						Long time = times.get(j).getTime();
 						//Log.d("Route", "time=" + time + " currTime=" + currTime
 						//		+ " min=" + min);
@@ -173,17 +182,38 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 							minStopRouteIndex = k;
 							min = time;
 						}
+					}*/
+					for (int j = 0; j < times.size(); j++) {
+						Long time = times.get(j).getTime();
+						if (time > currTime && time < min2) {
+							if (time < min) {
+								minTimeIndex = j;
+								minStopRouteIndex = k;
+								min = time;
+							} else {
+								minTimeIndex2 = j;
+								minStopRouteIndex2 = k;
+								min2 = time;
+							}
+							Log.d("Route", "For ("+sr.getRoute().getCode() + ","+sr.getRoute().getDirection()+") min = "+min+" min2 = "+min2);
+						}
 					}
 				}
 			}
 
+			String str = "";
 			// Add result to the line
 			if (min < 9999999999999l) {
 				long minutes = (min - currTime) / 10000;
-				list.set(i, line + "    " + minutes + " minutes until arrival");
+				str =  line + "    " + minutes + " minutes until 1st. ";
+				if (min2 < 9999999999999l) {
+					long minutes2 = (min2 - currTime) / 10000;
+					str += minutes2 + " minutes until 2nd.";
+				}
 			} else {
-				list.set(i, line + "    End Of Service");
+				str = line + "    End Of Service";
 			}
+			list.set(i, str);
 			Log.d("Route", "list(" + i + ")=" + list.get(i));
 			adapter.notifyDataSetChanged();
 			

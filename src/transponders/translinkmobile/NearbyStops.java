@@ -300,7 +300,7 @@ public class NearbyStops extends FragmentActivity {
 			// The application is still unable to load the map.
 		}
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
-		mMap.setMyLocationEnabled(true);
+		mMap.setMyLocationEnabled(false);
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
 		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
 				stopMarkersMap, polyline, userLatLng);
@@ -445,12 +445,25 @@ public class NearbyStops extends FragmentActivity {
 			Log.d("Location", "using gps");
 			locationManager.requestLocationUpdates(
 					LocationManager.GPS_PROVIDER, 60000, 50, locationListener);
+			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			if (location != null) {
+				userLatLng = new LatLng(location.getLatitude(),
+						location.getLongitude());
+				userPos.setVisible(true);
+				userPos.setPosition(userLatLng);
+				if (!updatedOnce) {
+					locationChanged(userLatLng);
+				}
+				updatedOnce = true;
+			}
 		} else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) &&
 					(mobile == NetworkInfo.State.CONNECTED || mobile == NetworkInfo.State.CONNECTING)) {
 				Log.d("Location", "using network");
 				locationManager.requestLocationUpdates(
 						LocationManager.NETWORK_PROVIDER, 60000, 50,
 						locationListener);
+				
+				
 		} else {
 			// No location provider enabled. Use the default location for now
 			Log.d("Location", "cannot find user location");
