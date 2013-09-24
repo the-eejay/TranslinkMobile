@@ -15,6 +15,9 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.NetworkInfo.State;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -29,13 +32,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+//import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -301,6 +306,23 @@ public class NearbyStops extends FragmentActivity {
 				stopMarkersMap, polyline, userLatLng);
 		userLatLng = new LatLng(0,0);
 		updatedOnce = false;
+		
+		final Button button = (Button) findViewById(R.id.bLocateMe);
+		button.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				updatedOnce = false;
+				showNearbyStops();
+				if (userLatLng.latitude != 0 && userLatLng.longitude != 0) {
+					locationChanged(userLatLng);
+				}
+				
+			}
+		});
+		
+		TextView textView = (TextView) findViewById(R.id.routeInfoBox);
+		textView.setVisibility(View.INVISIBLE);
 	}
 
 
@@ -357,7 +379,7 @@ public class NearbyStops extends FragmentActivity {
 				locationChanged(arg0);
 			}
 		});
-
+		/*
 		mMap.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
 
 			@Override
@@ -372,7 +394,9 @@ public class NearbyStops extends FragmentActivity {
 				return true;
 			}
 			
-		});
+		});*/
+		
+	
 		
 		// Acquire a reference to the system Location Manager
 		LocationManager locationManager = (LocationManager) this
@@ -406,16 +430,27 @@ public class NearbyStops extends FragmentActivity {
 
 		// Register the listener with the Location Manager to receive location updates
 		// Check every 1 minute and only if location has changed by 50 meters.
-		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		State wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState();
+		State mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();
+		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) &&
+				(wifi == NetworkInfo.State.CONNECTED || wifi == NetworkInfo.State.CONNECTING)) {
 			Log.d("Location", "using network");
 			locationManager.requestLocationUpdates(
 					LocationManager.NETWORK_PROVIDER, 60000, 50,
 					locationListener);
+			
 		} else if (locationManager
 				.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			Log.d("Location", "using gps");
 			locationManager.requestLocationUpdates(
 					LocationManager.GPS_PROVIDER, 60000, 50, locationListener);
+		} else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) &&
+					(mobile == NetworkInfo.State.CONNECTED || mobile == NetworkInfo.State.CONNECTING)) {
+				Log.d("Location", "using network");
+				locationManager.requestLocationUpdates(
+						LocationManager.NETWORK_PROVIDER, 60000, 50,
+						locationListener);
 		} else {
 			// No location provider enabled. Use the default location for now
 			Log.d("Location", "cannot find user location");
@@ -453,6 +488,9 @@ public class NearbyStops extends FragmentActivity {
 	public void showRoute() 
 	{
 		routeStopsLoader.requestRouteStops(selectedRoute);
+		TextView textView = (TextView) findViewById(R.id.routeInfoBox); 
+		textView.setText(selectedRoute.getCode() + ": "+selectedRoute.getDescription());
+		textView.setVisibility(View.VISIBLE);
 	}
 
 	@Override

@@ -9,11 +9,41 @@
 		 android:layout_width="match_parent"
 		 android:layout_height="match_parent" >
 		    
+   	    	
+   	    
 			<fragment 
 			 android:id="@+id/map"
 			 android:layout_width="match_parent"
 			 android:layout_height="match_parent"
 			 class="com.google.android.gms.maps.SupportMapFragment" />
+			
+			 <RelativeLayout
+   	    	    android:layout_width="match_parent"
+        		android:layout_height="match_parent" >
+        		
+        		 <Button
+		            android:id="@+id/bLocateMe"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentRight="true"
+		            android:layout_alignParentTop="true"
+		            android:layout_centerVertical="true"
+		            android:layout_marginRight="3dp"
+		            android:clickable="true"
+		            android:onClick="locateMeButtonOnClick"
+		            android:text="@string/locate_me"
+		            android:textColor="@color/white" />
+        		 
+        		 <TextView 
+        		     android:id="@+id/routeInfoBox"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentBottom="true"
+		            android:layout_centerVertical="true"
+		            android:layout_marginBottom="3dp"
+		            android:text="@string/temp"
+		            android:textColor="@color/black" />
+   	    	</RelativeLayout>   
 			
 			<android.support.v4.view.ViewPager
 		     android:id="@+id/pager"
