@@ -550,7 +550,15 @@ public class NearbyStops extends FragmentActivity {
 					Log.d("Drawer", "previousStackCount=" + previousBackStackPosition + " stackCount=" + stackCount);
 					//if (stackCount == 0) {
 						// finish();
-					
+					for (int i =0; i <manager.getFragments().size(); i++) {
+						Fragment frag = (Fragment) manager.getFragments().get(i);
+						Log.d("Drawer", "***i="+i);
+						if (frag == null) {
+							Log.d("Drawer", "******Fragment null");
+						} else {
+							Log.d("Drawer", "***Fragment: " + frag.getClass());
+						}
+					}
 					if (previousBackStackPosition < stackCount){
 						//do nothing because back button was not actually pushed
 					//	if (manager.getFragments().get(stackCount-1).getClass() == SupportMapFragment.class) {
@@ -561,40 +569,44 @@ public class NearbyStops extends FragmentActivity {
 						
 						Fragment currFrag = (Fragment) manager.getFragments()
 								.get(stackCount);
-						Log.d("Debug", "currFrag class is "+currFrag.getClass());
-						currFrag.onResume();
-						
-						// Log.d("Drawer", "First backstatefragment is called "
-						// + (Fragment)manager.getFragments().get(0));
-						if (currFrag.getClass() == SupportMapFragment.class) {
-							// assume seeing NearbyStops
-
-							Log.d("Drawer", "found the supportmapfragment");
-							StackState state;
-							
-							
-							//state = stackStates.get(stackStates
-							//		.size() - 1);
-							
-							state = stackStatesMap.get(stackCount);
-							
-
-							if (state == StackState.NearbyStops) {
-								// Should check if need to refresh or not
-								Log.d("Drawer", "starting nearbyStops");
-								showNearbyStops();
-							} else if (state == StackState.ShowRoute) {
-								// Should check if need to refresh or not
-								Log.d("Drawer", "starting showroute");
-								showRoute();
-							}
-							//stackStates.remove(stackStates.size()-1);
+						if (currFrag == null) {
+							Log.d("Drawer", "currFrag is null");
 						} else {
-							if (viewingMap) {
-								//remove the map state from fragment just viewing
+							Log.d("Drawer", "currFrag class is "+currFrag.getClass());
+							currFrag.onResume();
+							
+							// Log.d("Drawer", "First backstatefragment is called "
+							// + (Fragment)manager.getFragments().get(0));
+							if (currFrag.getClass() == SupportMapFragment.class) {
+								// assume seeing NearbyStops
+	
+								Log.d("Drawer", "found the supportmapfragment");
+								StackState state;
+								
+								
+								//state = stackStates.get(stackStates
+								//		.size() - 1);
+								
+								state = stackStatesMap.get(stackCount);
+								
+	
+								if (state == StackState.NearbyStops) {
+									// Should check if need to refresh or not
+									Log.d("Drawer", "starting nearbyStops");
+									showNearbyStops();
+								} else if (state == StackState.ShowRoute) {
+									// Should check if need to refresh or not
+									Log.d("Drawer", "starting showroute");
+									showRoute();
+								}
 								//stackStates.remove(stackStates.size()-1);
+							} else {
+								if (viewingMap) {
+									//remove the map state from fragment just viewing
+									//stackStates.remove(stackStates.size()-1);
+								}
+								viewingMap = false;
 							}
-							viewingMap = false;
 						}
 					}
 					previousBackStackPosition = stackCount;
