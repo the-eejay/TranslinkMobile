@@ -25,6 +25,7 @@
     <string name="next_arrow_desc">Next Arrow</string>
     <string name="locate_me">Me</string>
     <string name="temp">Temp</string>
+    <string name="service_code">412</string>
     
     <string name="title_template_step">Tutorial - Page <xliff:g id="step_number">%1$d</xliff:g></string>
     <string name="lorem_ipsum"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et magna ut erat elementum cursus in quis ipsum.]]></string>

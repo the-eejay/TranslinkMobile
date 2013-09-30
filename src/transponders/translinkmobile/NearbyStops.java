@@ -67,6 +67,7 @@ public class NearbyStops extends FragmentActivity {
 	public static final int NUM_PAGES = 4;
 	public static final String PREFS_NAME = "MyPrefsFile";
 	public static final String TUTORIAL_SETTING = "SHOW_TUTORIAL";
+	public static final String SELECTED_STOP_NAME = "SELECTED_STOP_NAME";
 
 	public enum StackState {
 		NearbyStops, ShowRoute
@@ -365,7 +366,7 @@ public class NearbyStops extends FragmentActivity {
 					}
 					setSelectedStops(stops);
 
-					openTimetableFragment();
+					openTimetableFragment(marker.getTitle());
 				}
 			}
 		});
@@ -533,11 +534,15 @@ public class NearbyStops extends FragmentActivity {
 		getActionBar().setTitle(mTitle);
 	}
 
-	public void openTimetableFragment() {
+	public void openTimetableFragment(String stopName) {
 		Fragment fragment = new Fragment();
 		FragmentManager manager = getSupportFragmentManager();
 		// manager.addOnBackStackChangedListener(getBackListener());
 		fragment = new DisplayRoutesFragment();
+		
+		Bundle args = new Bundle();
+		args.putString(SELECTED_STOP_NAME, stopName);
+		fragment.setArguments(args);
 
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.content_frame, fragment);

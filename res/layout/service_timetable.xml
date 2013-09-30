@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:orientation="vertical"
+    android:background="@drawable/background_others" >
+    
+    <TextView
+        android:id="@+id/stop_name"
+        android:layout_width="fill_parent"
+        android:layout_height="70dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="@string/news"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+	<ScrollView 
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent" >
+		    
+	    <TableLayout 
+		    android:id="@+id/service_table"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:stretchColumns="*">
+	 
+		   <TableRow
+		        android:id="@+id/service_row1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content">
+		        
+		       <TextView
+		        android:id="@+id/service_color"
+		        android:layout_span="4"
+		        android:layout_height="70dp"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+		        android:paddingLeft="10dp"
+		        android:background="@color/transparent_black" 
+		        android:visibility="gone" />"
+		        
+		     <TextView
+		        android:id="@+id/service_code"
+		        android:layout_span="50"
+		        android:layout_height="70dp"
+		        android:paddingLeft="10dp"
+		        android:layout_weight="1"
+		        android:text="@string/service_code"
+		        android:textAppearance="?android:attr/textAppearanceLarge"  
+		        android:visibility="gone"/>
+		     
+		     <TextView
+		        android:id="@+id/service_time"
+		        android:layout_span="80"
+		        android:layout_height="70dp"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:layout_weight="1"
+		        android:paddingLeft="10dp" 
+		        android:visibility="gone"/>
+		        
+  		        
+		    </TableRow>
+	
+		</TableLayout>
+	
+	</ScrollView>
+</LinearLayout>

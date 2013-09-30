@@ -12,6 +12,7 @@ import org.json.simple.JSONValue;
 
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 /**
  * The class that will load the route data from Translink OPIA API. It
@@ -31,6 +32,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	private ArrayAdapter<String> adapter; 
 	private HashMap<Integer, Route> positionRouteMap;
 	
+	private List<TextView> firstArrivalTexts, secondArrivalTexts;
 	private CountDownLatch lock; //to perform unit tests
 
 	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, HashMap<Integer,Route> positionRouteMap) {
@@ -39,6 +41,17 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		stopRoutes = new ArrayList<StopRoute>();
 		this.adapter = adapter;
 		this.positionRouteMap = positionRouteMap;
+	}
+	
+	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Route> positionRouteMap) {
+		isLoading = false;
+		this.list = list;
+		stopRoutes = new ArrayList<StopRoute>();
+		this.adapter = adapter;
+		this.positionRouteMap = positionRouteMap;
+		
+		firstArrivalTexts = firsts;
+		secondArrivalTexts = seconds;
 	}
 
 	/**
@@ -49,7 +62,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      */
 	public void requestRouteTimes(ArrayList<Stop> stops) {
 		isLoading = true;
-		//Build the retreive route schedule URL
+		//Build the retrieve route schedule URL
 		this.stops = stops;
 		String stopString = "";
 		boolean isFirst = true;
@@ -206,12 +219,18 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 			if (min < 9999999999999l) {
 				long minutes = (min - currTime) / 10000;
 				str =  line + "    " + minutes + " minutes until 1st. ";
+				firstArrivalTexts.get(i).setText(minutes + " minutes until 1st.");
+				Log.d("RouteDataLoader", "setting first textview");
 				if (min2 < 9999999999999l) {
 					long minutes2 = (min2 - currTime) / 10000;
 					str += minutes2 + " minutes until 2nd.";
+					secondArrivalTexts.get(i).setText(minutes2 + " minutes until 2nd.");
+					Log.d("RouteDataLoader", "setting second textview");
 				}
 			} else {
 				str = line + "    End Of Service";
+				firstArrivalTexts.get(i).setText("End of Service.");
+				secondArrivalTexts.get(i).setText("N/A");
 			}
 			list.set(i, str);
 			Log.d("Route", "list(" + i + ")=" + list.get(i));
