@@ -219,12 +219,30 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 			if (min < 9999999999999l) {
 				long minutes = (min - currTime) / 10000;
 				str =  line + "    " + minutes + " minutes until 1st. ";
-				firstArrivalTexts.get(i).setText(minutes + " minutes until 1st.");
+				
+				String format = minutes + " Mins";
+				if(minutes >= 60)
+				{
+					long hour = minutes / 60;
+					long remainingMins = minutes % 60;
+					format = hour + " Hour " + remainingMins + " Mins";
+				}
+				
+				firstArrivalTexts.get(i).setText(format);
 				Log.d("RouteDataLoader", "setting first textview");
 				if (min2 < 9999999999999l) {
 					long minutes2 = (min2 - currTime) / 10000;
 					str += minutes2 + " minutes until 2nd.";
-					secondArrivalTexts.get(i).setText(minutes2 + " minutes until 2nd.");
+					
+					String format2 = minutes2 + " Mins";
+					if(minutes2 >= 60)
+					{
+						long hour = minutes2 / 60;
+						long remainingMins = minutes2 % 60;
+						format2 = hour + " Hour " + remainingMins + " Mins";
+					}				
+					
+					secondArrivalTexts.get(i).setText(format2);
 					Log.d("RouteDataLoader", "setting second textview");
 				}
 			} else {

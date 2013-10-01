@@ -37,26 +37,27 @@
 				android:textAppearance="?android:attr/textAppearanceLarge"
 		        android:paddingLeft="10dp"
 		        android:background="@color/transparent_black" 
-		        android:visibility="gone" />"
+		        android:visibility="gone" />
 		        
 		     <TextView
 		        android:id="@+id/service_code"
-		        android:layout_span="50"
+		        android:layout_span="30"
 		        android:layout_height="70dp"
 		        android:paddingLeft="10dp"
 		        android:layout_weight="1"
 		        android:text="@string/service_code"
 		        android:textAppearance="?android:attr/textAppearanceLarge"  
-		        android:visibility="gone"/>
+		        android:visibility="gone" />
 		     
 		     <TextView
 		        android:id="@+id/service_time"
-		        android:layout_span="80"
+		        android:layout_span="70"
 		        android:layout_height="70dp"
 				android:textAppearance="?android:attr/textAppearanceLarge"
 				android:layout_weight="1"
 		        android:paddingLeft="10dp" 
-		        android:visibility="gone"/>
+		        android:visibility="gone"
+		        android:background="@color/transparent_black" />
 		        
   		        
 		    </TableRow>

@@ -161,7 +161,8 @@ public class DisplayRoutesFragment extends Fragment {
  
             TableRow.LayoutParams param2 = new TableRow.LayoutParams();
             param2.column = 1;
-            param2.span = 50;
+            param2.span = 30;
+            param2.weight = 1;
             cell2.setLayoutParams(param2);
             
             TextView serviceCode = new TextView(rowContext);
@@ -183,11 +184,12 @@ public class DisplayRoutesFragment extends Fragment {
             LinearLayout cell3 = new LinearLayout(rowContext);
             cell3.setOrientation(LinearLayout.VERTICAL);
             cell3.setMinimumHeight(height);
-            cell3.setPadding(15, 15, 15, 15);
+            cell3.setPadding(15, 15, 0, 15);
  
             TableRow.LayoutParams param3 = new TableRow.LayoutParams();
             param3.column = 2;
-            param3.span = 80;
+            param3.span = 70;
+            param3.weight = 1;
             cell3.setLayoutParams(param3);
             
             TextView firstText = new TextView(rowContext);
