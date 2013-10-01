@@ -36,6 +36,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -56,7 +61,8 @@ import com.google.android.gms.maps.model.Polyline;
  * @author Transponders
  * @version 1.0
  */
-public class NearbyStops extends FragmentActivity {
+public class NearbyStops extends FragmentActivity implements
+GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
 	/**
 	 * Set the default location in case the application cannot detect the
@@ -105,6 +111,27 @@ public class NearbyStops extends FragmentActivity {
 	private ViewPager mPager;
 	private PagerAdapter mPagerAdapter;
 	
+	private LocationClient mLocationClient;
+	private LocationRequest mLocationRequest;
+	// Handle to SharedPreferences for this app
+    SharedPreferences mPrefs;
+    // Handle to a SharedPreferences editor
+    SharedPreferences.Editor mEditor;
+ // Milliseconds per second
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    // Update frequency in seconds
+    public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+    // Update frequency in milliseconds
+    private static final long UPDATE_INTERVAL =
+            MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
+    // The fastest update frequency, in seconds
+    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
+    // A fast frequency ceiling in milliseconds
+    private static final long FASTEST_INTERVAL =
+            MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
+    boolean mUpdatesRequested = true;
+
+	
 	// For testing purposes
 	private JourneyPlanner jpFragment = null;
 	private MaintenanceNewsFragment mnFragment = null;
@@ -138,6 +165,30 @@ public class NearbyStops extends FragmentActivity {
 		// For debugging, uncomment this line below so that the tutorial doesn't show at all.
 		// showTut = false;
 
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create();
+        // Use high accuracy
+        mLocationRequest.setPriority(
+                LocationRequest.PRIORITY_HIGH_ACCURACY);
+        // Set the update interval to 5 seconds
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        // Set the fastest update interval to 1 second
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        // Open the shared preferences
+        mPrefs = getSharedPreferences("SharedPreferences",
+                Context.MODE_PRIVATE);
+        // Get a SharedPreferences editor
+        mEditor = mPrefs.edit();
+        /*
+         * Create a new location client, using the enclosing class to
+         * handle callbacks.
+         */
+        mLocationClient = new LocationClient(this, this, this);
+        // Start with updates turned off
+        mUpdatesRequested = true;
+        mLocationClient.connect();
+
+		
 		if (showTut)
 			showFirstTimeTutorial();
 		
@@ -186,6 +237,9 @@ public class NearbyStops extends FragmentActivity {
 		};
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		
+		
+
 	}
 
 	/**
@@ -313,11 +367,12 @@ public class NearbyStops extends FragmentActivity {
 			
 			@Override
 			public void onClick(View v) {
-				updatedOnce = false;
+				/*updatedOnce = false;
 				showNearbyStops();
 				if (userLatLng.latitude != 0 && userLatLng.longitude != 0) {
 					locationChanged(userLatLng);
-				}
+				}*/
+				startUpdates();
 				
 			}
 		});
@@ -412,10 +467,11 @@ public class NearbyStops extends FragmentActivity {
 						location.getLongitude());
 				userPos.setVisible(true);
 				userPos.setPosition(userLatLng);
-				if (!updatedOnce) {
+				//if (!updatedOnce) {
 					locationChanged(userLatLng);
-				}
+				//}
 				updatedOnce = true;
+				Log.d("Location", "Location changed");
 			}
 
 			public void onStatusChanged(String provider, int status,
@@ -431,7 +487,7 @@ public class NearbyStops extends FragmentActivity {
 
 		// Register the listener with the Location Manager to receive location updates
 		// Check every 1 minute and only if location has changed by 50 meters.
-		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		/*ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		State wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState();
 		State mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();
 		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) &&
@@ -445,16 +501,16 @@ public class NearbyStops extends FragmentActivity {
 				.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			Log.d("Location", "using gps");
 			locationManager.requestLocationUpdates(
-					LocationManager.GPS_PROVIDER, 60000, 50, locationListener);
+					LocationManager.GPS_PROVIDER, 100, 0, locationListener);
 			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 			if (location != null) {
 				userLatLng = new LatLng(location.getLatitude(),
 						location.getLongitude());
 				userPos.setVisible(true);
 				userPos.setPosition(userLatLng);
-				if (!updatedOnce) {
+				//if (!updatedOnce) {
 					locationChanged(userLatLng);
-				}
+				//}
 				updatedOnce = true;
 			}
 		} else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) &&
@@ -470,7 +526,7 @@ public class NearbyStops extends FragmentActivity {
 			Log.d("Location", "cannot find user location");
 			locationChanged(new LatLng(-27.498037, 153.017823));
 		}
-
+	*/
 		// map2Fragment = new ShowRouteFragment();
 
 
@@ -739,4 +795,56 @@ public class NearbyStops extends FragmentActivity {
 		return mnFragment;
 	}
 	/*End of Testing functions */
+
+	@Override
+	public void onConnected(Bundle arg0) {
+		
+        // Display the connection status
+        // If already requested, start periodic updates
+        if (mUpdatesRequested) {
+            mLocationClient.requestLocationUpdates(mLocationRequest, this);
+            
+        }
+		
+	}
+
+	@Override
+	public void onDisconnected() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	 @Override
+	    public void onLocationChanged(Location location) {
+	        // Report to the UI that the location was updated
+	        /*String msg = "Updated Location: " +
+	                Double.toString(location.getLatitude()) + "," +
+	                Double.toString(location.getLongitude());
+	        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();*/
+		 
+				// Called when a new location is found by the network location
+				// provider.
+				userLatLng = new LatLng(location.getLatitude(),
+						location.getLongitude());
+				userPos.setVisible(true);
+				userPos.setPosition(userLatLng);
+				//if (!updatedOnce) {
+					locationChanged(userLatLng);
+				//}
+				updatedOnce = true;
+				Log.d("Location", "Location changed");
+				mLocationClient.removeLocationUpdates(this);
+			
+	    }
+
+	public void startUpdates() {
+		mLocationClient.requestLocationUpdates(mLocationRequest, this);
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
