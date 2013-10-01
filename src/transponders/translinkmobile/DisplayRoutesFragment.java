@@ -104,6 +104,7 @@ public class DisplayRoutesFragment extends Fragment {
         title.setText(displayName);
 	
 		//showLines();
+
         populateTable();
 				
 		return view;
@@ -124,6 +125,9 @@ public class DisplayRoutesFragment extends Fragment {
 	
 	public void populateTable()
 	{
+		firstArrivalTexts.clear();
+        secondArrivalTexts.clear();
+		
 		for(int i = 0; i < services.size(); i++)
 		{
 			TableRow newRow = new TableRow(tableContext);

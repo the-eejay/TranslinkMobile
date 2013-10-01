@@ -1,6 +1,7 @@
 package transponders.translinkmobile;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	
 	private List<TextView> firstArrivalTexts, secondArrivalTexts;
 	private CountDownLatch lock; //to perform unit tests
+	
+	static int hour;
+	static int minute;
 
 	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, HashMap<Integer,Route> positionRouteMap) {
 		isLoading = false;
@@ -147,8 +151,11 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 								StopRoute sr = new StopRoute(stop, r);
 								//Log.d("Route",
 								//		"longstr=" + timestr.substring(6, 18));
-								sr.addTime(new Date(Long.parseLong(timestr
-										.substring(6, 18))));
+								Date date = new Date(Long.parseLong(timestr
+										.substring(6, 18) )*10);
+								sr.addTime(date);
+								Log.d("Route", "route="+r.getCode()+" date="+date+ " t="+timestr
+										.substring(6, 18));
 								stopRoutes.add(sr);
 
 							} catch (Exception e) {
@@ -177,7 +184,11 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 			int minStopRouteIndex2 = 0;
 			Long min = 9999999999999l;
 			Long min2 = 9999999999999l;
-			Long currTime = System.currentTimeMillis() / 10;
+			//Long currTime = System.currentTimeMillis() / 10;
+			Calendar c = Calendar.getInstance();
+			Long currTime = c.getTimeInMillis();
+			Date date = new Date(currTime);
+			Log.d("Route", "current time ="+date);
 			for (int k = 0; k < stopRoutes.size(); k++) {
 				StopRoute sr = stopRoutes.get(k);
 				//if (line.contains(sr.getRoute().getCode())) {
@@ -217,7 +228,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 			String str = "";
 			// Add result to the line
 			if (min < 9999999999999l) {
-				long minutes = (min - currTime) / 10000;
+				long minutes = (min - currTime) / 60000;
 				str =  line + "    " + minutes + " minutes until 1st. ";
 				
 				String format = minutes + " Mins";
@@ -229,9 +240,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				}
 				
 				firstArrivalTexts.get(i).setText(format);
-				Log.d("RouteDataLoader", "setting first textview");
+				Log.d("RouteDataLoader", "first " + format);
 				if (min2 < 9999999999999l) {
-					long minutes2 = (min2 - currTime) / 10000;
+					long minutes2 = (min2 - currTime) / 60000;
 					str += minutes2 + " minutes until 2nd.";
 					
 					String format2 = minutes2 + " Mins";
@@ -243,7 +254,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 					}				
 					
 					secondArrivalTexts.get(i).setText(format2);
-					Log.d("RouteDataLoader", "setting second textview");
+					Log.d("RouteDataLoader", "second " + format2);
 				}
 			} else {
 				str = line + "    End Of Service";
