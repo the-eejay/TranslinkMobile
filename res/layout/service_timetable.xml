@@ -15,6 +15,11 @@
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge" />
     
+    <View
+	    android:layout_width="fill_parent"
+	    android:layout_height="1dip"
+	    android:background="@color/separator_line" />
+    
 	<ScrollView 
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent" >
@@ -57,6 +62,15 @@
 				android:layout_weight="1"
 		        android:paddingLeft="10dp" 
 		        android:background="@color/transparent_black" 
+		        android:visibility="gone" />
+		     
+		     <TextView
+		        android:id="@+id/mini_arrow"
+		        android:layout_span="5"
+		        android:layout_height="70dp"
+		        android:paddingLeft="10dp"
+		        android:layout_weight="1"
+		        android:textAppearance="?android:attr/textAppearanceLarge"  
 		        android:visibility="gone" />
 		        
   		        

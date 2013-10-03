@@ -35,9 +35,6 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	
 	private List<TextView> firstArrivalTexts, secondArrivalTexts;
 	private CountDownLatch lock; //to perform unit tests
-	
-	static int hour;
-	static int minute;
 
 	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, HashMap<Integer,Route> positionRouteMap) {
 		isLoading = false;
@@ -231,36 +228,54 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				long minutes = (min - currTime) / 60000;
 				str =  line + "    " + minutes + " minutes until 1st. ";
 				
+				// Rounding, if seconds > 30, add another minute
+				long remainingMilis1 = (min - currTime) %  60000;
+				if(remainingMilis1 > 30000)
+					minutes += 1;
+				
 				String format = minutes + " Mins";
 				if(minutes >= 60)
 				{
 					long hour = minutes / 60;
 					long remainingMins = minutes % 60;
-					format = hour + " Hour " + remainingMins + " Mins";
+				
+					String hourFormat1 = hour > 1 ? " Hours " : " Hour ";
+					String minFormat1 = remainingMins > 1 ? " Mins" : " Min";
 					
-					if(hour > 1)
-						format = hour + " Hours " + remainingMins + " Mins";
+					format = hour + hourFormat1 + remainingMins + minFormat1;
+				
 				}
 				
 				firstArrivalTexts.get(i).setText(format);
 				Log.d("RouteDataLoader", "first " + format);
+				
 				if (min2 < 9999999999999l) {
 					long minutes2 = (min2 - currTime) / 60000;
 					str += minutes2 + " minutes until 2nd.";
+					
+					// Rounding, if seconds > 30, add another minute
+					long remainingMilis2 = (min2 - currTime) %  60000;
+					if(remainingMilis2 > 30000)
+						minutes2 += 1;
 					
 					String format2 = minutes2 + " Mins";
 					if(minutes2 >= 60)
 					{
 						long hour = minutes2 / 60;
 						long remainingMins = minutes2 % 60;
-						format2 = hour + " Hour " + remainingMins + " Mins";
 						
-						if(hour > 1)
-							format = hour + " Hours " + remainingMins + " Mins";
+						String hourFormat2 = hour > 1 ? " Hours " : " Hour ";
+						String minFormat2 = remainingMins > 1 ? " Mins" : " Min";
+						
+						format2 = hour + hourFormat2 + remainingMins + minFormat2;
 					}				
 					
 					secondArrivalTexts.get(i).setText(format2);
 					Log.d("RouteDataLoader", "second " + format2);
+				}
+				else
+				{
+					secondArrivalTexts.get(i).setText("End of Service");
 				}
 			} else {
 				str = line + "    End Of Service";

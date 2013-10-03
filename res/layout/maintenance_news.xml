@@ -8,12 +8,13 @@
     <TextView
         android:id="@+id/newsDate"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:background="@drawable/editedbutton"
         android:paddingLeft="10dp"
         android:text="@string/news"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/white" />
+        android:textColor="@color/white" 
+        android:gravity="center_vertical"/>
     
 	<ScrollView 
 	    android:layout_width="fill_parent"

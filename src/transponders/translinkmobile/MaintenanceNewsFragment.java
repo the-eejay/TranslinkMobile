@@ -35,7 +35,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +58,7 @@ public class MaintenanceNewsFragment extends Fragment {
 	Context tableContext;
 	TextView newsDate;
 	FragmentActivity parent;
+	DisplayMetrics scale;
 	
 	// For testing purposes
 	private StringBuilder allTitles = new StringBuilder();
@@ -71,6 +75,7 @@ public class MaintenanceNewsFragment extends Fragment {
 		newsDate = (TextView) view.findViewById(R.id.newsDate);
 		checkConnection();
 		
+		scale = getActivity().getResources().getDisplayMetrics();
         return view;
     }
 	
@@ -97,6 +102,7 @@ public class MaintenanceNewsFragment extends Fragment {
         	downloadTask.execute(url);
         	date = calendar.getTime();
         	newsDate.setText("Last updated: " + date.toString().substring(0, 20));
+        	newsDate.setTextSize(18);
         }
         else 
         {
@@ -207,7 +213,7 @@ public class MaintenanceNewsFragment extends Fragment {
 			
 			doc.getDocumentElement().normalize();
 			NodeList nList = doc.getElementsByTagName("item");
-			Drawable arrow = getResources().getDrawable(R.drawable.show_more2);
+			Drawable arrow = getResources().getDrawable(R.drawable.mini_arrow_small);
 			
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				
@@ -227,19 +233,24 @@ public class MaintenanceNewsFragment extends Fragment {
 	            	Context rowContext = newRow.getContext();
 	            	TextView text1 = new TextView(rowContext);
 	            	
+	            	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, scale);
+	            	newRow.setMinimumHeight(height);
+	            	
 	            	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
 	                param1.column = 0;
 	                text1.setLayoutParams(param1);
 	                
 	                text1.setText(title);
-	                text1.setTextSize(14);
+	                text1.setTextSize(15);
 	                text1.setOnClickListener(new NewsListener(link));
-	                text1.setPadding(20, 15, 10, 15);
+	                text1.setPadding(20, 0, 10, 0);
+	                text1.setGravity(Gravity.CENTER_VERTICAL);
 	                text1.setCompoundDrawablePadding(0);
 	    			text1.setCompoundDrawablesWithIntrinsicBounds(null, null, arrow, null);
+	    			text1.setMinimumHeight(height);
 	    			text1.setBackgroundResource(R.drawable.selector);
-
-            		newRow.addView(text1);
+	    			
+	    			newRow.addView(text1);
             		newsTable.addView(newRow);
             		
             		View separatorLine = new View(tableContext);

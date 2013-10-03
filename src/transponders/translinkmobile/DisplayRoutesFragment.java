@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -25,6 +24,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableLayout;
@@ -60,8 +60,6 @@ public class DisplayRoutesFragment extends Fragment {
 	private Context tableContext;
 	private List<String> services = new ArrayList<String>();
 	private List<String> directions = new ArrayList<String>();
-	private List<String> firstArrivals = new ArrayList<String>();
-	private List<String> secondArrivals = new ArrayList<String>();
 	
 	private List<TextView> firstArrivalTexts = new ArrayList<TextView>();
 	private List<TextView> secondArrivalTexts = new ArrayList<TextView>();
@@ -127,7 +125,7 @@ public class DisplayRoutesFragment extends Fragment {
 	{
 		firstArrivalTexts.clear();
         secondArrivalTexts.clear();
-		
+        
 		for(int i = 0; i < services.size(); i++)
 		{
 			TableRow newRow = new TableRow(tableContext);
@@ -156,12 +154,11 @@ public class DisplayRoutesFragment extends Fragment {
             
             ///////////////////////////////////////////////////
             
-            // Service code (column 1)
+            // Service code & direction (column 1)
             LinearLayout cell2 = new LinearLayout(rowContext);
             cell2.setOrientation(LinearLayout.VERTICAL);
             cell2.setMinimumHeight(height);
-            cell2.setPadding(30, 15, 0, 15);
-            cell2.setGravity(Gravity.CENTER);
+            cell2.setGravity(Gravity.CENTER_VERTICAL);
  
             TableRow.LayoutParams param2 = new TableRow.LayoutParams();
             param2.column = 1;
@@ -171,11 +168,16 @@ public class DisplayRoutesFragment extends Fragment {
             
             TextView serviceCode = new TextView(rowContext);
             serviceCode.setText(services.get(i));
-            serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
             serviceCode.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+            serviceCode.setPadding(30, 0, -10, 0);
+            
+            if(stopType == 2)
+            	serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             
             TextView direction = new TextView(rowContext);
             direction.setText(directions.get(i));
+            direction.setPadding(30, 0, -10, 0);
 
             cell2.addView(serviceCode);
             cell2.addView(direction);
@@ -189,7 +191,6 @@ public class DisplayRoutesFragment extends Fragment {
             cell3.setOrientation(LinearLayout.VERTICAL);
             cell3.setMinimumHeight(height);
             cell3.setGravity(Gravity.CENTER_VERTICAL);
-            cell3.setPadding(45, 15, 0, 15);
  
             TableRow.LayoutParams param3 = new TableRow.LayoutParams();
             param3.column = 2;
@@ -199,14 +200,21 @@ public class DisplayRoutesFragment extends Fragment {
             
             TextView firstText = new TextView(rowContext);
             TextView secondText = new TextView(rowContext);
+            firstText.setPadding(0, 0, 0, 0);
+            secondText.setPadding(3, 0, 0, 0);
             
-            firstText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            firstText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
             firstText.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
             
             if(stopType == 1)
             	firstText.setTextColor(getResources().getColor(R.color.bus_green));
             else if(stopType == 2)
+            {
             	firstText.setTextColor(getResources().getColor(R.color.train_orange));
+            	firstText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            	firstText.setPadding(40, 0, 0, 0);
+                secondText.setPadding(43, 0, 0, 0);
+            }
             else
             	firstText.setTextColor(getResources().getColor(R.color.ferry_blue));       
             
@@ -216,7 +224,29 @@ public class DisplayRoutesFragment extends Fragment {
             secondArrivalTexts.add(secondText);
             
             newRow.addView(cell3);
-
+            
+            ////////////////////////////////////////////////////////////////////////
+            
+            // Mini arrow (column 3)
+            LinearLayout cell4 = new LinearLayout(rowContext);
+            cell4.setOrientation(LinearLayout.VERTICAL);
+            cell4.setMinimumHeight(height);
+            cell4.setGravity(Gravity.CENTER_VERTICAL);
+            
+            TableRow.LayoutParams param4 = new TableRow.LayoutParams();
+            param4.column = 3;
+            param4.span = 5;
+            param4.weight = 1;
+            cell4.setLayoutParams(param4);
+            
+            ImageView miniArrow = new ImageView(rowContext);
+            miniArrow.setImageResource(R.drawable.mini_arrow);
+            
+            cell4.addView(miniArrow);
+            newRow.addView(cell4);
+            
+            ////////////////////////////////////////////////////////////////////////
+            
             View separatorLine = new View(tableContext);
             separatorLine.setBackgroundColor(getResources().getColor(R.color.separator_line));
             separatorLine.setPadding(0, 0, 0, 0);
@@ -224,6 +254,7 @@ public class DisplayRoutesFragment extends Fragment {
             lineParam.height = 2;
             separatorLine.setLayoutParams(lineParam);
             
+            newRow.setBackgroundResource(R.drawable.selector);
             table.addView(newRow);
             table.addView(separatorLine);
 		}
@@ -330,7 +361,7 @@ public class DisplayRoutesFragment extends Fragment {
     {
     	if (stops.size()>1) {
     		//Looking at a group of stops
-    		ArrayList<String> routeIdsAlready = new ArrayList<String>();
+    		//ArrayList<String> routeIdsAlready = new ArrayList<String>();
     		for (Stop stop: stops) {
     			ArrayList<Route> routes = stop.getRoutes();
     			for (Route route: routes) {
@@ -350,8 +381,32 @@ public class DisplayRoutesFragment extends Fragment {
     				lines.add(route.getCode()+"\t"+directionStr);
     				positionRouteMap.put(lines.size()-1, route);
     				
-    				services.add(route.getCode());
-    				directions.add(directionStr);
+    				// Special route code and direction for trains
+    				if(stopType == 2)
+    				{
+    					String name = route.getDescription();
+    					String[] getTo = name.split(" to ");
+    					String[] getFrom = getTo;
+    					
+    					String to = getTo[1];
+    					if(to.contains(" - "))
+    					{
+    						to = to.split(" - ")[0];
+    					}
+    					
+    					if(getFrom[0].contains(" via "))
+    					{
+    						getFrom = getFrom[0].split(" via ");
+    					}
+    					
+    					services.add(to);
+    					directions.add("From " + getFrom[0]);
+    				}
+    				else
+    				{
+    					services.add(route.getCode());
+        				directions.add(directionStr);
+    				}
     			}
     		}
     	} else {
