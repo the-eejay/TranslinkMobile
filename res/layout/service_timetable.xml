@@ -32,7 +32,7 @@
 		        
 		       <TextView
 		        android:id="@+id/service_color"
-		        android:layout_span="4"
+		        android:layout_span="3"
 		        android:layout_height="70dp"
 				android:textAppearance="?android:attr/textAppearanceLarge"
 		        android:paddingLeft="10dp"
@@ -51,13 +51,13 @@
 		     
 		     <TextView
 		        android:id="@+id/service_time"
-		        android:layout_span="70"
+		        android:layout_span="50"
 		        android:layout_height="70dp"
 				android:textAppearance="?android:attr/textAppearanceLarge"
 				android:layout_weight="1"
 		        android:paddingLeft="10dp" 
-		        android:visibility="gone"
-		        android:background="@color/transparent_black" />
+		        android:background="@color/transparent_black" 
+		        android:visibility="gone" />
 		        
   		        
 		    </TableRow>

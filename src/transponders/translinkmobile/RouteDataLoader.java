@@ -237,6 +237,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 					long hour = minutes / 60;
 					long remainingMins = minutes % 60;
 					format = hour + " Hour " + remainingMins + " Mins";
+					
+					if(hour > 1)
+						format = hour + " Hours " + remainingMins + " Mins";
 				}
 				
 				firstArrivalTexts.get(i).setText(format);
@@ -251,6 +254,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 						long hour = minutes2 / 60;
 						long remainingMins = minutes2 % 60;
 						format2 = hour + " Hour " + remainingMins + " Mins";
+						
+						if(hour > 1)
+							format = hour + " Hours " + remainingMins + " Mins";
 					}				
 					
 					secondArrivalTexts.get(i).setText(format2);

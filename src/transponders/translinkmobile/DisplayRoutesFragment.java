@@ -141,7 +141,7 @@ public class DisplayRoutesFragment extends Fragment {
         	TextView colorBar = new TextView(rowContext);
         	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
             param1.column = 0;
-            param1.span = 4;
+            param1.span = 3;
             colorBar.setLayoutParams(param1);
             colorBar.setHeight(height);
             
@@ -160,7 +160,7 @@ public class DisplayRoutesFragment extends Fragment {
             LinearLayout cell2 = new LinearLayout(rowContext);
             cell2.setOrientation(LinearLayout.VERTICAL);
             cell2.setMinimumHeight(height);
-            cell2.setPadding(30, 15, 15, 15);
+            cell2.setPadding(30, 15, 0, 15);
             cell2.setGravity(Gravity.CENTER);
  
             TableRow.LayoutParams param2 = new TableRow.LayoutParams();
@@ -171,12 +171,12 @@ public class DisplayRoutesFragment extends Fragment {
             
             TextView serviceCode = new TextView(rowContext);
             serviceCode.setText(services.get(i));
-            serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+            serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             serviceCode.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
             
             TextView direction = new TextView(rowContext);
             direction.setText(directions.get(i));
-            
+
             cell2.addView(serviceCode);
             cell2.addView(direction);
             
@@ -188,18 +188,19 @@ public class DisplayRoutesFragment extends Fragment {
             LinearLayout cell3 = new LinearLayout(rowContext);
             cell3.setOrientation(LinearLayout.VERTICAL);
             cell3.setMinimumHeight(height);
-            cell3.setPadding(15, 15, 0, 15);
+            cell3.setGravity(Gravity.CENTER_VERTICAL);
+            cell3.setPadding(45, 15, 0, 15);
  
             TableRow.LayoutParams param3 = new TableRow.LayoutParams();
             param3.column = 2;
-            param3.span = 70;
+            param3.span = 50;
             param3.weight = 1;
             cell3.setLayoutParams(param3);
             
             TextView firstText = new TextView(rowContext);
             TextView secondText = new TextView(rowContext);
             
-            firstText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+            firstText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             firstText.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
             
             if(stopType == 1)

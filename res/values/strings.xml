@@ -38,7 +38,7 @@
     
     <string-array name="leave_options_array">
         <item>Leave after</item>
-        <item>Leave before</item>
+        <item>Arrive before</item>
         <item>First services</item>
         <item>Last services</item>
     </string-array>
