@@ -62,7 +62,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 
 		
 		String urlString = "http://deco3801-010.uqcloud.net/routestops.php?route="
-				+ route.getCode() + "&type=" + route.getType();
+				+ route.getCode() + "&type=" + route.getType() + "&directions=" + route.getDirection();
 
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
@@ -220,8 +220,21 @@ public void requestRouteLine(Route route) {
 		//try {
 			
 			JSONArray array = (JSONArray)((JSONObject)obj).get("Paths");
-			JSONObject obj2 = (JSONObject)array.get(0);
-			output = (String) (obj2.get("Path"));
+			//JSONObject obj2 = (JSONObject)array.get(0);
+			
+			HashMap<Long, String> directionToPath = new HashMap<Long, String>();
+			
+			for(int i = 0; i < array.size(); i++)
+			{
+				JSONObject obj2 = (JSONObject) array.get(i);
+				Long direction = (Long) obj2.get("Direction");
+				String path = (String) obj2.get("Path");
+				
+				directionToPath.put(direction, path);
+			}
+			
+			output = directionToPath.get(route2.getDirection());
+			
 		//} catch (Exception e) {
 			//error loading data
 		//}

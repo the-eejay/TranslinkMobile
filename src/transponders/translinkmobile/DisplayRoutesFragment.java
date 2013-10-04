@@ -92,17 +92,25 @@ public class DisplayRoutesFragment extends Fragment {
 		table = (TableLayout) view.findViewById(R.id.service_table);
         tableContext = table.getContext();
         
-        String displayName = selectedStopName;
-        String[] splitted = selectedStopName.split(",");
-      
-        if(splitted.length == 2)
-        	displayName = splitted[0] + "\n" + splitted[1];
-        
         TextView title = (TextView) view.findViewById(R.id.stop_name);
+        String displayName = selectedStopName;
         title.setText(displayName);
+        
+        String[] splittedByStop = selectedStopName.split(", stop ");
+        String[] splittedByNear = selectedStopName.split(" near ");
+      
+        if(splittedByStop.length == 2)
+        {
+        	displayName = splittedByStop[0] + "\n Stop " + splittedByStop[1];
+        	title.setText(displayName);
+        }
+        else if(splittedByNear.length == 2)
+        {
+        	displayName = splittedByNear[0] + "\n near " + splittedByNear[1];
+        	title.setText(displayName);
+        }
 	
 		//showLines();
-
         populateTable();
 				
 		return view;

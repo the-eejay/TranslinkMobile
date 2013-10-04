@@ -233,17 +233,17 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				if(remainingMilis1 > 30000)
 					minutes += 1;
 				
-				String format = minutes + " Mins";
+				long remainingMins1 = minutes % 60;
+				String minFormat1 = remainingMins1 > 1 ? " Mins" : " Min";
+				
+				String format = remainingMins1 + minFormat1;
+				
 				if(minutes >= 60)
 				{
-					long hour = minutes / 60;
-					long remainingMins = minutes % 60;
-				
-					String hourFormat1 = hour > 1 ? " Hours " : " Hour ";
-					String minFormat1 = remainingMins > 1 ? " Mins" : " Min";
+					long hour1 = minutes / 60;
+					String hourFormat1 = hour1 > 1 ? " Hours " : " Hour ";
 					
-					format = hour + hourFormat1 + remainingMins + minFormat1;
-				
+					format = hour1 + hourFormat1 + remainingMins1 + minFormat1;
 				}
 				
 				firstArrivalTexts.get(i).setText(format);
@@ -258,16 +258,17 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 					if(remainingMilis2 > 30000)
 						minutes2 += 1;
 					
-					String format2 = minutes2 + " Mins";
+					long remainingMins2 = minutes2 % 60;
+					String minFormat2 = remainingMins2 > 1 ? " Mins" : " Min";
+					
+					String format2 = remainingMins2 + minFormat2;
+					
 					if(minutes2 >= 60)
 					{
-						long hour = minutes2 / 60;
-						long remainingMins = minutes2 % 60;
+						long hour2 = minutes2 / 60;
+						String hourFormat2 = hour2 > 1 ? " Hours " : " Hour ";
 						
-						String hourFormat2 = hour > 1 ? " Hours " : " Hour ";
-						String minFormat2 = remainingMins > 1 ? " Mins" : " Min";
-						
-						format2 = hour + hourFormat2 + remainingMins + minFormat2;
+						format2 = hour2 + hourFormat2 + remainingMins2 + minFormat2;
 					}				
 					
 					secondArrivalTexts.get(i).setText(format2);
@@ -279,7 +280,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				}
 			} else {
 				str = line + "    End Of Service";
-				firstArrivalTexts.get(i).setText("End of Service.");
+				firstArrivalTexts.get(i).setText("End of Service");
 				secondArrivalTexts.get(i).setText("N/A");
 			}
 			list.set(i, str);
