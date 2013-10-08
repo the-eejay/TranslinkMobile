@@ -26,7 +26,7 @@ import android.widget.ArrayAdapter;
 
 public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private enum State {
-		STOPS, POLYLINE
+		STOPS, POLYLINE, STOPS_BY_TRIP
 	}
 	private boolean isLoading; //isLoading - if currently performing async task
 	private String result;
@@ -34,6 +34,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private State state;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
+	private HashMap<Stop, Date> stopTimesMap;
 	private int[] markerIcons = {R.drawable.bus_geo_border, R.drawable.train_geo_border, R.drawable.ferry_geo_border};
 	private Route route2;
 	private Polyline polyline;
@@ -73,7 +74,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 
 	}
 	
-public void requestRouteLine(Route route) {
+	public void requestRouteLine(Route route) {
 		
 
 		
@@ -86,6 +87,15 @@ public void requestRouteLine(Route route) {
 		isLoading = true;
 		state = State.POLYLINE;
 
+	}
+	
+	public void requestTripStops(Trip trip) {
+		String urlString = "http://deco3801-010.uqcloud.net/tripStops.php?tripId="+trip.getTripId();
+		JSONRequest request = new JSONRequest();
+		request.setListener(this);
+		request.execute(urlString);
+		isLoading = true;
+		state = State.STOPS_BY_TRIP;
 	}
 
 	/**
@@ -108,6 +118,15 @@ public void requestRouteLine(Route route) {
 			}
 		} else if (state == State.STOPS){ 
 			stops = parseJSONToStops();
+			addMarkersToMap(stops);
+			requestRouteLine(route2);
+		
+		} else if (state == State.STOPS_BY_TRIP) {
+			stops = parseJSONToStops();
+			stopTimesMap = new HashMap<Stop, Date>();
+			for (Stop stop: stops) {
+				stopTimesMap.put(stop, stopTrips.find(stop).getTime());
+			}
 			addMarkersToMap(stops);
 			requestRouteLine(route2);
 		}
@@ -189,7 +208,7 @@ public void requestRouteLine(Route route) {
 				Marker m = map.addMarker(new MarkerOptions()
 						.position(stop.getPosition())
 						.title(stop.getDescription())
-						//.snippet(stop.getDescription())
+						.snippet(stopTimesMap.get(stop).toString())
 						.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
 				stopMarkers.add(m);
 				stopMarkersMap.put(m, stop);

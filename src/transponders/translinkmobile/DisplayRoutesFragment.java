@@ -47,7 +47,8 @@ public class DisplayRoutesFragment extends Fragment {
 	private ArrayList<Stop> stops;
 	private RouteDataLoader routeLoader;
 	private ArrayAdapter<String> adapter; 
-	private HashMap<Integer, Route> positionRouteMap;
+	//private HashMap<Integer, Route> positionRouteMap;
+	private HashMap<Integer, Trip> positionTripMap;
 	private FragmentManager manager;
 	private DisplayRoutesFragment thisVar;
 	
@@ -121,7 +122,7 @@ public class DisplayRoutesFragment extends Fragment {
 		stopType = stops.get(0).getServiceType();
 		Log.d("DisplayRoutes", "Service type: " + stopType);
 		
-		positionRouteMap = new HashMap<Integer, Route>();
+		positionTripMap = new HashMap<Integer, Trip>();
 		makeLines();
 	
 		adapter = new ArrayAdapter<String>(
@@ -268,7 +269,7 @@ public class DisplayRoutesFragment extends Fragment {
 		}
 		
 		//routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
-		routeLoader = new RouteDataLoader(lines, adapter, firstArrivalTexts, secondArrivalTexts, positionRouteMap);
+		routeLoader = new RouteDataLoader(lines, adapter, firstArrivalTexts, secondArrivalTexts, positionTripMap);
 		routeLoader.requestRouteTimes(stops);
 		
 		if (lock != null) {
@@ -287,9 +288,9 @@ public class DisplayRoutesFragment extends Fragment {
 		
     	public void onClick(View v) 
 		{
-    		Route routeCode = positionRouteMap.get(pos);
+    		Trip trip = positionTripMap.get(pos);
     		NearbyStops act = (NearbyStops)getActivity();
-    		act.setSelectedRoute(routeCode);
+    		act.setSelectedTrip(trip);
     		
     		 NearbyStops nearbyStops =  (NearbyStops)getActivity();
              // Should move these steps to NearbyStops itself and add check whether need to refresh or not
@@ -321,9 +322,9 @@ public class DisplayRoutesFragment extends Fragment {
         	@Override
         	public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
         		//Set selected route in NearbyStops then change view back to it
-        		Route routeCode = positionRouteMap.get(pos);
+        		Trip trip = positionTripMap.get(pos);
         		NearbyStops act = (NearbyStops)getActivity();
-        		act.setSelectedRoute(routeCode);
+        		act.setSelectedTrip(trip);
         		//Fragment fragment = null;
         		/*if (act.getMap2Fragment() == null) {
         			Log.d("Drawer", "map2 is NULL");

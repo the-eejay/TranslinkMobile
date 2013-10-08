@@ -29,27 +29,31 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	private String result;
 	private ArrayList<Stop> stops;
 	private List<String> list; //list - a list of Strings for use by the ArrayAdapter
-	private ArrayList<StopRoute> stopRoutes;
+	//private ArrayList<StopRoute> stopRoutes;
+	private ArrayList<StopTrip> stopTrips;
 	private ArrayAdapter<String> adapter; 
-	private HashMap<Integer, Route> positionRouteMap;
+	//private HashMap<Integer, Route> positionRouteMap;
+	private HashMap<Integer, Trip> positionTripMap;
+	private ArrayList<Trip> trips;
 	
 	private List<TextView> firstArrivalTexts, secondArrivalTexts;
 	private CountDownLatch lock; //to perform unit tests
 
-	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, HashMap<Integer,Route> positionRouteMap) {
+	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, HashMap<Integer,Trip> positionTripMap) {
 		isLoading = false;
 		this.list = list;
-		stopRoutes = new ArrayList<StopRoute>();
+		stopTrips = new ArrayList<StopTrip>();
+		trips = new ArrayList<Trip>();
 		this.adapter = adapter;
-		this.positionRouteMap = positionRouteMap;
+		this.positionTripMap = positionTripMap;
 	}
 	
-	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Route> positionRouteMap) {
+	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Trip> positionRouteMap) {
 		isLoading = false;
 		this.list = list;
-		stopRoutes = new ArrayList<StopRoute>();
+		stopTrips = new ArrayList<StopTrip>();
 		this.adapter = adapter;
-		this.positionRouteMap = positionRouteMap;
+		this.positionTripMap = positionRouteMap;
 		
 		firstArrivalTexts = firsts;
 		secondArrivalTexts = seconds;
@@ -98,7 +102,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		
 		this.result = result;
 
-		setStopRouteTimes();
+		setStopTripTimes();
 		addTimesToList();
 		isLoading = false;
 	}
@@ -115,7 +119,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      * A method to get the departure times of each service route.
      *
      */
-	public void setStopRouteTimes() {
+	public void setStopTripTimes() {
 
 		/* Parse the JSON received from the server. The format is shown below for the parts used:
 		 * {StopTimetables: [Trips:[DepartureTime, Route: {Code}]]}
@@ -125,18 +129,19 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				.get("StopTimetables");
 		//Log.d("Route", "Found "+timetables.size()+" timetables.");
 		for (int h = 0; h < timetables.size(); h++) {
-			JSONArray trips = (JSONArray) ((JSONObject) timetables.get(h))
+			JSONArray tripsJSON = (JSONArray) ((JSONObject) timetables.get(h))
 					.get("Trips");
 			//Log.d("Route", "Found "+trips.size()+" trips.");
 			for (int i = 0; i < trips.size(); i++) {
-				JSONObject time = (JSONObject) trips.get(i);
+				JSONObject time = (JSONObject) tripsJSON.get(i);
 				String timestr = (String) time.get("DepartureTime");
 				String routecode = (String) ((JSONObject) time.get("Route"))
 						.get("Code");
 				long direction = (((Long) ((JSONObject) time.get("Route"))
 						.get("Direction")));
+				String tripId = (String) ( time.get("TripId"));
 				//Log.d("RESULT=", timestr);
-
+				Trip trip = null; 
 				//Create each StopRoute relationship and give them the times from the JSON
 				Log.d("Route", "Found "+stops.size()+" stops.");
 				for (Stop stop : stops) {
@@ -145,21 +150,30 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 					for (Route r : routes) {
 						if (r.getCode().equals(routecode) && direction == r.getDirection()) {
 							try {
-								StopRoute sr = new StopRoute(stop, r);
+								if (trip == null) {
+									trip = new Trip(tripId, r);
+								}
+								StopTrip st = new StopTrip(stop, trip);
 								//Log.d("Route",
 								//		"longstr=" + timestr.substring(6, 18));
 								Date date = new Date(Long.parseLong(timestr
 										.substring(6, 18) )*10);
-								sr.addTime(date);
+								st.setTime(date);
 								Log.d("Route", "route="+r.getCode()+" date="+date+ " t="+timestr
 										.substring(6, 18));
-								stopRoutes.add(sr);
+								stopTrips.add(st);
+								
+								//trip.addStopRoute(sr);
+								
 
 							} catch (Exception e) {
 								Log.d("Route", "error in parsing JSON date");
 							}
 						}
 					}
+				}
+				if (trip != null) {
+					trips.add(trip);
 				}
 			}
 
@@ -175,8 +189,8 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		for (int i = 0; i < list.size(); i++) {
 			String line = list.get(i);
 			ArrayList<StopRoute> matching = new ArrayList<StopRoute>();
-			int minTimeIndex = 0;
-			int minTimeIndex2 = 0;
+			//int minTimeIndex = 0;
+			//int minTimeIndex2 = 0;
 			int minStopRouteIndex = 0;
 			int minStopRouteIndex2 = 0;
 			Long min = 9999999999999l;
@@ -186,12 +200,12 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 			Long currTime = c.getTimeInMillis();
 			Date date = new Date(currTime);
 			Log.d("Route", "current time ="+date);
-			for (int k = 0; k < stopRoutes.size(); k++) {
-				StopRoute sr = stopRoutes.get(k);
+			for (int k = 0; k < stopTrips.size(); k++) {
+				StopTrip st = stopTrips.get(k);
 				//if (line.contains(sr.getRoute().getCode())) {
-				if (positionRouteMap.get(i) == sr.getRoute()) {
+				if (positionTripMap.get(i).getRoute() == st.getTrip().getRoute()) {
 
-					ArrayList<Date> times = sr.getTimes();
+					//Date time = st.getTime();
 					
 					// Find the closest scheduled time after the current time
 					/*for (int j = 0; j < times.size(); j++) {
@@ -204,21 +218,21 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 							min = time;
 						}
 					}*/
-					for (int j = 0; j < times.size(); j++) {
-						Long time = times.get(j).getTime();
+					//for (int j = 0; j < times.size(); j++) {
+						Long time = st.getTime().getTime();
 						if (time > currTime && time < min2) {
 							if (time < min) {
-								minTimeIndex = j;
+								//minTimeIndex = j;
 								minStopRouteIndex = k;
 								min = time;
 							} else {
-								minTimeIndex2 = j;
+								//minTimeIndex2 = j;
 								minStopRouteIndex2 = k;
 								min2 = time;
 							}
-							Log.d("Route", "For ("+sr.getRoute().getCode() + ","+sr.getRoute().getDirection()+") min = "+min+" min2 = "+min2);
+							//Log.d("Route", "For ("+sr.getRoute().getCode() + ","+sr.getRoute().getDirection()+") min = "+min+" min2 = "+min2);
 						}
-					}
+					//}
 				}
 			}
 
@@ -293,6 +307,13 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		}
 	}
 
+	public ArrayList<StopTrip> getStopTrips() {
+		return stopTrips;
+		
+	}
+	
+	
+	
 	/*Test methods*/
 	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
 		this.lock =lock;
