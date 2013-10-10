@@ -53,7 +53,8 @@ public class DisplayRoutesFragment extends Fragment {
 	private ArrayList<Stop> stops;
 	private RouteDataLoader routeLoader;
 	private ArrayAdapter<String> adapter; 
-	private HashMap<Integer, Route> positionRouteMap;
+	//private HashMap<Integer, Route> positionRouteMap;
+	private HashMap<Integer, Trip> positionTripMap;
 	private FragmentManager manager;
 	private DisplayRoutesFragment thisVar;
 	private PullToRefreshScrollView pullToRefreshView;
@@ -136,7 +137,7 @@ public class DisplayRoutesFragment extends Fragment {
 		stopType = stops.get(0).getServiceType();
 		Log.d("DisplayRoutes", "Service type: " + stopType);
 		
-		positionRouteMap = new HashMap<Integer, Route>();
+		positionTripMap = new HashMap<Integer, Trip>();
 		makeLines();
 	
 		/*adapter = new ArrayAdapter<String>(
@@ -283,7 +284,8 @@ public class DisplayRoutesFragment extends Fragment {
 		}
 		
 		//routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
-		routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionRouteMap);
+
+		routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionTripMap);
 		routeLoader.requestRouteTimes(stops);
 		
 		if (lock != null) {
@@ -302,12 +304,24 @@ public class DisplayRoutesFragment extends Fragment {
 		
     	public void onClick(View v) 
 		{
-    		Route routeCode = positionRouteMap.get(pos);
-    		NearbyStops act = (NearbyStops)getActivity();
-    		act.setSelectedRoute(routeCode);
+    		NearbyStops nearbyStops = (NearbyStops)getActivity();
     		
-    		 NearbyStops nearbyStops =  (NearbyStops)getActivity();
-             // Should move these steps to NearbyStops itself and add check whether need to refresh or not
+    		Trip trip = positionTripMap.get(pos);
+    		nearbyStops.setSelectedTrip(trip);
+    		
+    		//RouteDataLoader rdl = nearbyStops.getRouteDataLoader();
+    		
+    		/*ArrayList<StopTrip> stopTrips = routeLoader.getStopTrips();
+    		ArrayList<StopTrip> selectedTripsStopTrips = new ArrayList<StopTrip>();
+    		for (StopTrip st: stopTrips) {
+    			if (st.getTrip() == trip) {
+    				selectedTripsStopTrips.add(st);
+    			}
+    		}
+    		nearbyStops.setSelectedTripsStopTrips(selectedTripsStopTrips);(*/
+    		
+    		
+    		// Should move these steps to NearbyStops itself and add check whether need to refresh or not
              nearbyStops.removeAllMarkers();
              nearbyStops.showRoute();
              nearbyStops.addStateToStack(StackState.ShowRoute);
@@ -336,9 +350,9 @@ public class DisplayRoutesFragment extends Fragment {
         	@Override
         	public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
         		//Set selected route in NearbyStops then change view back to it
-        		Route routeCode = positionRouteMap.get(pos);
+        		Trip trip = positionTripMap.get(pos);
         		NearbyStops act = (NearbyStops)getActivity();
-        		act.setSelectedRoute(routeCode);
+        		act.setSelectedTrip(trip);
         		//Fragment fragment = null;
         		/*if (act.getMap2Fragment() == null) {
         			Log.d("Drawer", "map2 is NULL");
@@ -382,6 +396,7 @@ public class DisplayRoutesFragment extends Fragment {
      */
     private void makeLines()
     {
+    	Log.d("Route", "Making Lines.  stops.size()="+stops.size());
     	services.clear();
     	directions.clear();
     	
@@ -389,7 +404,9 @@ public class DisplayRoutesFragment extends Fragment {
     		//Looking at a group of stops
     		//ArrayList<String> routeIdsAlready = new ArrayList<String>();
     		for (Stop stop: stops) {
+    			
     			ArrayList<Route> routes = stop.getRoutes();
+    			Log.d("Route", "stop "+stop.getDescription()+" has routes.size()=" + routes.size());
     			for (Route route: routes) {
 	    			/*boolean foundRouteIdMatch = false;
 	    			for (String routeIdAlready: routeIdsAlready) {
@@ -402,11 +419,13 @@ public class DisplayRoutesFragment extends Fragment {
 	    				routeIdsAlready.add(route.getCode());
 	    				lines.add(route.getCode() + "\t\t");
 	    				positionRouteMap.put(lines.size()-1, route);
-	    			}*/	
+
+	    			}*/
+
     				//lines.add(route.getCode()+"\t"+directionStr);
-    				
+    				//positionRouteMap.put(lines.size()-1, route);
+    							
     				// Special route code and direction for trains
-    				String directionStr = route.getDirectionAsString();
     				if(stopType == 2)
     				{
     					String name = route.getDescription();
@@ -429,26 +448,30 @@ public class DisplayRoutesFragment extends Fragment {
     				}
     				else
     				{
+    					String directionStr = route.getDirectionAsString();
     					services.add(route.getCode());
         				directions.add(directionStr);
     				}
     				
-    				positionRouteMap.put(services.size()-1, route);
+    				positionTripMap.put(services.size()-1, new Trip("NOT_AN_ACTUAL_TRIP", route));
     			}
     		}
     	} else {
     		ArrayList<Route> routes = stops.get(0).getRoutes();
+    		Log.d("Route", "stop "+stops.get(0).getDescription()+" has routes.size()=" + routes.size());
     		for (int i=0; i<routes.size(); i++) {
     			String code = routes.get(i).getCode();
     			String directionStr = routes.get(i).getDirectionAsString();
+
     			//lines.add(code + "\t"+directionStr);
+    			//positionRouteMap.put(lines.size()-1, routes.get(i));
+    			//routeMap.put(routes.get(i), code);
     			
     			services.add(code);
 				directions.add(directionStr);
-				positionRouteMap.put(services.size()-1, routes.get(i));
+				positionTripMap.put(services.size()-1, new Trip("NOT_AN_ACTUAL_TRIP", routes.get(i)));
     		}
     	}
-    
     }
     
     /**

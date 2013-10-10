@@ -1,6 +1,8 @@
 package transponders.translinkmobile;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
@@ -19,6 +21,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.State;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -64,6 +67,18 @@ import com.google.android.gms.maps.model.Polyline;
 public class NearbyStops extends FragmentActivity implements
 GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
+	/*nearbystops  -> stopdataloader
+				<- (stops with each stop having list of route)
+	(single  stop) -> routedataloader   set up list of stoptrips where StopTrip:{Stop, Trip:{id, route}, Time}
+						combine the stoptrips with common routes to find time to display
+						the closest time to now is also the Trip to assign
+						assign position in ListView to the soonest Trip by finding the Route, 
+						user clicks position, get that Trip
+			<-(Trip)
+		-> (Trip) routeStopsLoader	use the trip to find the stops and line as opposed to the route */
+	
+	
+	
 	/**
 	 * Set the default location in case the application cannot detect the
 	 * current location of the device.
@@ -88,10 +103,16 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	private SupportMapFragment mapFrag;
 	private boolean updatedOnce;
 	private ArrayList<Stop> selectedStops;
-	private Route selectedRoute;
+	//private Route selectedRoute;
+	private Trip selectedTrip;
+	private ArrayList<StopTrip> selectedTripsStopTrips;
+	//private String selectedTripId;
 	private LatLng userLatLng;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
+	
+	
+	
 	private Polyline polyline;
 
 	// private ShowRouteFragment map2Fragment;
@@ -145,6 +166,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 
 		stopMarkers = new ArrayList<Marker>();
 		stopMarkersMap = new HashMap<Marker, Stop>();
+		
+		
 		
 
 		// Set the fragment manager so it will pop elements from the stackStates
@@ -359,7 +382,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		mMap.setMyLocationEnabled(false);
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
 		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
-				stopMarkersMap, polyline, userLatLng);
+				stopMarkersMap, polyline);
 		userLatLng = new LatLng(0,0);
 		updatedOnce = false;
 		
@@ -558,9 +581,10 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 
 	public void showRoute() 
 	{
-		routeStopsLoader.requestRouteStops(selectedRoute);
+		//routeStopsLoader.requestRouteStops(selectedRoute);
+		routeStopsLoader.requestTripStops(selectedTrip);
 		TextView textView = (TextView) findViewById(R.id.routeInfoBox); 
-		textView.setText(selectedRoute.getCode() + ": "+selectedRoute.getDescription());
+		textView.setText(selectedTrip.getRoute().getCode() + ": "+selectedTrip.getRoute().getDescription());
 		textView.setVisibility(View.VISIBLE);
 	}
 
@@ -715,13 +739,22 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		this.selectedStops = stops;
 	}
 
-	public Route getSelectedRoute() {
+	/*public Route getSelectedRoute() {
 		return selectedRoute;
-	}
+	}*/
 
+	/*
 	public void setSelectedRoute(Route route) {
 		selectedRoute = route;
+	}*/
+	
+	public void setSelectedTrip(Trip trip) {
+		selectedTrip = trip;
 	}
+	
+	/*public void setSelectedTripsStopTrips(ArrayList<StopTrip> stopTrips) {
+		this.selectedTripsStopTrips = stopTrips;
+	}*/
 	
 	
 
@@ -795,6 +828,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	{
 		return mnFragment;
 	}
+	
+	
 	/*End of Testing functions */
 
 	@Override
@@ -847,5 +882,11 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		// TODO Auto-generated method stub
 		
 	}
+	
+
+	
+	/*public void setSelectedTripId(String tripId) {
+		selectedTripId = tripId;
+	}*/
 
 }
