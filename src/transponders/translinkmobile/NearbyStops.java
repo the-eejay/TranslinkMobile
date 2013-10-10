@@ -1,6 +1,8 @@
 package transponders.translinkmobile;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
@@ -19,6 +21,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.State;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -107,6 +110,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	private LatLng userLatLng;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
+	
+	
+	
 	private Polyline polyline;
 
 	// private ShowRouteFragment map2Fragment;
@@ -160,6 +166,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 
 		stopMarkers = new ArrayList<Marker>();
 		stopMarkersMap = new HashMap<Marker, Stop>();
+		
+		
 		
 
 		// Set the fragment manager so it will pop elements from the stackStates
@@ -873,6 +881,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		// TODO Auto-generated method stub
 		
 	}
+	
+
 	
 	/*public void setSelectedTripId(String tripId) {
 		selectedTripId = tripId;

@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -44,6 +45,10 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	//private LatLng userLatLng;
 	private CountDownLatch lock; //to perform unit tests
 	private ArrayList<Stop> stops;
+	private ArrayList<EstimatedBus> estimatedBuses;
+	private ArrayList<Marker> estimatedBusMarkers;
+	private HashMap<Marker, EstimatedBus> estimatedBusMarkersMap;
+	private CountDownTimer estimatedBusTimer;
 
 	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline) {
 		isLoading = false;
@@ -54,6 +59,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		this.polyline = polyline;
 		stopTrips = new ArrayList<StopTrip>();
 		//this.userLatLng = loc;
+		estimatedBuses = new ArrayList<EstimatedBus>();
+		estimatedBusMarkers = new ArrayList<Marker>();
+		estimatedBusMarkersMap = new HashMap<Marker, EstimatedBus>();
 	}
 
 	/**
@@ -141,7 +149,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 			for (Stop stop: stops) {
 				stopTimesMap.put(stop, stopTrips.find(stop).getTime());
 			}*/
-			
+			setEstimatedBuses(setUpBuses());
 			addMarkersToMap(stops);
 			requestTripLine(trip2);
 		}
@@ -197,6 +205,8 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 						Log.d("Route", "setting date to "+ date);
 						stopTrip.setTime(date);
 						stopTrips.add(stopTrip);
+						
+						
 					}
 					output.add(stop);
 				}
@@ -342,6 +352,77 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		}
 	}
 	
+	public ArrayList<EstimatedBus> setUpBuses() {
+		ArrayList<EstimatedBus> estimatedBuses = new ArrayList<EstimatedBus>();
+		for (int i =1; i < stopTrips.size(); i++) {
+			StopTrip stStart = stopTrips.get(i-1);
+			StopTrip stEnd = stopTrips.get(i);
+			EstimatedBus bus = new EstimatedBus(stStart.getStop().getPosition(), stEnd.getStop().getPosition(), stStart.getTime(), stEnd.getTime());
+			Log.d("Bus", "Created new bus at " + bus.getPosition());
+			estimatedBuses.add(bus);
+		}
+		return estimatedBuses;
+	}
+	
+	public void setEstimatedBuses(ArrayList<EstimatedBus> estimatedBuses) {
+		this.estimatedBuses = estimatedBuses;
+		estimatedBusMarkers = new ArrayList<Marker>();
+		estimatedBusMarkersMap = new HashMap<Marker, EstimatedBus>();
+		for (EstimatedBus bus: estimatedBuses) {
+			Log.d("Bus", "adding the bus at "+bus.getPosition());
+			boolean visiboolean = bus.isActive();
+			Marker busMarker = map.addMarker(new MarkerOptions()
+				.position(bus.getPosition())
+				.title("Estimated Bus")
+				.visible(visiboolean)
+				.icon(BitmapDescriptorFactory
+						.fromResource(R.drawable.location_geo_border)));
+			estimatedBusMarkers.add(busMarker);
+			estimatedBusMarkersMap.put(busMarker, bus);
+			
+		}
+		updateBuses();
+		
+		if (estimatedBusTimer != null) {
+			estimatedBusTimer.cancel();
+		}
+		estimatedBusTimer = new CountDownTimer (Long.MAX_VALUE, 5000) {
+
+			@Override
+			public void onFinish() {
+				;
+				
+			}
+
+			@Override
+			public void onTick(long arg0) {
+				
+				updateBuses();
+				
+			}
+			
+		}.start();
+	}
+	
+	public void updateBuses() {
+		Calendar c = Calendar.getInstance();
+		Long currTime = c.getTimeInMillis();
+		for (EstimatedBus bus: estimatedBuses) {
+			bus.update(new Date(currTime));
+			if (bus.isActive())
+			Log.d("Bus", "Bus at "+bus.getPosition()+" isActive="+bus.isActive());
+		}
+		System.out.println("There is "+ estimatedBusMarkers.size()+" markers");
+		for (Marker m: estimatedBusMarkers) {
+			EstimatedBus bus = estimatedBusMarkersMap.get(m);
+			if (bus.isActive()) {
+				m.setPosition(bus.getPosition());
+				m.setVisible(true);
+			} else {
+				m.setVisible(false);
+			}
+		}
+	}
 	
 	/*Test methods*/
 	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
