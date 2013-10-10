@@ -65,7 +65,7 @@ public class NearbyStops extends FragmentActivity implements
 GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
 	/*nearbystops  -> stopdataloader
-		<- (stops with each stop having list of route)
+				<- (stops with each stop having list of route)
 	(single  stop) -> routedataloader   set up list of stoptrips where StopTrip:{Stop, Trip:{id, route}, Time}
 						combine the stoptrips with common routes to find time to display
 						the closest time to now is also the Trip to assign
@@ -102,7 +102,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	private ArrayList<Stop> selectedStops;
 	//private Route selectedRoute;
 	private Trip selectedTrip;
-	private String selectedTripId;
+	private ArrayList<StopTrip> selectedTripsStopTrips;
+	//private String selectedTripId;
 	private LatLng userLatLng;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
@@ -372,7 +373,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		mMap.setMyLocationEnabled(false);
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
 		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
-				stopMarkersMap, polyline, userLatLng);
+				stopMarkersMap, polyline);
 		userLatLng = new LatLng(0,0);
 		updatedOnce = false;
 		
@@ -729,9 +730,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		this.selectedStops = stops;
 	}
 
-	public Route getSelectedRoute() {
+	/*public Route getSelectedRoute() {
 		return selectedRoute;
-	}
+	}*/
 
 	/*
 	public void setSelectedRoute(Route route) {
@@ -741,6 +742,10 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	public void setSelectedTrip(Trip trip) {
 		selectedTrip = trip;
 	}
+	
+	/*public void setSelectedTripsStopTrips(ArrayList<StopTrip> stopTrips) {
+		this.selectedTripsStopTrips = stopTrips;
+	}*/
 	
 	
 
@@ -814,6 +819,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	{
 		return mnFragment;
 	}
+	
+	
 	/*End of Testing functions */
 
 	@Override
@@ -867,8 +874,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		
 	}
 	
-	public void setSelectedTripId(String tripId) {
+	/*public void setSelectedTripId(String tripId) {
 		selectedTripId = tripId;
-	}
+	}*/
 
 }

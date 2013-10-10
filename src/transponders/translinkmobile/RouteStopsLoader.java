@@ -1,6 +1,7 @@
 package transponders.translinkmobile;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ import android.widget.ArrayAdapter;
 
 public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private enum State {
-		STOPS, POLYLINE, STOPS_BY_TRIP
+		STOPS, POLYLINE, STOPS_BY_TRIP, POLYLINE_BY_TRIP
 	}
 	private boolean isLoading; //isLoading - if currently performing async task
 	private String result;
@@ -34,22 +35,25 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private State state;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
-	private HashMap<Stop, Date> stopTimesMap;
+	private ArrayList<StopTrip> stopTrips;
+	//private HashMap<Stop, Date> stopTimesMap;
 	private int[] markerIcons = {R.drawable.bus_geo_border, R.drawable.train_geo_border, R.drawable.ferry_geo_border};
 	private Route route2;
+	private Trip trip2;
 	private Polyline polyline;
-	private LatLng userLatLng;
+	//private LatLng userLatLng;
 	private CountDownLatch lock; //to perform unit tests
 	private ArrayList<Stop> stops;
 
-	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline, LatLng loc) {
+	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline) {
 		isLoading = false;
 		this.map = map;
 		this.stopMarkers = stopMarkers;
 		this.stopMarkersMap = stopMarkersMap;
 		route2= null;
 		this.polyline = polyline;
-		this.userLatLng = loc;
+		stopTrips = new ArrayList<StopTrip>();
+		//this.userLatLng = loc;
 	}
 
 	/**
@@ -90,12 +94,22 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	}
 	
 	public void requestTripStops(Trip trip) {
-		String urlString = "http://deco3801-010.uqcloud.net/tripStops.php?tripId="+trip.getTripId();
+		String urlString = "http://deco3801-010.uqcloud.net/tripstops.php?tripId="+trip.getTripId();
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
 		request.execute(urlString);
 		isLoading = true;
 		state = State.STOPS_BY_TRIP;
+		this.trip2 = trip;
+	}
+	
+	public void requestTripLine(Trip trip) {
+		String urlString = "http://deco3801-010.uqcloud.net/tripline.php?tripId=" + trip.getTripId();
+		JSONRequest request = new JSONRequest();
+		request.setListener(this);
+		request.execute(urlString);
+		isLoading = true;
+		state = State.POLYLINE_BY_TRIP;
 	}
 
 	/**
@@ -110,7 +124,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		isLoading = false;
 		this.result = result;
 
-		if (state == State.POLYLINE) {
+		if (state == State.POLYLINE || state == State.POLYLINE_BY_TRIP) {
 			//get the line from JSON and add to map
 			String line = parseJSONToLine();
 			if (line != null) {
@@ -123,12 +137,13 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		
 		} else if (state == State.STOPS_BY_TRIP) {
 			stops = parseJSONToStops();
-			stopTimesMap = new HashMap<Stop, Date>();
+			/*stopTimesMap = new HashMap<Stop, Date>();
 			for (Stop stop: stops) {
 				stopTimesMap.put(stop, stopTrips.find(stop).getTime());
-			}
+			}*/
+			
 			addMarkersToMap(stops);
-			requestRouteLine(route2);
+			requestTripLine(trip2);
 		}
 	}
 
@@ -150,7 +165,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 			* {Stops: [StopId, Description, Position: {Lat, Lng}, HasParentLocation,
 			* ParentLocation: {Id, Position: {Lat, Lng}}, Routes: [Code, Name]]}
 			*/
-		if(state != State.STOPS){
+		if(state != State.STOPS && state != State.STOPS_BY_TRIP){
 			return output;
 		}
 			Object obj = JSONValue.parse(result);
@@ -174,6 +189,15 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 						JSONObject route = (JSONObject)routes.get(j);
 						stop.addRoute(new Route((String)route.get("Code"), (String)route.get("Name"), (Integer)route.get("Vehicle")));
 					}*/
+					if (state == State.STOPS_BY_TRIP) {
+						StopTrip stopTrip = new StopTrip(stop, trip2);
+						String time = (String)((JSONObject)obj2).get("Time");
+						Date date = new Date(Long.parseLong(time
+								.substring(6, 18) )*10);
+						Log.d("Route", "setting date to "+ date);
+						stopTrip.setTime(date);
+						stopTrips.add(stopTrip);
+					}
 					output.add(stop);
 				}
 				return output;
@@ -195,7 +219,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 
 		}
 		stopMarkers.clear();*/
-		
+		Log.d("Route", "about to add "+stops.size()+" stops to map");
 		// Add new stop markers to map
 		if (stops != null) 
 		{
@@ -205,10 +229,33 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 				Log.d("serviceType", "" + serviceType);
 				
 				
+				// Get the time from the stopTrips
+				String snippet = "";
+				if (state == State.STOPS_BY_TRIP) {
+					for (StopTrip st: stopTrips) {
+						if (stop == st.getStop()) {
+							Calendar c = Calendar.getInstance();
+							long currTime = c.getTimeInMillis();
+							long min = st.getTime().getTime(); 
+							Log.d("Route", "display minutes is "+min);
+							long minutes = (min - currTime) / 60000;
+							// Rounding, if seconds > 30, add another minute
+							long remainingMilis1 = (min - currTime) %  60000;
+							if(remainingMilis1 > 30000)
+								minutes += 1;
+							long remainingMins1 = minutes % 60;
+							String minFormat1 = remainingMins1 > 1 ? " Mins" : " Min";
+							snippet = remainingMins1 + minFormat1 + " until you arrive here assuming you \n catch the next bus at the previously selected stop.";
+							break;
+						}
+					}
+				}
+				
+				
 				Marker m = map.addMarker(new MarkerOptions()
 						.position(stop.getPosition())
 						.title(stop.getDescription())
-						.snippet(stopTimesMap.get(stop).toString())
+						.snippet(snippet)
 						.icon(BitmapDescriptorFactory.fromResource(markerIcons[serviceType-1])));
 				stopMarkers.add(m);
 				stopMarkersMap.put(m, stop);
@@ -229,7 +276,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	}
 	
 	public String parseJSONToLine() {
-		if (state != State.POLYLINE) {
+		if (state != State.POLYLINE && state != State.POLYLINE_BY_TRIP) {
 			return null;
 		}
 		
@@ -238,21 +285,28 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		
 		//try {
 			
-			JSONArray array = (JSONArray)((JSONObject)obj).get("Paths");
-			//JSONObject obj2 = (JSONObject)array.get(0);
-			
-			HashMap<Long, String> directionToPath = new HashMap<Long, String>();
-			
-			for(int i = 0; i < array.size(); i++)
-			{
-				JSONObject obj2 = (JSONObject) array.get(i);
-				Long direction = (Long) obj2.get("Direction");
-				String path = (String) obj2.get("Path");
+			if (state == State.POLYLINE) {
+				JSONArray array = (JSONArray)((JSONObject)obj).get("Paths");
+				//JSONObject obj2 = (JSONObject)array.get(0);
+				HashMap<Long, String> directionToPath = new HashMap<Long, String>();
 				
-				directionToPath.put(direction, path);
+				for(int i = 0; i < array.size(); i++)
+				{
+					JSONObject obj2 = (JSONObject) array.get(i);
+					Long direction = (Long) obj2.get("Direction");
+					String path = (String) obj2.get("Path");
+					
+					directionToPath.put(direction, path);
+				}
+				
+				output = directionToPath.get(route2.getDirection());
+			} else {
+				//array = (JSONArray)((JSONObject)obj).get("Path");
+				String path = (String)((JSONObject)obj).get("Path");
+				output = path;
 			}
 			
-			output = directionToPath.get(route2.getDirection());
+			
 			
 		//} catch (Exception e) {
 			//error loading data

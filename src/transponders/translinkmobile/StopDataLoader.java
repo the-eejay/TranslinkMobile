@@ -198,8 +198,9 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 		if (stops != null) {
 			for (Stop stop : stops) {
 				int serviceType = stop.getServiceType();
-				
+				Log.d("stopdataresult", stop.getDescription() + " hasParent="+stop.hasParent());
 				if (stop.hasParent()) {
+					Log.d("stopdataresult", "Parent is "+stop.getParentId());
 					//stops with parent must only be added as markers if not
 					//there's not already a stop added for that position
 					boolean isAlreadyUsed = false;

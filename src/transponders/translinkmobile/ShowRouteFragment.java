@@ -119,7 +119,7 @@ public class ShowRouteFragment extends Fragment {
 
 			});
 			
-			routeStopsLoader.requestRouteStops(((NearbyStops)getActivity()).getSelectedRoute());
+			//routeStopsLoader.requestRouteStops(((NearbyStops)getActivity()).getSelectedRoute());
 			
 			
 			return view;
