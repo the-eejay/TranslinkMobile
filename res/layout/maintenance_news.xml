@@ -9,7 +9,7 @@
         android:id="@+id/newsDate"
         android:layout_width="fill_parent"
         android:layout_height="40dp"
-        android:background="@drawable/editedbutton"
+        android:background="@color/ferry_blue"
         android:paddingLeft="10dp"
         android:text="@string/news"
         android:textAppearance="?android:attr/textAppearanceLarge"

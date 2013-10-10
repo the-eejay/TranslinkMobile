@@ -83,8 +83,10 @@
 	        android:layout_marginTop="20dp"
 	        android:layout_marginLeft="22dp"
 	        android:layout_marginRight="22dp" 
-	        android:background="@drawable/buttongreen"/>
-	
+	        android:textColor="@color/white"
+	        android:textStyle="bold"
+	        android:background="@drawable/selector_jp" />
+	    
 	    <Button
 	        android:id="@+id/timeSpinner"
 	        style="?android:attr/spinnerStyle"

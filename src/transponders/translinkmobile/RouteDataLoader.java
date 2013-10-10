@@ -44,11 +44,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		this.positionRouteMap = positionRouteMap;
 	}
 	
-	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Route> positionRouteMap) {
+	public RouteDataLoader(List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Route> positionRouteMap) {
 		isLoading = false;
-		this.list = list;
 		stopRoutes = new ArrayList<StopRoute>();
-		this.adapter = adapter;
 		this.positionRouteMap = positionRouteMap;
 		
 		firstArrivalTexts = firsts;
@@ -172,8 +170,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      */
 	public void addTimesToList() {
 		Log.d("Route", "adding times to list");
-		for (int i = 0; i < list.size(); i++) {
-			String line = list.get(i);
+		for (int i = 0; i < firstArrivalTexts.size(); i++) {
 			ArrayList<StopRoute> matching = new ArrayList<StopRoute>();
 			int minTimeIndex = 0;
 			int minTimeIndex2 = 0;
@@ -222,11 +219,11 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				}
 			}
 
-			String str = "";
+			//String str = "";
 			// Add result to the line
 			if (min < 9999999999999l) {
 				long minutes = (min - currTime) / 60000;
-				str =  line + "    " + minutes + " minutes until 1st. ";
+				//str =  line + "    " + minutes + " minutes until 1st. ";
 				
 				// Rounding, if seconds > 30, add another minute
 				long remainingMilis1 = (min - currTime) %  60000;
@@ -251,7 +248,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 				
 				if (min2 < 9999999999999l) {
 					long minutes2 = (min2 - currTime) / 60000;
-					str += minutes2 + " minutes until 2nd.";
+					//str += minutes2 + " minutes until 2nd.";
 					
 					// Rounding, if seconds > 30, add another minute
 					long remainingMilis2 = (min2 - currTime) %  60000;
@@ -279,13 +276,13 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 					secondArrivalTexts.get(i).setText("End of Service");
 				}
 			} else {
-				str = line + "    End Of Service";
 				firstArrivalTexts.get(i).setText("End of Service");
 				secondArrivalTexts.get(i).setText("N/A");
+				//str = line + "    End Of Service";
 			}
-			list.set(i, str);
-			Log.d("Route", "list(" + i + ")=" + list.get(i));
-			adapter.notifyDataSetChanged();
+			//list.set(i, str);
+			//Log.d("Route", "list(" + i + ")=" + list.get(i));
+			//adapter.notifyDataSetChanged();
 			
 		}
 		if (lock != null) {

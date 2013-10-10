@@ -251,6 +251,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	 */
 	public void locationChanged(LatLng location) {
 		mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+		mMap.animateCamera(CameraUpdateFactory.zoomTo((float) 14.8), 2000, null);
 		stopLoader
 				.requestStopsNear(location.latitude, location.longitude, 1000);
 	}

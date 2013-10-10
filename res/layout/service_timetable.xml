@@ -20,7 +20,8 @@
 	    android:layout_height="1dip"
 	    android:background="@color/separator_line" />
     
-	<ScrollView 
+	<com.handmark.pulltorefresh.library.PullToRefreshScrollView
+	    android:id="@+id/timetable_scrollview"
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent" >
 		    
@@ -78,5 +79,5 @@
 	
 		</TableLayout>
 	
-	</ScrollView>
+	</com.handmark.pulltorefresh.library.PullToRefreshScrollView>
 </LinearLayout>

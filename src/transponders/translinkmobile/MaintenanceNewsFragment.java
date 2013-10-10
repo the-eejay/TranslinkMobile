@@ -50,6 +50,8 @@ import android.widget.Toast;
 
 public class MaintenanceNewsFragment extends Fragment {
 
+	//private final String url = "http://jp.translink.com.au/travel-information/service-updates/rss";
+	private final String url = "http://translink.com.au/travel-information/service-notices/rss";
 	private final String FILENAME = "MaintenanceNews.xml";
 	private final String TITLE = "Maintenance News";
 	final Calendar calendar = Calendar.getInstance();
@@ -92,7 +94,6 @@ public class MaintenanceNewsFragment extends Fragment {
 		
         ConnectivityManager connMgr = (ConnectivityManager) parent.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        String url = "http://jp.translink.com.au/travel-information/service-updates/rss";
         
         Date date;
         
@@ -135,8 +136,10 @@ public class MaintenanceNewsFragment extends Fragment {
             	
                 return downloadUrl(urls[0]);
             } catch (IOException e) {
-            	Toast toast = Toast.makeText(parent.getApplicationContext(), "Invalid URL.", Toast.LENGTH_LONG);
-    			toast.show();
+            	
+            	e.printStackTrace();
+            	//Toast toast = Toast.makeText(parent.getApplicationContext(), "Invalid URL.", Toast.LENGTH_LONG);
+    			//toast.show();
     			return null;
             }
         }
@@ -161,6 +164,7 @@ public class MaintenanceNewsFragment extends Fragment {
                 // Starts the query
                 conn.connect();
                 int response = conn.getResponseCode();
+                Log.d("The URL is: ", "" + url);
                 Log.d("The response is: ", "" + response);
                 is = conn.getInputStream();
 
@@ -222,44 +226,49 @@ public class MaintenanceNewsFragment extends Fragment {
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 		 
 					Element eElement = (Element) nNode;
-		 
-					String link = eElement.getElementsByTagName("link").item(0).getTextContent();
-					String title = eElement.getElementsByTagName("title").item(0).getTextContent();
 					
-					allTitles.append(title);
-					allURLs.append(link);
+					String category = eElement.getElementsByTagName("category").item(0).getTextContent();
 					
-					TableRow newRow = new TableRow(tableContext);
-	            	Context rowContext = newRow.getContext();
-	            	TextView text1 = new TextView(rowContext);
-	            	
-	            	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, scale);
-	            	newRow.setMinimumHeight(height);
-	            	
-	            	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
-	                param1.column = 0;
-	                text1.setLayoutParams(param1);
-	                
-	                text1.setText(title);
-	                text1.setTextSize(15);
-	                text1.setOnClickListener(new NewsListener(link));
-	                text1.setPadding(20, 0, 10, 0);
-	                text1.setGravity(Gravity.CENTER_VERTICAL);
-	                text1.setCompoundDrawablePadding(0);
-	    			text1.setCompoundDrawablesWithIntrinsicBounds(null, null, arrow, null);
-	    			text1.setMinimumHeight(height);
-	    			text1.setBackgroundResource(R.drawable.selector);
-	    			
-	    			newRow.addView(text1);
-            		newsTable.addView(newRow);
-            		
-            		View separatorLine = new View(tableContext);
-                    separatorLine.setBackgroundColor(getResources().getColor(R.color.separator_line));
-                    separatorLine.setPadding(0, 0, 0, 0);
-                    TableLayout.LayoutParams lineParam = new TableLayout.LayoutParams();
-                    lineParam.height = 2;
-                    separatorLine.setLayoutParams(lineParam);
-                    newsTable.addView(separatorLine);
+					if(category.equalsIgnoreCase("current"))
+					{
+						String link = eElement.getElementsByTagName("link").item(0).getTextContent();
+						String title = eElement.getElementsByTagName("title").item(0).getTextContent();
+						
+						allTitles.append(title);
+						allURLs.append(link);
+						
+						TableRow newRow = new TableRow(tableContext);
+		            	Context rowContext = newRow.getContext();
+		            	TextView text1 = new TextView(rowContext);
+		            	
+		            	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, scale);
+		            	newRow.setMinimumHeight(height);
+		            	
+		            	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
+		                param1.column = 0;
+		                text1.setLayoutParams(param1);
+		                
+		                text1.setText(title);
+		                text1.setTextSize(15);
+		                text1.setOnClickListener(new NewsListener(link));
+		                text1.setPadding(20, 0, 10, 0);
+		                text1.setGravity(Gravity.CENTER_VERTICAL);
+		                text1.setCompoundDrawablePadding(0);
+		    			text1.setCompoundDrawablesWithIntrinsicBounds(null, null, arrow, null);
+		    			text1.setMinimumHeight(height);
+		    			text1.setBackgroundResource(R.drawable.selector);
+		    			
+		    			newRow.addView(text1);
+	            		newsTable.addView(newRow);
+	            		
+	            		View separatorLine = new View(tableContext);
+	                    separatorLine.setBackgroundColor(getResources().getColor(R.color.separator_line));
+	                    separatorLine.setPadding(0, 0, 0, 0);
+	                    TableLayout.LayoutParams lineParam = new TableLayout.LayoutParams();
+	                    lineParam.height = 2;
+	                    separatorLine.setLayoutParams(lineParam);
+	                    newsTable.addView(separatorLine);
+					}
 				}
 			}
     	}
@@ -267,6 +276,7 @@ public class MaintenanceNewsFragment extends Fragment {
     	{
     		Toast toast = Toast.makeText(parent.getApplicationContext(), "Exception occured.", Toast.LENGTH_LONG);
 			toast.show();
+			e.printStackTrace();
     	}
 	}
 	

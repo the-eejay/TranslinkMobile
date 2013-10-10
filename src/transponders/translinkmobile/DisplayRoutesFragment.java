@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
+
 import transponders.translinkmobile.NearbyStops.StackState;
 
 import android.support.v4.app.Fragment;
@@ -12,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -27,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -41,7 +47,7 @@ import android.widget.TextView;
 public class DisplayRoutesFragment extends Fragment {
 	
 	public final static String ARGS_SELECTED_STOPS = "SELECTED_STOPS";
-	private List<String> lines = new ArrayList<String>();
+	//private List<String> lines = new ArrayList<String>();
 	//private HashMap<Route, String> routeMap = new HashMap<Route, String>();
 	private ListView listView;
 	private ArrayList<Stop> stops;
@@ -50,6 +56,7 @@ public class DisplayRoutesFragment extends Fragment {
 	private HashMap<Integer, Route> positionRouteMap;
 	private FragmentManager manager;
 	private DisplayRoutesFragment thisVar;
+	private PullToRefreshScrollView pullToRefreshView;
 	
 	private CountDownLatch lock;
 	
@@ -109,7 +116,15 @@ public class DisplayRoutesFragment extends Fragment {
         	displayName = splittedByNear[0] + "\n near " + splittedByNear[1];
         	title.setText(displayName);
         }
-	
+        
+        pullToRefreshView = (PullToRefreshScrollView) view.findViewById(R.id.timetable_scrollview);
+        pullToRefreshView.setOnRefreshListener(new OnRefreshListener<ScrollView>(){
+
+        	@Override
+			public void onRefresh(final PullToRefreshBase<ScrollView> refreshView) {
+        		new GetDataTask().execute();
+			}
+        });
 		//showLines();
         populateTable();
 				
@@ -124,8 +139,8 @@ public class DisplayRoutesFragment extends Fragment {
 		positionRouteMap = new HashMap<Integer, Route>();
 		makeLines();
 	
-		adapter = new ArrayAdapter<String>(
-        		getActivity().getApplicationContext(), R.layout.route_list_item, lines);
+		/*adapter = new ArrayAdapter<String>(
+        		getActivity().getApplicationContext(), R.layout.route_list_item, lines);*/
 		
 	}
 	
@@ -268,7 +283,7 @@ public class DisplayRoutesFragment extends Fragment {
 		}
 		
 		//routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
-		routeLoader = new RouteDataLoader(lines, adapter, firstArrivalTexts, secondArrivalTexts, positionRouteMap);
+		routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionRouteMap);
 		routeLoader.requestRouteTimes(stops);
 		
 		if (lock != null) {
@@ -367,6 +382,9 @@ public class DisplayRoutesFragment extends Fragment {
      */
     private void makeLines()
     {
+    	services.clear();
+    	directions.clear();
+    	
     	if (stops.size()>1) {
     		//Looking at a group of stops
     		//ArrayList<String> routeIdsAlready = new ArrayList<String>();
@@ -384,12 +402,11 @@ public class DisplayRoutesFragment extends Fragment {
 	    				routeIdsAlready.add(route.getCode());
 	    				lines.add(route.getCode() + "\t\t");
 	    				positionRouteMap.put(lines.size()-1, route);
-	    			}*/
-    				String directionStr = route.getDirectionAsString();
-    				lines.add(route.getCode()+"\t"+directionStr);
-    				positionRouteMap.put(lines.size()-1, route);
+	    			}*/	
+    				//lines.add(route.getCode()+"\t"+directionStr);
     				
     				// Special route code and direction for trains
+    				String directionStr = route.getDirectionAsString();
     				if(stopType == 2)
     				{
     					String name = route.getDescription();
@@ -415,6 +432,8 @@ public class DisplayRoutesFragment extends Fragment {
     					services.add(route.getCode());
         				directions.add(directionStr);
     				}
+    				
+    				positionRouteMap.put(services.size()-1, route);
     			}
     		}
     	} else {
@@ -422,12 +441,11 @@ public class DisplayRoutesFragment extends Fragment {
     		for (int i=0; i<routes.size(); i++) {
     			String code = routes.get(i).getCode();
     			String directionStr = routes.get(i).getDirectionAsString();
-    			lines.add(code + "\t"+directionStr);
-    			positionRouteMap.put(lines.size()-1, routes.get(i));
-    			//routeMap.put(routes.get(i), code);
+    			//lines.add(code + "\t"+directionStr);
     			
     			services.add(code);
 				directions.add(directionStr);
+				positionRouteMap.put(services.size()-1, routes.get(i));
     		}
     	}
     
@@ -468,6 +486,25 @@ public class DisplayRoutesFragment extends Fragment {
 	
 	}
 	
+	private class GetDataTask extends AsyncTask<Void, Void, String[]> {
+
+	    @Override
+	    protected void onPostExecute(String[] result) {
+	        // Call onRefreshComplete when the list has been refreshed.
+	        pullToRefreshView.onRefreshComplete();
+	        table.removeAllViews();
+	        populateTable();
+	        super.onPostExecute(result);
+	    }
+
+		@Override
+		protected String[] doInBackground(Void... params) {
+			Log.d("GetDataTask", "INSIDE DOINBACKGROUND");
+			init();
+			return null;
+		}
+	}
+	
 	/*Testing methods*/
 	public ArrayAdapter<String> getAdapter() {
 		return adapter;
@@ -475,10 +512,10 @@ public class DisplayRoutesFragment extends Fragment {
 	public RouteDataLoader getRouteDataLoader() {
 		return routeLoader;
 	}
-	public List<String> getLines() {
-		return lines;
-	}
 	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
 		this.lock =lock;
 	}
+  /*public List<String> getLines() {
+		return lines;
+	}*/
 }
