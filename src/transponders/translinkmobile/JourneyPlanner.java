@@ -45,7 +45,7 @@ import android.widget.Toast;
  * @version 1.0
  */
 public class JourneyPlanner extends Fragment implements
-		JSONRequest.NetworkListener, OnClickListener {
+		JSONRequest.NetworkListener, OnClickListener, OnItemSelectedListener {
 
 	public static final String ARGS_USER_LOC = "USER_LOCATION";
 	
@@ -53,13 +53,21 @@ public class JourneyPlanner extends Fragment implements
 	private EditText fromText;
 	private EditText destText;
 	private Spinner spinner;
-	static Button dateButton;
-	static Button timeButton;
+	private Spinner vehicleSpinner;
+	private Spinner maxWalkSpinner;
+	private static Button dateButton;
+	private static Button timeButton;
+	private static Button fromMyLocButton;
+	private static Button fromClearButton;
+	private static Button toMyLocButton;
+	private static Button toClearButton;
 	private final String TITLE = "Journey Planner";
 	// params/options
 	private List<String> paramList = new ArrayList<String>();
 	int leaveOption = 0;
 	int requests = 0;
+	int vehicleType = 0;
+	int maxWalkDistance = 1000;
 
 	// Date/Time Settings
 	static String date;
@@ -108,6 +116,19 @@ public class JourneyPlanner extends Fragment implements
 		
 		time = hour + ":" + temp; 
 		
+		fromText = (EditText) view.findViewById(R.id.fromLocation);
+		destText = (EditText) view.findViewById(R.id.toLocation);
+		
+		fromMyLocButton = (Button) view.findViewById(R.id.from_myloc_button);
+		toMyLocButton = (Button) view.findViewById(R.id.to_myloc_button);
+		fromMyLocButton.setOnClickListener(this);
+		toMyLocButton.setOnClickListener(this);
+		
+		fromClearButton = (Button) view.findViewById(R.id.from_clear_button);
+		toClearButton = (Button) view.findViewById(R.id.to_clear_button);
+		fromClearButton.setOnClickListener(this);
+		toClearButton.setOnClickListener(this);
+		
 		dateButton = (Button) view.findViewById(R.id.dateSpinner);
 		timeButton = (Button) view.findViewById(R.id.timeSpinner);
 		dateButton.setText(date);
@@ -123,55 +144,25 @@ public class JourneyPlanner extends Fragment implements
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// Apply the adapter to the spinner
 		spinner.setAdapter(adapter);
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {           
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            	leaveOption = position;
-            	// We need to disable date/time in the right circumstance
-    	        if (position > 1) {
-    	        	// First or last services
-    	        	timeButton.setEnabled(false);
-    	        	dateButton.setEnabled(false);
-    	        } else {
-    	        	timeButton.setEnabled(true);
-    	        	dateButton.setEnabled(true);
-    	        }
-            }
+		spinner.setOnItemSelectedListener(this);
 
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-		fromText = (EditText) view.findViewById(R.id.fromLocation);
-		destText = (EditText) view.findViewById(R.id.toLocation);
+		vehicleSpinner = (Spinner) view.findViewById(R.id.vehicle_type_spinner);
+		ArrayAdapter<CharSequence> vehicleAdapter = ArrayAdapter.createFromResource(getActivity(),
+				R.array.vehicle_type_array, android.R.layout.simple_spinner_item);
+		vehicleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		vehicleSpinner.setAdapter(vehicleAdapter);
+		vehicleSpinner.setOnItemSelectedListener(this);
+		
+		maxWalkSpinner = (Spinner) view.findViewById(R.id.max_walk_spinner);
+		ArrayAdapter<CharSequence> maxWalkAdapter = ArrayAdapter.createFromResource(getActivity(),
+				R.array.max_walk_array, android.R.layout.simple_spinner_item);
+		maxWalkAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		maxWalkSpinner.setAdapter(maxWalkAdapter);
+		maxWalkSpinner.setOnItemSelectedListener(this);
+		maxWalkSpinner.setSelection(1);
 
 		Button button = (Button) view.findViewById(R.id.sendDestButton);
-		button.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				paramList.clear();
-				if (isNetworkAvailable()) {
-					Log.d("BUTTON ONCLICK", "this function is called");
-					getLocIds();
-				} else {
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							getActivity().getApplicationContext());
-					builder.setTitle("No network connection");
-					builder.setMessage("No network connection!");
-					builder.setPositiveButton("OK",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									dialog.dismiss();
-								}
-							});
-					AlertDialog alert = builder.create();
-					alert.show();
-				}
-			}
-		});
+		button.setOnClickListener(this);
 		
 		return view;
 	}
@@ -235,13 +226,17 @@ public class JourneyPlanner extends Fragment implements
 		if (paramList.size() == 2) {
 			// We need to make two calls to resolve.php before we can continue
 			
+			Log.d("SELECTED VEHICLE TYPE", "" + vehicleType);
+			Log.d("SELECTED MAX WALK DISTANCE", "" + maxWalkDistance);
+			
 			paramList.add(date + " " + time);
 			paramList.add("" + leaveOption);
+			paramList.add("" + vehicleType);
+			paramList.add("" + maxWalkDistance);
 			Log.d("LeaveOption: ", "" + leaveOption);
 			Object[] paramArray = paramList.toArray();
 			String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length,
 					String[].class);
-			
 			
 			showJPFragment = new ShowJourneyPage();
 			
@@ -270,10 +265,50 @@ public class JourneyPlanner extends Fragment implements
 	        	newFragment = new DatePickerFragment();
 	    	    newFragment.show(getFragmentManager(), "datePicker");
 	            break;
+	            
 	        case R.id.timeSpinner:
 	        	newFragment = new TimePickerFragment();
 	    	    newFragment.show(getFragmentManager(), "timePicker");
 	    	    break;	
+	    	    
+	        case R.id.from_myloc_button:
+	        	fromText.setText("" + userLoc[0] + ", " + userLoc[1]);
+	        	break;
+	        	
+	        case R.id.to_myloc_button:
+	        	destText.setText("" + userLoc[0] + ", " + userLoc[1]);
+	        	break;
+	        	
+	        case R.id.from_clear_button:
+	        	fromText.setText("");
+	        	break;
+	        	
+	        case R.id.to_clear_button:
+	        	destText.setText("");
+	        	break;
+	        	
+	        case R.id.sendDestButton:
+	        	paramList.clear();
+				if (isNetworkAvailable()) {
+					Log.d("BUTTON ONCLICK", "this function is called");
+					getLocIds();
+				} else {
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							getActivity().getApplicationContext());
+					builder.setTitle("No network connection");
+					builder.setMessage("No network connection!");
+					builder.setPositiveButton("OK",
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.dismiss();
+								}
+							});
+					AlertDialog alert = builder.create();
+					alert.show();
+				}
+				break;
         }
     }
 	
@@ -324,6 +359,43 @@ public class JourneyPlanner extends Fragment implements
 			timeButton.setText(time);
 		}
 	}
+
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+		if(view != null)
+		{
+			switch(parent.getId())
+			{
+				case R.id.leave_options_spinner:
+					leaveOption = position;
+	            	// We need to disable date/time in the right circumstance
+	    	        if (position > 1) {
+	    	        	// First or last services
+	    	        	timeButton.setEnabled(false);
+	    	        	dateButton.setEnabled(false);
+	    	        } else {
+	    	        	timeButton.setEnabled(true);
+	    	        	dateButton.setEnabled(true);
+	    	        }
+	    	        break;
+	    	        
+				case R.id.vehicle_type_spinner:
+					if(position > 0)
+					{
+						vehicleType = (int) Math.pow(2, position);
+					}
+					break;
+					
+				case R.id.max_walk_spinner:
+					maxWalkDistance = (position + 1) * 500;
+					break;
+			}
+		}		
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {}
 	
 	/*Testing functions */
 	public static Calendar getCurrentDate()

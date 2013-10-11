@@ -6,57 +6,109 @@
 
 	<RelativeLayout
 	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content" >
+	    android:layout_height="wrap_content" 
+	    android:paddingBottom="22dp">
 	
 	    <TextView
 	        android:id="@+id/from_label"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/from" 
+	        android:textStyle="bold"
 	        android:layout_marginTop="20dp"
 	        android:layout_marginLeft="22dp"
 	        android:layout_marginRight="22dp"
 	        android:textSize="18sp"/>
 	    
-	    <EditText
-	        android:id="@+id/fromLocation"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:hint="@string/fromLocation"
-	        android:inputType="text" 
-	        android:layout_below="@id/from_label" 
-	        android:layout_marginTop="5dp"
-	        android:layout_marginLeft="22dp"
-	        android:layout_marginRight="22dp"/>
+	    <LinearLayout
+	        android:id="@+id/from_wrapper"
+	        android:layout_width="match_parent"
+	    	android:layout_height="wrap_content" 
+	    	android:orientation="horizontal"
+	    	android:layout_below="@id/from_label" >
+	    
+		    <EditText
+		        android:id="@+id/fromLocation"
+		        android:layout_width="0px"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="6"
+		        android:hint="@string/fromLocation"
+		        android:inputType="text" 
+		        android:layout_marginTop="5dp"
+		        android:layout_marginLeft="22dp"
+		        android:layout_marginRight="2dp"/>
+		    
+		    <Button
+	            android:id="@+id/from_myloc_button"
+	            android:layout_width="30dp"
+	            android:layout_height="30dp"
+	            android:layout_marginTop="5dp"
+	            android:layout_marginRight="5dp"
+	            android:background="@drawable/selector_mylocation" />
+		    
+		    <Button
+	            android:id="@+id/from_clear_button"
+	            android:layout_width="30dp"
+	            android:layout_height="30dp"
+	            android:layout_marginTop="5dp"
+	            android:layout_marginRight="22dp"
+	            android:background="@drawable/selector_clearbutton" />
 	
+	    </LinearLayout>
 	    <TextView
 	        android:id="@+id/to_label"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/to" 
-	        android:layout_below="@id/fromLocation"
+	        android:textStyle="bold"
+	        android:layout_below="@id/from_wrapper"
 	        android:layout_marginTop="20dp"
 	        android:layout_marginLeft="22dp"
 	        android:layout_marginRight="22dp"
 	        android:textSize="18sp"/>
-	    
-	    <EditText
-	        android:id="@+id/toLocation"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/to_label"        
-	        android:hint="@string/toLocation"
-	        android:inputType="text" 
-	        android:layout_marginTop="5dp"
-	        android:layout_marginLeft="22dp"
-	        android:layout_marginRight="22dp" />
+	   	
+	    <LinearLayout
+	        android:id="@+id/to_wrapper"
+	        android:layout_width="match_parent"
+	    	android:layout_height="wrap_content" 
+	    	android:orientation="horizontal"
+	    	android:layout_below="@id/to_label" >
+	    	
+		    <EditText
+		        android:id="@+id/toLocation"
+		        android:layout_width="0px"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="6"        
+		        android:hint="@string/toLocation"
+		        android:inputType="text" 
+		        android:layout_marginTop="5dp"
+		        android:layout_marginLeft="22dp"
+		        android:layout_marginRight="2dp" />
+		    
+		    <Button
+	            android:id="@+id/to_myloc_button"
+	            android:layout_width="30dp"
+	            android:layout_height="30dp"
+	            android:layout_marginTop="5dp"
+	            android:layout_marginRight="5dp"
+	            android:background="@drawable/selector_mylocation" />
+		    
+		    <Button
+	            android:id="@+id/to_clear_button"
+	            android:layout_width="30dp"
+	            android:layout_height="30dp"
+	            android:layout_marginTop="5dp"
+	            android:layout_marginRight="22dp"
+	            android:background="@drawable/selector_clearbutton" />
 	
+	    </LinearLayout>
+	    
 	    <Spinner
 	        android:id="@+id/leave_options_spinner"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentLeft="true"
-	        android:layout_below="@+id/toLocation"
+	        android:layout_below="@id/to_wrapper"
 	        android:textSize="18sp"
 	        android:textColor="@color/black"
 	        android:layout_marginTop="20dp"
@@ -73,31 +125,75 @@
 	        android:text="@string/currentDate" 
 	        android:layout_marginTop="5dp"
 	        android:layout_marginLeft="22dp" />
-	
-	    <Button
-	        android:id="@+id/sendDestButton"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/dateSpinner"
-	        android:text="@string/sendDest" 
-	        android:layout_marginTop="20dp"
-	        android:layout_marginLeft="22dp"
-	        android:layout_marginRight="22dp" 
-	        android:textColor="@color/white"
-	        android:textStyle="bold"
-	        android:background="@drawable/selector_jp" />
 	    
 	    <Button
 	        android:id="@+id/timeSpinner"
 	        style="?android:attr/spinnerStyle"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:layout_above="@+id/sendDestButton"
+	        android:layout_below="@id/leave_options_spinner"
+	        android:layout_marginTop="5dp"
 	        android:layout_marginLeft="22dp"
 	        android:layout_marginRight="22dp"
-	        android:layout_toRightOf="@+id/dateSpinner"
+	        android:layout_toRightOf="@id/dateSpinner"
 	        android:text="@string/currentTime" />
 	    
+	   <TextView
+	        android:id="@+id/vehicle_type_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/vehicle_button_string" 
+	        android:layout_below="@id/dateSpinner"
+	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp"
+	        android:textSize="18sp"/>
+	   
+	   <Spinner
+	        android:id="@+id/vehicle_type_spinner"
+	        android:layout_width="100dp"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/dateSpinner"
+	        android:layout_toRightOf="@id/vehicle_type_label"
+	        android:textSize="18sp"
+	        android:textColor="@color/black"
+	        android:layout_marginTop="12dp"
+	        android:layout_marginRight="22dp" />
+	   
+	   <TextView
+	        android:id="@+id/max_walk_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/max_walk_string" 
+	        android:layout_below="@id/vehicle_type_label"
+	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp"
+	        android:textSize="18sp"/>
+	   
+	   <Spinner
+	        android:id="@+id/max_walk_spinner"
+	        android:layout_width="100dp"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/vehicle_type_label"
+	        android:layout_toRightOf="@id/max_walk_label"
+	        android:textSize="18sp"
+	        android:textColor="@color/black"
+	        android:layout_marginTop="12dp"
+	        android:layout_marginRight="22dp" />
+	
+	    <Button
+	        android:id="@+id/sendDestButton"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/max_walk_label"
+	        android:text="@string/sendDest" 
+	        android:layout_marginTop="25dp"
+	        android:layout_marginLeft="22dp"
+	        android:layout_marginRight="22dp" 
+	        android:textColor="@color/white"
+	        android:textStyle="bold"
+	        android:background="@drawable/selector_jp" />
 	</RelativeLayout>
 	
 </ScrollView>

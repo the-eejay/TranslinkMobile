@@ -45,18 +45,22 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 		String destId = ids[1];
 		String date = ids[2];
 		String leaveOption = ids[3];
-		requestPlan(fromId, destId, date, leaveOption);
+		String vehicleType = ids[4];
+		String maxWalkDistance = ids[5];
+		requestPlan(fromId, destId, date, leaveOption, vehicleType, maxWalkDistance);
 		
 		return view;
 	}
 
-	private void requestPlan(String fromId, String destId, String date, String leaveOption) {
+	private void requestPlan(String fromId, String destId, String date, String leaveOption, String vehType, String maxWalk) {
 
 		/* Call our php code on web zone */
 
 		String urlString = "http://deco3801-010.uqcloud.net/journeyplan.php?fromLocId="
 				+ Uri.encode(fromId) + "&destLocId=" + Uri.encode(destId) + "&date=" + Uri.encode(date)
-				+ "&leaveOption=" + Uri.encode(leaveOption);
+				+ "&leaveOption=" + Uri.encode(leaveOption) 
+				+ "&vehicleTypes=" + Uri.encode(vehType) 
+				+ "&maxWalkDistance=" + Uri.encode(maxWalk);
 		Log.d("JourneyMap request: ", urlString);
 		request = new JSONRequest();
 		request.setListener(this);

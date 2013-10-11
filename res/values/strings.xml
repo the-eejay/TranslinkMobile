@@ -27,6 +27,8 @@
     <string name="temp">Temp</string>
     <string name="service_code">412</string>
     <string name="my_location_desc">My Location Button</string>
+    <string name="vehicle_button_string">Vehicle type:</string>
+    <string name="max_walk_string">Max. walking distance:</string>
     
     <string name="title_template_step">Tutorial - Page <xliff:g id="step_number">%1$d</xliff:g></string>
     <string name="lorem_ipsum"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et magna ut erat elementum cursus in quis ipsum.]]></string>
@@ -42,6 +44,23 @@
         <item>Arrive before</item>
         <item>First services</item>
         <item>Last services</item>
+    </string-array>
+    
+    <string-array name="vehicle_type_array">
+        <item>All</item>
+        <item>Bus</item>
+        <item>Ferry</item>
+        <item>Train</item>
+        <item>Walk</item>
+    </string-array>
+    
+    <string-array name="max_walk_array">
+        <item>500 m</item>
+        <item>1000 m</item>
+        <item>1500 m</item>
+        <item>2000 m</item>
+        <item>2500 m</item>
+        <item>3000 m</item>
     </string-array>
 
 </resources>
