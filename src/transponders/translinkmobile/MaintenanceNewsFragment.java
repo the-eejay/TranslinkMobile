@@ -75,9 +75,9 @@ public class MaintenanceNewsFragment extends Fragment {
 		newsTable = (TableLayout) view.findViewById(R.id.newsTable);
 		tableContext = newsTable.getContext();
 		newsDate = (TextView) view.findViewById(R.id.newsDate);
-		checkConnection();
-		
 		scale = getActivity().getResources().getDisplayMetrics();
+		
+		checkConnection();
         return view;
     }
 	
@@ -242,6 +242,7 @@ public class MaintenanceNewsFragment extends Fragment {
 		            	TextView text1 = new TextView(rowContext);
 		            	
 		            	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, scale);
+		            	
 		            	newRow.setMinimumHeight(height);
 		            	
 		            	TableRow.LayoutParams param1 = new TableRow.LayoutParams();

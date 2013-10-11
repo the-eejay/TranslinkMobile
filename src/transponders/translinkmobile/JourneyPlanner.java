@@ -3,15 +3,18 @@ package transponders.translinkmobile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -31,7 +34,8 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
+import android.widget.Filter;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -50,8 +54,8 @@ public class JourneyPlanner extends Fragment implements
 	public static final String ARGS_USER_LOC = "USER_LOCATION";
 	
 	// UI elements
-	private EditText fromText;
-	private EditText destText;
+	private AutoCompleteTextView fromText;
+	private AutoCompleteTextView destText;
 	private Spinner spinner;
 	private Spinner vehicleSpinner;
 	private Spinner maxWalkSpinner;
@@ -62,12 +66,17 @@ public class JourneyPlanner extends Fragment implements
 	private static Button toMyLocButton;
 	private static Button toClearButton;
 	private final String TITLE = "Journey Planner";
+	
 	// params/options
+	private List<String> resolvedLocations = new ArrayList<String>();
 	private List<String> paramList = new ArrayList<String>();
+	private HashMap<String, String> locationsToID = new HashMap<String, String>();
 	int leaveOption = 0;
 	int requests = 0;
 	int vehicleType = 0;
 	int maxWalkDistance = 1000;
+	boolean hasChosenFromLocation = false;
+	boolean hasChosenToLocation = false;
 
 	// Date/Time Settings
 	static String date;
@@ -86,7 +95,7 @@ public class JourneyPlanner extends Fragment implements
 	// For testing purposes
 	static ShowJourneyPage showJPFragment = null;
 	private JSONRequest request;
-
+	
 	@SuppressLint("NewApi")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -116,8 +125,25 @@ public class JourneyPlanner extends Fragment implements
 		
 		time = hour + ":" + temp; 
 		
-		fromText = (EditText) view.findViewById(R.id.fromLocation);
-		destText = (EditText) view.findViewById(R.id.toLocation);
+		fromText = (AutoCompleteTextView) view.findViewById(R.id.fromLocation);
+		destText = (AutoCompleteTextView) view.findViewById(R.id.toLocation);
+		
+		resolvedLocations.add("ZERO");
+		resolvedLocations.add("ONE");
+		resolvedLocations.add("TWO");
+		resolvedLocations.add("THREE");
+		resolvedLocations.add("FOUR");
+		
+		LocationAdapter fromAdapter = new LocationAdapter(getActivity(),
+			    android.R.layout.simple_spinner_dropdown_item, resolvedLocations, fromText);
+		
+		LocationAdapter destAdapter = new LocationAdapter(getActivity(),
+			    android.R.layout.simple_spinner_dropdown_item, resolvedLocations, destText);
+		
+		fromText.setAdapter(fromAdapter);
+		destText.setAdapter(destAdapter);
+		fromText.setThreshold(3);
+		destText.setThreshold(3);
 		
 		fromMyLocButton = (Button) view.findViewById(R.id.from_myloc_button);
 		toMyLocButton = (Button) view.findViewById(R.id.to_myloc_button);
@@ -181,77 +207,10 @@ public class JourneyPlanner extends Fragment implements
 		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 
-	private void getLocIds() {
-		Log.d("BUTTON ONCLICK", "getLocIDs is called");
-		String origin = fromText.getText().toString();
-		String destination = destText.getText().toString();
-		
-		if (destination == null || destination.equalsIgnoreCase(""))
-		{
-			// User did not enter the destination
-			Toast.makeText(getActivity().getApplicationContext(), "Please enter the destination!", Toast.LENGTH_SHORT).show();
-		    return;
-		}
-		
-		if(selectedDate.before(currentDate))
-		{
-			// The entered date has already passed
-			Toast.makeText(getActivity().getApplicationContext(), "The entered date has already passed!", Toast.LENGTH_SHORT).show();
-		    return;
-		}
-		
-		if (origin == null || origin.equalsIgnoreCase(""))
-		{
-			// User did not input the from location, so use current location
-			origin = userLoc[0] + ", " + userLoc[1];
-		}
-
-		getLocationId(origin);
-		getLocationId(destination);                                                                                     
-	}
-
-	private void getLocationId(String loc) 
-	{
-		Log.d("BUTTON ONCLICK", "getLocationId is called");
-		String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" + Uri.encode(loc);
-		request = new JSONRequest();
-		request.setListener(this);
-		request.execute(url);
-	}
-
 	@Override
 	public void networkRequestCompleted(String result) {
-		Log.d("BUTTON ONCLICK", "networkRequestCompleted is called");
-		paramList.add(result);
-		if (paramList.size() == 2) {
-			// We need to make two calls to resolve.php before we can continue
-			
-			Log.d("SELECTED VEHICLE TYPE", "" + vehicleType);
-			Log.d("SELECTED MAX WALK DISTANCE", "" + maxWalkDistance);
-			
-			paramList.add(date + " " + time);
-			paramList.add("" + leaveOption);
-			paramList.add("" + vehicleType);
-			paramList.add("" + maxWalkDistance);
-			Log.d("LeaveOption: ", "" + leaveOption);
-			Object[] paramArray = paramList.toArray();
-			String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length,
-					String[].class);
-			
-			showJPFragment = new ShowJourneyPage();
-			
-			Log.d("BUTTON ONCLICK", "ShowJourneyPage() is called");
-			Fragment fragment2 = showJPFragment;
-    		Bundle args = new Bundle();
-            args.putStringArray(ShowJourneyPage.ARGS_JOURNEY, paramStrArray);
-            fragment2.setArguments(args);
-    		
-    	    FragmentManager fragmentManager = getFragmentManager();
-    	    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-    	    fragmentTransaction.replace(R.id.content_frame, fragment2);
-    	    fragmentTransaction.addToBackStack(null);
-    	    fragmentTransaction.commitAllowingStateLoss();
-		}
+		
+		Log.d("NETWORK REQ COMPLETED", result);
 	}
 	
 	@Override
@@ -272,11 +231,15 @@ public class JourneyPlanner extends Fragment implements
 	    	    break;	
 	    	    
 	        case R.id.from_myloc_button:
-	        	fromText.setText("" + userLoc[0] + ", " + userLoc[1]);
+	        	String fromDisplay = "" + userLoc[0] + ", " + userLoc[1];
+	        	fromText.setText(fromDisplay);
+	        	locationsToID.put(fromDisplay, "GP:" + fromDisplay);
 	        	break;
 	        	
 	        case R.id.to_myloc_button:
-	        	destText.setText("" + userLoc[0] + ", " + userLoc[1]);
+	        	String toDisplay = "" + userLoc[0] + ", " + userLoc[1];
+	        	destText.setText(toDisplay);
+	        	locationsToID.put(toDisplay, "GP:" + toDisplay);
 	        	break;
 	        	
 	        case R.id.from_clear_button:
@@ -291,22 +254,76 @@ public class JourneyPlanner extends Fragment implements
 	        	paramList.clear();
 				if (isNetworkAvailable()) {
 					Log.d("BUTTON ONCLICK", "this function is called");
-					getLocIds();
+					//getLocIds();
+					
+					String origin = fromText.getText().toString();
+					
+					if(origin == null || origin.equalsIgnoreCase(""))
+					{
+						paramList.add(0, "GP:" + userLoc[0] + "," + userLoc[1]);
+					}
+					else
+					{
+						String originID = locationsToID.get(origin);
+						
+						if(originID == null)
+						{
+							Toast.makeText(getActivity().getApplicationContext(), "Please select a valid location from the dropdown!", Toast.LENGTH_SHORT).show();
+							return;
+						}
+						else
+						{
+							paramList.add(0, originID);
+						}
+					}
+					
+					String destination = destText.getText().toString();
+					
+					if(destination == null || destination.equalsIgnoreCase(""))
+					{
+						Toast.makeText(getActivity().getApplicationContext(), "Please enter the destination!", Toast.LENGTH_SHORT).show();
+						return;
+					}
+					else
+					{
+						String destinationID = locationsToID.get(destination);
+						
+						if(destinationID == null)
+						{
+							Toast.makeText(getActivity().getApplicationContext(), "Please select a valid location from the dropdown!", Toast.LENGTH_SHORT).show();
+							return;
+						}
+						else
+						{
+							paramList.add(1, destinationID);
+						}
+					}
+					
+					paramList.add(date + " " + time);
+					paramList.add("" + leaveOption);
+					paramList.add("" + vehicleType);
+					paramList.add("" + maxWalkDistance);
+					Log.d("LeaveOption: ", "" + leaveOption);
+					Object[] paramArray = paramList.toArray();
+					String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length,
+							String[].class);
+					
+					showJPFragment = new ShowJourneyPage();
+					
+					Log.d("BUTTON ONCLICK", "ShowJourneyPage() is called");
+					Fragment fragment2 = showJPFragment;
+		    		Bundle args = new Bundle();
+		            args.putStringArray(ShowJourneyPage.ARGS_JOURNEY, paramStrArray);
+		            fragment2.setArguments(args);
+		    		
+		    	    FragmentManager fragmentManager = getFragmentManager();
+		    	    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		    	    fragmentTransaction.replace(R.id.content_frame, fragment2);
+		    	    fragmentTransaction.addToBackStack(null);
+		    	    fragmentTransaction.commitAllowingStateLoss();
+		    	    
 				} else {
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							getActivity().getApplicationContext());
-					builder.setTitle("No network connection");
-					builder.setMessage("No network connection!");
-					builder.setPositiveButton("OK",
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									dialog.dismiss();
-								}
-							});
-					AlertDialog alert = builder.create();
-					alert.show();
+					Toast.makeText(getActivity().getApplicationContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
 				}
 				break;
         }
@@ -367,6 +384,14 @@ public class JourneyPlanner extends Fragment implements
 		{
 			switch(parent.getId())
 			{
+				case R.id.fromLocation:
+					
+					break;
+					
+				case R.id.toLocation:
+
+					break;
+			
 				case R.id.leave_options_spinner:
 					leaveOption = position;
 	            	// We need to disable date/time in the right circumstance
@@ -382,9 +407,9 @@ public class JourneyPlanner extends Fragment implements
 	    	        
 				case R.id.vehicle_type_spinner:
 					if(position > 0)
-					{
 						vehicleType = (int) Math.pow(2, position);
-					}
+					else
+						vehicleType = 0;
 					break;
 					
 				case R.id.max_walk_spinner:
@@ -437,4 +462,92 @@ public class JourneyPlanner extends Fragment implements
 		return showJPFragment;
 	}
 	/*End of Testing functions */
+	
+	private class LocationAdapter extends ArrayAdapter<String>
+	{
+		List<String> objects;
+		AutoCompleteTextView ownerACTV;
+		
+		public LocationAdapter(Context context, int textViewResourceId,
+				List<String> objects) {
+			super(context, textViewResourceId, objects);
+			this.objects = objects;
+		}
+		
+		public LocationAdapter(Context context, int textViewResourceId,
+				List<String> objects, AutoCompleteTextView actv) {
+			super(context, textViewResourceId, objects);
+			this.objects = objects;
+			this.ownerACTV = actv;
+		}
+		
+		@Override
+	    public Filter getFilter() 
+		{
+			Filter filter = new Filter(){
+				  @Override
+	              protected FilterResults performFiltering(CharSequence constraint)
+				  {
+					  objects.clear();
+					  FilterResults results = new FilterResults();
+					  String typedText = ownerACTV.getText().toString();
+					  
+					  try
+					  {
+						  Log.d("performFiltering", "TYPED TEXT LENGTH: " + typedText.length());
+						  if(typedText.length() >= 3)
+						  {
+							  String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" 
+								  		+ Uri.encode(typedText)
+								  		+ "&maxResults=" + Uri.encode("5");
+							  request = new JSONRequest();
+							  request.setListener(JourneyPlanner.this);
+							  request.execute(url);
+							  
+							  String result = request.get();
+							  
+							  Object obj = JSONValue.parse(result);
+							  JSONArray array = (JSONArray)((JSONObject)obj).get("Locations");
+									
+							  for(int i = 0; i < array.size(); i++)
+							  {
+								  JSONObject location = (JSONObject) array.get(i);
+								  String desc = (String) location.get("Description");
+								  String id = (String) location.get("Id");
+								
+								  Log.d("filterResults", "Description: " + desc);
+								  Log.d("filterResults", "ID: " + id);
+								  
+								  String[] splitted = desc.split(" \\(");
+								  if (splitted.length > 1)
+									  desc = splitted[0];
+								  
+								  locationsToID.put(desc, id);
+								  objects.add(desc);
+							  }
+						  }
+
+						  results.values = objects;
+						  results.count = objects.size();
+					  
+					  }
+					  catch (Exception e)
+					  {
+						  e.printStackTrace();
+					  }
+					  
+					  Log.d("performFiltering", "return FilterResults");
+					  return results;
+				  }
+				  
+				  @Override
+			      protected void publishResults(CharSequence arg0, FilterResults arg1) 
+				  {
+			          notifyDataSetChanged();
+			      }
+			};
+			
+			return filter;
+		}	
+	}
 }

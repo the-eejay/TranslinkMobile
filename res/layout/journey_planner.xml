@@ -27,7 +27,7 @@
 	    	android:orientation="horizontal"
 	    	android:layout_below="@id/from_label" >
 	    
-		    <EditText
+		    <AutoCompleteTextView
 		        android:id="@+id/fromLocation"
 		        android:layout_width="0px"
 		        android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
 	    	android:orientation="horizontal"
 	    	android:layout_below="@id/to_label" >
 	    	
-		    <EditText
+		    <AutoCompleteTextView
 		        android:id="@+id/toLocation"
 		        android:layout_width="0px"
 		        android:layout_height="wrap_content"
