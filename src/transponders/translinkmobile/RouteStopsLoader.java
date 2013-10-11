@@ -1,5 +1,6 @@
 package transponders.translinkmobile;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -244,7 +245,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 				if (state == State.STOPS_BY_TRIP) {
 					for (StopTrip st: stopTrips) {
 						if (stop == st.getStop()) {
-							Calendar c = Calendar.getInstance();
+							/*Calendar c = Calendar.getInstance();
 							long currTime = c.getTimeInMillis();
 							long min = st.getTime().getTime(); 
 							Log.d("Route", "display minutes is "+min);
@@ -255,7 +256,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 								minutes += 1;
 							long remainingMins1 = minutes % 60;
 							String minFormat1 = remainingMins1 > 1 ? " Mins" : " Min";
-							snippet = remainingMins1 + minFormat1 + " until you arrive here assuming you \n catch the next bus at the previously selected stop.";
+							snippet = remainingMins1 + minFormat1 + " until you arrive here assuming you \n catch the next bus at the previously selected stop.";*/
+							String dateString = new SimpleDateFormat("HH:mm").format(st.getTime());
+							snippet = "Selected Trip Arrival Time: " + dateString;
 							break;
 						}
 					}

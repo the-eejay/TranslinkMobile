@@ -556,6 +556,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		
 		TextView routeInfo = (TextView) findViewById(R.id.routeInfoBox); 
 		routeInfo.setVisibility(View.GONE);
+		mMap.setMyLocationEnabled(false);
+		final Button button = (Button) findViewById(R.id.bLocateMe);
+		button.setVisibility(View.VISIBLE);
 	}
 
 	public void showFirstTimeTutorial() 
@@ -579,6 +582,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		TextView routeInfo = (TextView) findViewById(R.id.routeInfoBox); 
 		routeInfo.setText(selectedTrip.getRoute().getCode() + ": "+selectedTrip.getRoute().getDescription());
 		routeInfo.setVisibility(View.VISIBLE);
+		mMap.setMyLocationEnabled(true);
+		final Button button = (Button) findViewById(R.id.bLocateMe);
+		button.setVisibility(View.GONE);
 	}
 
 	@Override
