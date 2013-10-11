@@ -8,9 +8,7 @@
 		 android:id="@+id/content_frame"
 		 android:layout_width="match_parent"
 		 android:layout_height="match_parent" >
-		    
-   	    	
-   	    
+		    	
 			<fragment 
 			 android:id="@+id/map"
 			 android:layout_width="match_parent"
@@ -23,16 +21,15 @@
         		
         		 <Button
 		            android:id="@+id/bLocateMe"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
+		            android:layout_width="45dp"
+		            android:layout_height="45dp"
 		            android:layout_alignParentRight="true"
 		            android:layout_alignParentTop="true"
 		            android:layout_centerVertical="true"
-		            android:layout_marginRight="3dp"
-		            android:clickable="true"
+		            android:layout_marginTop="10dp"
+		            android:layout_marginRight="10dp"
 		            android:onClick="locateMeButtonOnClick"
-		            android:text="@string/locate_me"
-		            android:textColor="@color/white" />
+		            android:background="@drawable/selector_mylocation" />
         		 
         		 <TextView 
         		     android:id="@+id/routeInfoBox"
@@ -42,7 +39,8 @@
 		            android:layout_centerVertical="true"
 		            android:layout_marginBottom="3dp"
 		            android:text="@string/temp"
-		            android:textColor="@color/black" />
+		            android:textColor="@color/black" 
+		            android:visibility="gone"/>
    	    	</RelativeLayout>   
 			
 			<android.support.v4.view.ViewPager

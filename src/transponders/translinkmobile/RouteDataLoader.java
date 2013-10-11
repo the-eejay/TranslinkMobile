@@ -315,8 +315,6 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		
 	}
 	
-	
-	
 	/*Test methods*/
 	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
 		this.lock =lock;

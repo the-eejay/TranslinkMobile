@@ -38,7 +38,7 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 		View view = inflater.inflate(R.layout.journey_page, container, false);
 
 		wv = (WebView) view.findViewById(R.id.webView);
-		wv.setWebViewClient(new WebViewClient());
+		wv.setWebViewClient(new CustomWebViewClient());
 
 		String[] ids = getArguments().getStringArray(ARGS_JOURNEY);
 		String fromId = ids[0];
@@ -76,6 +76,17 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 		Log.d("URL: ", URL.toString());
 		/* Got the URL, time to load it into the web view */
 		wv.loadUrl(URL);
+	}
+	
+	class CustomWebViewClient extends WebViewClient
+	{
+	    @Override
+	    public boolean shouldOverrideUrlLoading(WebView view, String url) 
+	    {
+	    	Log.d("CLICKED URL", url);
+	    	
+	    	return false;
+	    }
 	}
 	
 	/*Testing functions */

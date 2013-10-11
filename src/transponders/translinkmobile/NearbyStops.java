@@ -1,8 +1,6 @@
 package transponders.translinkmobile;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
@@ -17,11 +15,7 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.NetworkInfo.State;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -36,6 +30,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -110,8 +105,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	private LatLng userLatLng;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
-	
-	
 	
 	private Polyline polyline;
 
@@ -400,9 +393,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 				
 			}
 		});
-		
-		TextView textView = (TextView) findViewById(R.id.routeInfoBox);
-		textView.setVisibility(View.INVISIBLE);
 	}
 
 
@@ -563,6 +553,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 
 		if (showTut)
 			showFirstTimeTutorial();
+		
+		TextView routeInfo = (TextView) findViewById(R.id.routeInfoBox); 
+		routeInfo.setVisibility(View.GONE);
 	}
 
 	public void showFirstTimeTutorial() 
@@ -583,9 +576,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	{
 		//routeStopsLoader.requestRouteStops(selectedRoute);
 		routeStopsLoader.requestTripStops(selectedTrip);
-		TextView textView = (TextView) findViewById(R.id.routeInfoBox); 
-		textView.setText(selectedTrip.getRoute().getCode() + ": "+selectedTrip.getRoute().getDescription());
-		textView.setVisibility(View.VISIBLE);
+		TextView routeInfo = (TextView) findViewById(R.id.routeInfoBox); 
+		routeInfo.setText(selectedTrip.getRoute().getCode() + ": "+selectedTrip.getRoute().getDescription());
+		routeInfo.setVisibility(View.VISIBLE);
 	}
 
 	@Override
