@@ -234,6 +234,9 @@ public class MaintenanceNewsFragment extends Fragment {
 						String link = eElement.getElementsByTagName("link").item(0).getTextContent();
 						String title = eElement.getElementsByTagName("title").item(0).getTextContent();
 						
+						if(title.length() > 50)
+							title = title.substring(0, 47) + "...";
+						
 						allTitles.append(title);
 						allURLs.append(link);
 						

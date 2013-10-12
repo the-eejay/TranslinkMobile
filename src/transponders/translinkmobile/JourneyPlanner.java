@@ -73,7 +73,7 @@ public class JourneyPlanner extends Fragment implements
 	private HashMap<String, String> locationsToID = new HashMap<String, String>();
 	int leaveOption = 0;
 	int requests = 0;
-	int vehicleType = 0;
+	int vehicleType = 30;
 	int maxWalkDistance = 1000;
 	boolean hasChosenFromLocation = false;
 	boolean hasChosenToLocation = false;
@@ -127,12 +127,6 @@ public class JourneyPlanner extends Fragment implements
 		
 		fromText = (AutoCompleteTextView) view.findViewById(R.id.fromLocation);
 		destText = (AutoCompleteTextView) view.findViewById(R.id.toLocation);
-		
-		resolvedLocations.add("ZERO");
-		resolvedLocations.add("ONE");
-		resolvedLocations.add("TWO");
-		resolvedLocations.add("THREE");
-		resolvedLocations.add("FOUR");
 		
 		LocationAdapter fromAdapter = new LocationAdapter(getActivity(),
 			    android.R.layout.simple_spinner_dropdown_item, resolvedLocations, fromText);
@@ -299,6 +293,22 @@ public class JourneyPlanner extends Fragment implements
 						}
 					}
 					
+					if(selectedDate.before(currentDate))
+					{
+						// The entered date has already passed
+						Toast.makeText(getActivity().getApplicationContext(), "The entered date has already passed!", Toast.LENGTH_SHORT).show();
+						return;
+					}
+					
+					Calendar dayLimit = (Calendar) currentDate.clone();
+					dayLimit.add(Calendar.DAY_OF_MONTH, 30);
+					if(selectedDate.after(dayLimit))
+					{
+						// The entered date is more than 30 days in the future
+						Toast.makeText(getActivity().getApplicationContext(), "The search date cannot be more than 30 days in the future!", Toast.LENGTH_SHORT).show();
+						return;
+					}
+
 					paramList.add(date + " " + time);
 					paramList.add("" + leaveOption);
 					paramList.add("" + vehicleType);
@@ -398,7 +408,7 @@ public class JourneyPlanner extends Fragment implements
 	    	        if (position > 1) {
 	    	        	// First or last services
 	    	        	timeButton.setEnabled(false);
-	    	        	dateButton.setEnabled(false);
+	    	        	dateButton.setEnabled(true);
 	    	        } else {
 	    	        	timeButton.setEnabled(true);
 	    	        	dateButton.setEnabled(true);
@@ -409,7 +419,7 @@ public class JourneyPlanner extends Fragment implements
 					if(position > 0)
 						vehicleType = (int) Math.pow(2, position);
 					else
-						vehicleType = 0;
+						vehicleType = 30;
 					break;
 					
 				case R.id.max_walk_spinner:
@@ -465,20 +475,39 @@ public class JourneyPlanner extends Fragment implements
 	
 	private class LocationAdapter extends ArrayAdapter<String>
 	{
-		List<String> objects;
+		List<String> locations;
 		AutoCompleteTextView ownerACTV;
 		
 		public LocationAdapter(Context context, int textViewResourceId,
-				List<String> objects) {
+				List<String> objects) 
+		{
 			super(context, textViewResourceId, objects);
-			this.objects = objects;
+			this.locations = objects;
 		}
 		
 		public LocationAdapter(Context context, int textViewResourceId,
-				List<String> objects, AutoCompleteTextView actv) {
+				List<String> objects, AutoCompleteTextView actv) 
+		{
 			super(context, textViewResourceId, objects);
-			this.objects = objects;
+			this.locations = objects;
 			this.ownerACTV = actv;
+		}
+		
+		@Override
+		public int getCount() 
+		{
+			return this.locations.size();
+		}
+
+		@Override
+		public String getItem(final int position) 
+		{
+			// For cases when perform filtering finishes in the middle of getItem,
+			// making inconsistencies between position and count.
+			if(position > getCount()-1)
+				return "";
+			
+			return this.locations.get(position);
 		}
 		
 		@Override
@@ -488,7 +517,7 @@ public class JourneyPlanner extends Fragment implements
 				  @Override
 	              protected FilterResults performFiltering(CharSequence constraint)
 				  {
-					  objects.clear();
+					  locations.clear();
 					  FilterResults results = new FilterResults();
 					  String typedText = ownerACTV.getText().toString();
 					  
@@ -523,12 +552,12 @@ public class JourneyPlanner extends Fragment implements
 									  desc = splitted[0];
 								  
 								  locationsToID.put(desc, id);
-								  objects.add(desc);
+								  locations.add(desc);
 							  }
 						  }
 
-						  results.values = objects;
-						  results.count = objects.size();
+						  results.values = locations;
+						  results.count = locations.size();
 					  
 					  }
 					  catch (Exception e)
@@ -543,7 +572,7 @@ public class JourneyPlanner extends Fragment implements
 				  @Override
 			      protected void publishResults(CharSequence arg0, FilterResults arg1) 
 				  {
-			          notifyDataSetChanged();
+					  notifyDataSetChanged();
 			      }
 			};
 			
