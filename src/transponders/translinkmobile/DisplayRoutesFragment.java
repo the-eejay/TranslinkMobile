@@ -1,9 +1,16 @@
 package transponders.translinkmobile;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
@@ -17,6 +24,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -44,7 +52,7 @@ import android.widget.TextView;
  * @author Transponders
  * @version 1.0
  */
-public class DisplayRoutesFragment extends Fragment {
+public class DisplayRoutesFragment extends Fragment implements JSONRequest.NetworkListener {
 	
 	public final static String ARGS_SELECTED_STOPS = "SELECTED_STOPS";
 	//private List<String> lines = new ArrayList<String>();
@@ -69,14 +77,21 @@ public class DisplayRoutesFragment extends Fragment {
 	private List<String> services = new ArrayList<String>();
 	private List<String> directions = new ArrayList<String>();
 	
-	private List<TextView> firstArrivalTexts = new ArrayList<TextView>();
-	private List<TextView> secondArrivalTexts = new ArrayList<TextView>();
+/*	private List<TextView> firstArrivalTexts = new ArrayList<TextView>();
+	private List<TextView> secondArrivalTexts = new ArrayList<TextView>();*/
+	
+	private ArrayList<Route> availableRoutes = new ArrayList<Route>();
+	private ArrayList<Trip> firstTrips = new ArrayList<Trip>();
+	private ArrayList<Trip> secondTrips = new ArrayList<Trip>();
+	private JSONRequest request;
+	Calendar c = Calendar.getInstance();
+	Long currTime = c.getTimeInMillis();
 	
 	@Override
 	public void onCreate(Bundle bundle) {
 		Log.d("DisplayRoutes", "DisplayRoutes: onCreate started");
 		super.onCreate(bundle);
-		init();
+		//init();
 		selectedStopName = getArguments().getString(NearbyStops.SELECTED_STOP_NAME);
 		Log.d("DisplayRoutes", selectedStopName);
 		thisVar = this;
@@ -127,7 +142,9 @@ public class DisplayRoutesFragment extends Fragment {
 			}
         });
 		//showLines();
-        populateTable();
+        
+        init();
+        //populateTable();
 				
 		return view;
 	}	
@@ -138,8 +155,8 @@ public class DisplayRoutesFragment extends Fragment {
 		Log.d("DisplayRoutes", "Service type: " + stopType);
 		
 		positionTripMap = new HashMap<Integer, Trip>();
-		makeLines();
-	
+		//makeLines();
+		requestRouteTimes(stops);
 		/*adapter = new ArrayAdapter<String>(
         		getActivity().getApplicationContext(), R.layout.route_list_item, lines);*/
 		
@@ -147,11 +164,16 @@ public class DisplayRoutesFragment extends Fragment {
 	
 	public void populateTable()
 	{
-		firstArrivalTexts.clear();
-        secondArrivalTexts.clear();
-        
-		for(int i = 0; i < services.size(); i++)
+		Log.d("populateTable", "POPULATE TABLE CALLED");
+		//firstArrivalTexts.clear();
+        //secondArrivalTexts.clear();
+		
+        Log.d("populateTable", "Num of first trips: " + firstTrips.size());
+		for(int i = 0; i < firstTrips.size(); i++)
 		{
+			Trip currentTrip = firstTrips.get(i);
+			Log.d("populateTable", currentTrip.getRoute().getDescription());
+			
 			TableRow newRow = new TableRow(tableContext);
         	Context rowContext = newRow.getContext();
         	newRow.setOnClickListener(new RouteListener(i));
@@ -191,17 +213,40 @@ public class DisplayRoutesFragment extends Fragment {
             cell2.setLayoutParams(param2);
             
             TextView serviceCode = new TextView(rowContext);
-            serviceCode.setText(services.get(i));
             serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
             serviceCode.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
-            serviceCode.setPadding(30, 0, -10, 0);
-            
-            if(stopType == 2)
-            	serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            
+            serviceCode.setPadding(30, 0, -10, 0);            	
+      
             TextView direction = new TextView(rowContext);
-            direction.setText(directions.get(i));
             direction.setPadding(30, 0, -10, 0);
+            
+            // Special code & direction for trains
+            if(stopType == 2)
+			{
+            	String originalName = currentTrip.getRoute().getDescription();
+				String[] getTo = originalName.split(" to ");
+				String[] getFrom = getTo;
+				
+				String to = getTo[1];
+				if(to.contains(" - "))
+				{
+					to = to.split(" - ")[0];
+				}
+				
+				if(getFrom[0].contains(" via "))
+				{
+					getFrom = getFrom[0].split(" via ");
+				}
+				
+				serviceCode.setText(to);
+				serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+				direction.setText("From " + getFrom[0]);
+			}
+            else
+            {
+            	serviceCode.setText(currentTrip.getRoute().getCode());
+            	direction.setText(currentTrip.getRoute().getDirectionAsString());
+            }
 
             cell2.addView(serviceCode);
             cell2.addView(direction);
@@ -242,10 +287,27 @@ public class DisplayRoutesFragment extends Fragment {
             else
             	firstText.setTextColor(getResources().getColor(R.color.ferry_blue));       
             
+            firstText.setText(formatTime(currentTrip.getDepartureTime()));
+            
+            boolean foundSecond = false;
+            for(int j = 0; j < secondTrips.size(); j++)
+            {
+            	Trip currentSecondTrip = secondTrips.get(j);
+            	
+            	if(currentSecondTrip.getRoute().getCode().equals(currentTrip.getRoute().getCode()))
+            	{
+            		secondText.setText(formatTime(currentSecondTrip.getDepartureTime()));
+            		foundSecond = true;
+            	}
+            }
+            
+            if(!foundSecond)
+            	secondText.setText("End of Service");
+            
             cell3.addView(firstText);
             cell3.addView(secondText);
-            firstArrivalTexts.add(firstText);
-            secondArrivalTexts.add(secondText);
+            //firstArrivalTexts.add(firstText);
+            //secondArrivalTexts.add(secondText);
             
             newRow.addView(cell3);
             
@@ -285,12 +347,12 @@ public class DisplayRoutesFragment extends Fragment {
 		
 		//routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
 
-		routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionTripMap);
+		/*routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionTripMap);
 		routeLoader.requestRouteTimes(stops);
 		
 		if (lock != null) {
 			lock.countDown();
-		}
+		}*/
 	}
 	
 	private class RouteListener implements OnClickListener
@@ -306,20 +368,8 @@ public class DisplayRoutesFragment extends Fragment {
 		{
     		NearbyStops nearbyStops = (NearbyStops)getActivity();
     		
-    		Trip trip = positionTripMap.get(pos);
+    		Trip trip = firstTrips.get(pos);
     		nearbyStops.setSelectedTrip(trip);
-    		
-    		//RouteDataLoader rdl = nearbyStops.getRouteDataLoader();
-    		
-    		/*ArrayList<StopTrip> stopTrips = routeLoader.getStopTrips();
-    		ArrayList<StopTrip> selectedTripsStopTrips = new ArrayList<StopTrip>();
-    		for (StopTrip st: stopTrips) {
-    			if (st.getTrip() == trip) {
-    				selectedTripsStopTrips.add(st);
-    			}
-    		}
-    		nearbyStops.setSelectedTripsStopTrips(selectedTripsStopTrips);(*/
-    		
     		
     		// Should move these steps to NearbyStops itself and add check whether need to refresh or not
              nearbyStops.removeAllMarkers();
@@ -453,7 +503,7 @@ public class DisplayRoutesFragment extends Fragment {
         				directions.add(directionStr);
     				}
     				
-    				positionTripMap.put(services.size()-1, new Trip("NOT_AN_ACTUAL_TRIP", route));
+    				//positionTripMap.put(services.size()-1, new Trip("NOT_AN_ACTUAL_TRIP", route));
     			}
     		}
     	} else {
@@ -469,7 +519,7 @@ public class DisplayRoutesFragment extends Fragment {
     			
     			services.add(code);
 				directions.add(directionStr);
-				positionTripMap.put(services.size()-1, new Trip("NOT_AN_ACTUAL_TRIP", routes.get(i)));
+				//positionTripMap.put(services.size()-1, new Trip("NOT_AN_ACTUAL_TRIP", routes.get(i)));
     		}
     	}
     }
@@ -515,8 +565,9 @@ public class DisplayRoutesFragment extends Fragment {
 	    protected void onPostExecute(String[] result) {
 	        // Call onRefreshComplete when the list has been refreshed.
 	        pullToRefreshView.onRefreshComplete();
+	        
 	        table.removeAllViews();
-	        populateTable();
+	        //populateTable();
 	        super.onPostExecute(result);
 	    }
 
@@ -538,7 +589,149 @@ public class DisplayRoutesFragment extends Fragment {
 	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
 		this.lock =lock;
 	}
-  /*public List<String> getLines() {
-		return lines;
-	}*/
+	
+	public void requestRouteTimes(ArrayList<Stop> stops) {
+		//Build the retrieve route schedule URL
+		String stopString = "";
+		boolean isFirst = true;
+		for (Stop stop : stops) {
+			if (isFirst) {
+				stopString = stopString + stop.getId();
+				isFirst = false;
+			} else {
+				stopString = stopString + "%2C" + stop.getId();
+			}
+		}
+		
+		String urlString = "http://deco3801-010.uqcloud.net/routeschedule.php?stop="
+				+ stopString;
+
+		request = new JSONRequest();
+		request.setListener(this);
+		request.execute(urlString);
+	}
+	
+	private String formatTime(long timeInMillis)
+	{
+		long minutes = (timeInMillis - currTime) / 60000;
+		
+		// Rounding, if seconds > 30, add another minute
+		long remainingMilis1 = (timeInMillis - currTime) %  60000;
+		if(remainingMilis1 > 30000)
+			minutes += 1;
+		
+		long remainingMins1 = minutes % 60;
+		String minFormat1 = remainingMins1 > 1 ? " Mins" : " Min";
+		
+		String format = remainingMins1 + minFormat1;
+		
+		if(minutes >= 60)
+		{
+			long hour1 = minutes / 60;
+			String hourFormat1 = hour1 > 1 ? " Hours " : " Hour ";
+			
+			format = hour1 + hourFormat1 + remainingMins1 + minFormat1;
+		}
+		
+		return format;
+	}
+
+	@Override
+	public void networkRequestCompleted(String result) {
+		loadSortedTripTimes(result);
+		//table.removeAllViews();
+		populateTable();
+	}
+	
+	public void loadSortedTripTimes(String result) {
+		/* Parse the JSON received from the server. The format is shown below for the parts used:
+		 * {StopTimetables: [Trips:[DepartureTime, Route: {Code}]]}
+		 */
+		
+		c = Calendar.getInstance();
+		currTime = c.getTimeInMillis();
+		
+		availableRoutes.clear();
+		firstTrips.clear();
+		secondTrips.clear();
+		
+		Object obj = JSONValue.parse(result);
+		JSONArray timetables = (JSONArray) ((JSONObject) obj)
+				.get("StopTimetables");
+		Log.d("setStopTripTimes", "Found "+timetables.size()+" timetables.");
+		for (int h = 0; h < timetables.size(); h++) {
+			JSONArray tripsJSON = (JSONArray) ((JSONObject) timetables.get(h))
+					.get("Trips");
+			
+			JSONArray routes = (JSONArray) ((JSONObject) timetables.get(h))
+					.get("Routes");
+			
+			for(int i = 0; i < routes.size(); i++)
+			{
+				String code = (String) ((JSONObject) routes.get(i)).get("Code");
+				String name = (String) ((JSONObject) routes.get(i)).get("Name");
+				Long type = (Long) ((JSONObject) routes.get(i)).get("ServiceType");
+				Long direction = (Long) ((JSONObject) routes.get(i)).get("Direction");
+				
+				availableRoutes.add(new Route(code, name, type, direction));
+			}
+		
+			HashMap<String, Integer> tripCount = new HashMap<String, Integer>();
+			//Log.d("Route", "Found "+trips.size()+" trips.");
+			for (int i = 0; i < tripsJSON.size(); i++) {
+				JSONObject time = (JSONObject) tripsJSON.get(i);
+				String timestr = (String) time.get("DepartureTime");
+				String routecode = (String) ((JSONObject) time.get("Route"))
+						.get("Code");
+				String routeName = (String) ((JSONObject) time.get("Route"))
+						.get("Name");
+				Long type = (Long) ((JSONObject) time.get("Route"))
+						.get("ServiceType");
+				long direction = (((Long) ((JSONObject) time.get("Route"))
+						.get("Direction")));
+				String tripId = (String) ( time.get("TripId"));
+				
+				Date date1 = new Date(Long.parseLong(timestr
+						.substring(6, 18)) * 10);
+				
+				long departureTime = date1.getTime();
+				if(departureTime > currTime)
+				{
+					if(!tripCount.containsKey(routecode))
+						tripCount.put(routecode, 1);
+					else
+						tripCount.put(routecode, tripCount.get(routecode) + 1);
+					
+					if(tripCount.get(routecode) == 1)
+					{
+						Log.d("loadSortedTripTimes", routecode + " " + direction + " " + departureTime + " arrival " + tripCount.get(routecode));
+						firstTrips.add(new Trip(tripId, new Route(routecode, routeName, type, direction), departureTime));
+					}
+					if(tripCount.get(routecode) == 2)
+					{
+						Log.d("loadSortedTripTimes", routecode + " " + direction + " " + departureTime + " arrival " + tripCount.get(routecode));
+						secondTrips.add(new Trip(tripId, new Route(routecode, routeName, type, direction), departureTime));
+					}
+				
+				}
+			}
+
+		}
+		
+		if(stops.size() > 1)
+		{
+			Log.d("loadSortedTripTimes", "GROUPED STOPS, DO ADDITIONAL SORTING");
+			Collections.sort(firstTrips);
+		}
+	}
+	
+	@Override
+	public void onStop() 
+	{
+		// Prevents crash when user hits back before the asynctask is finished
+	    if (this.request != null && this.request.getStatus() == Status.RUNNING) 
+	    	this.request.cancel(true);
+	    
+	    super.onStop();
+	}
 }

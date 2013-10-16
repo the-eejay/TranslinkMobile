@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -38,8 +39,11 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 		View view = inflater.inflate(R.layout.journey_page, container, false);
 
 		wv = (WebView) view.findViewById(R.id.webView);
+		WebSettings settings = wv.getSettings();
+		settings.setDomStorageEnabled(true);
+		settings.setJavaScriptEnabled(true);
 		wv.setWebViewClient(new CustomWebViewClient());
-
+		
 		String[] ids = getArguments().getStringArray(ARGS_JOURNEY);
 		String fromId = ids[0];
 		String destId = ids[1];
@@ -91,6 +95,7 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 	    	
 	    	return false;
 	    }
+	 
 	}
 	
 	/*Testing functions */
