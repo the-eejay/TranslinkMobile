@@ -35,6 +35,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	//private HashMap<Integer, Route> positionRouteMap;
 	private HashMap<Integer, Trip> positionTripMap;
 	private ArrayList<Trip> trips;
+	private DisplayRoutesFragment fragment; //this is bad and I should find solution to not need this
 	
 	private List<TextView> firstArrivalTexts, secondArrivalTexts;
 	private CountDownLatch lock; //to perform unit tests
@@ -49,13 +50,14 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		//this(null, null, positionTripMap);
 	}
 	
-	public RouteDataLoader(List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Trip> positionRouteMap) {
+	public RouteDataLoader(List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Trip> positionRouteMap, DisplayRoutesFragment fragment) {
 		isLoading = false;
 		stopTrips = new ArrayList<StopTrip>();
 		this.positionTripMap = positionRouteMap;
 		trips = new ArrayList<Trip>();
 		firstArrivalTexts = firsts;
 		secondArrivalTexts = seconds;
+		this.fragment = fragment;
 	}
 
 	/**
@@ -103,6 +105,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 
 		setStopTripTimes();
 		addTimesToList();
+		fragment.sortTable(getStopTrips());
 		isLoading = false;
 		
 	}

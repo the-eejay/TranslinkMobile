@@ -292,7 +292,7 @@ public class DisplayRoutesFragment extends Fragment {
 		
 		//routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
 		if (stopTrips == null) {
-			routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionTripMap);
+			routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionTripMap, this);
 			routeLoader.requestRouteTimes(stops);
 		} else {
 			routeLoader.addTimesToList();
@@ -318,6 +318,7 @@ public class DisplayRoutesFragment extends Fragment {
 		int nextNewPos = 0;
 		HashMap<Integer, Integer> newToOldMap = new HashMap<Integer, Integer>();
 		ArrayList<Trip> usedTrips = new ArrayList<Trip>();
+		ArrayList<Integer> usedRows = new ArrayList<Integer>();
 		for (StopTrip st: stopTrips) {
 			for (int i=0; i < services.size(); i++) {
 				Trip trip = positionTripMap.get(i);
@@ -325,15 +326,26 @@ public class DisplayRoutesFragment extends Fragment {
 				if (st.getTrip()  == trip && !(usedTrips.contains(trip)) ) {
 					//oldTrips.add(trip);
 					//newPositionTripMap.put(i, trip);
+					//rebuild please
 					newToOldMap.put(nextNewPos, i);
 					nextNewPos++;
 					usedTrips.add(trip);
+					usedRows.add(i);
 					break;
 				}
 				
 			}
 			
 		}
+		
+		//put the end of service stops at the bottom
+		for (int i=0; i<services.size(); i++) {
+			if (!(usedRows.contains(i))) {
+				newToOldMap.put(nextNewPos, i);
+				nextNewPos++;
+			}
+		}
+		
 		//Log.d("Route", "Oldtrips: "+positionTripMap);
 		//Log.d("Route", "Newtrips: "+positionTripMap);
 		
@@ -596,15 +608,15 @@ public class DisplayRoutesFragment extends Fragment {
 	        // Call onRefreshComplete when the list has been refreshed.
 	        pullToRefreshView.onRefreshComplete();
 	        table.removeAllViews();
-	        //populateTable(null);
-	        sortTable(routeLoader.getStopTrips());
+	        populateTable(null);
+	        //sortTable(routeLoader.getStopTrips());
 	        super.onPostExecute(result);
 	    }
 
 		@Override
 		protected String[] doInBackground(Void... params) {
 			Log.d("GetDataTask", "INSIDE DOINBACKGROUND");
-			//init();
+			init();
 			return null;
 		}
 	}
