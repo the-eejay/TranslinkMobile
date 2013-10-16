@@ -1,8 +1,6 @@
 package transponders.translinkmobile;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -74,10 +72,6 @@ public class DisplayRoutesFragment extends Fragment {
 	private List<TextView> firstArrivalTexts = new ArrayList<TextView>();
 	private List<TextView> secondArrivalTexts = new ArrayList<TextView>();
 	
-	private List<TableRow> rows;
-	private ArrayList<Trip> oldTrips;
-	private HashMap<Integer, Trip> newPositionTripMap;
-	
 	@Override
 	public void onCreate(Bundle bundle) {
 		Log.d("DisplayRoutes", "DisplayRoutes: onCreate started");
@@ -133,7 +127,7 @@ public class DisplayRoutesFragment extends Fragment {
 			}
         });
 		//showLines();
-        populateTable(null);
+        populateTable();
 				
 		return view;
 	}	
@@ -151,11 +145,11 @@ public class DisplayRoutesFragment extends Fragment {
 		
 	}
 	
-	public void populateTable(ArrayList<StopTrip> stopTrips)
+	public void populateTable()
 	{
 		firstArrivalTexts.clear();
         secondArrivalTexts.clear();
-        rows = new ArrayList<TableRow>();
+        
 		for(int i = 0; i < services.size(); i++)
 		{
 			TableRow newRow = new TableRow(tableContext);
@@ -287,91 +281,17 @@ public class DisplayRoutesFragment extends Fragment {
             newRow.setBackgroundResource(R.drawable.selector);
             table.addView(newRow);
             table.addView(separatorLine);
-            rows.add(newRow);
 		}
 		
 		//routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
-		if (stopTrips == null) {
-			routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionTripMap);
-			routeLoader.requestRouteTimes(stops);
-		} else {
-			routeLoader.addTimesToList();
-		}
+
+		routeLoader = new RouteDataLoader(firstArrivalTexts, secondArrivalTexts, positionTripMap);
+		routeLoader.requestRouteTimes(stops);
 		
 		if (lock != null) {
 			lock.countDown();
 		}
 	}
-	
-	public void sortTable(ArrayList<StopTrip> stopTrips) {
-		Collections.sort(stopTrips);
-		table.removeAllViews();
-		oldTrips = new ArrayList<Trip>();
-		//newPositionTripMap = new HashMap<Integer, Trip>();
-		
-		for(int i=0; i<stopTrips.size(); i++) {
-			Log.d("Route", "StopTrip["+i+"]"+stopTrips.get(i).getTrip().getTripId());
-		}
-		for (int i=0; i<services.size();i++) {
-			Log.d("Route", "Positiontripmap["+i+"]="+positionTripMap.get(i).getTripId());
-		}
-		int nextNewPos = 0;
-		HashMap<Integer, Integer> newToOldMap = new HashMap<Integer, Integer>();
-		ArrayList<Trip> usedTrips = new ArrayList<Trip>();
-		for (StopTrip st: stopTrips) {
-			for (int i=0; i < services.size(); i++) {
-				Trip trip = positionTripMap.get(i);
-				
-				if (st.getTrip()  == trip && !(usedTrips.contains(trip)) ) {
-					//oldTrips.add(trip);
-					//newPositionTripMap.put(i, trip);
-					newToOldMap.put(nextNewPos, i);
-					nextNewPos++;
-					usedTrips.add(trip);
-					break;
-				}
-				
-			}
-			
-		}
-		//Log.d("Route", "Oldtrips: "+positionTripMap);
-		//Log.d("Route", "Newtrips: "+positionTripMap);
-		
-		/*for (int i=0; i<services.size(); i++) {
-			Trip oldTrip = positionTripMap.get(i);
-			for (int j=0; j<services.size(); j++) {
-				if (newPositionTripMap.get(j) == oldTrip) {
-					newToOldMap.put(j, i);
-					break;
-				}
-			}
-		}*/
-		Log.d("Route", "newToOldMap="+newToOldMap);
-		Log.d("Route", "Rows size = "+rows.size());
-		for(int newPos=0; newPos<services.size(); newPos++) {
-			Log.d("Route", ""+newPos);
-			table.addView(rows.get(newToOldMap.get(newPos)));
-		}
-		
-		//table.addView(rows.get(0));
-		/*stops.clear();
-		positionTripMap.clear();
-		for (StopTrip st: stopTrips) {
-			if (!stops.contains(st.getStop())) {
-				stops.add(st.getStop());
-			}
-		}
-		Log.d("Route", "0="+stopTrips.get(0).getTrip().getRoute().getCode()+stopTrips.get(0).getTime().toString()+"1="+stopTrips.get(1).getTrip().getRoute().getCode()+" "+stopTrips.get(1).getTime().toString()+" 2="+stopTrips.get(2).getTrip().getRoute().getCode()+"  "+stopTrips.get(2).getTime().toString());
-		Log.d("Route", "0="+stops.get(0).get+" 1="+stops.get(1).getId()+" 2="+stops.get(2).getId());
-		makeLines();
-		populateTable(stopTrips);*/
-		
-		
-	}
-	
-	
-	
-	
 	
 	private class RouteListener implements OnClickListener
     {		
@@ -596,15 +516,14 @@ public class DisplayRoutesFragment extends Fragment {
 	        // Call onRefreshComplete when the list has been refreshed.
 	        pullToRefreshView.onRefreshComplete();
 	        table.removeAllViews();
-	        //populateTable(null);
-	        sortTable(routeLoader.getStopTrips());
+	        populateTable();
 	        super.onPostExecute(result);
 	    }
 
 		@Override
 		protected String[] doInBackground(Void... params) {
 			Log.d("GetDataTask", "INSIDE DOINBACKGROUND");
-			//init();
+			init();
 			return null;
 		}
 	}

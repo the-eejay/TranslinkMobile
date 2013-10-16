@@ -3,9 +3,7 @@ package transponders.translinkmobile;
 import java.util.ArrayList;
 import java.util.Date;
 
-import android.webkit.WebView;
-
-public class StopTrip implements Comparable<StopTrip> {
+public class StopTrip {
 	private Stop stop;
 	private Trip trip;
 	//private ArrayList<Date> times;
@@ -54,19 +52,6 @@ public class StopTrip implements Comparable<StopTrip> {
 	public void setTime(Date time) {
 		this.time=time;
 	}
-
-	@Override
-	public int compareTo(StopTrip b) {
-		if (b.getTime().getTime() < getTime().getTime()) {
-			return 1;
-		} else if (b.getTime().getTime() == getTime().getTime()) {
-			return 0;
-		} else {
-			return -1;
-		}
-		
-	}
-	
 	
 	/*public String getTripId() {
 		return tripId;

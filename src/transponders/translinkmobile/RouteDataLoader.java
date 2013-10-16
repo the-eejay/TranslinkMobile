@@ -104,7 +104,6 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		setStopTripTimes();
 		addTimesToList();
 		isLoading = false;
-		
 	}
 
 	/**
@@ -124,7 +123,6 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		/* Parse the JSON received from the server. The format is shown below for the parts used:
 		 * {StopTimetables: [Trips:[DepartureTime, Route: {Code}]]}
 		 */
-		stopTrips.clear();
 		Object obj = JSONValue.parse(result);
 		JSONArray timetables = (JSONArray) ((JSONObject) obj)
 				.get("StopTimetables");
@@ -204,13 +202,6 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 			for (int k = 0; k < stopTrips.size(); k++) {
 				StopTrip st = stopTrips.get(k);
 				//if (line.contains(sr.getRoute().getCode())) {
-				//Log.d("Times", ""+positionTripMap);
-				//Log.d("Times", "firstSize"+firstArrivalTexts.size());
-				//Log.d("Times", ""+i);
-				//Log.d("Times", ""+positionTripMap.get(i));
-				//Log.d("Times", ""+positionTripMap.get(i).getRoute());
-				//Log.d("Times", ""+st);
-				//Log.d("Times", ""+st.getTrip());
 				if (positionTripMap.get(i).getRoute() == st.getTrip().getRoute()) {
 
 					//Date time = st.getTime();
