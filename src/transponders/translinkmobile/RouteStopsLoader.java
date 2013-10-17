@@ -40,6 +40,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private ArrayList<StopTrip> stopTrips;
 	//private HashMap<Stop, Date> stopTimesMap;
 	private int[] markerIcons = {R.drawable.bus_geo_border, R.drawable.train_geo_border, R.drawable.ferry_geo_border};
+	private int[] roundMarkers= {R.drawable.bus_circle, R.drawable.ferry_circle, R.drawable.train_circle}; 
 	private Route route2;
 	private Trip trip2;
 	private Polyline polyline;
@@ -50,6 +51,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private ArrayList<Marker> estimatedBusMarkers;
 	private HashMap<Marker, EstimatedBus> estimatedBusMarkersMap;
 	private CountDownTimer estimatedBusTimer;
+	int serviceType;
 
 	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline) {
 		isLoading = false;
@@ -103,6 +105,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	}
 	
 	public void requestTripStops(Trip trip) {
+		serviceType = (int) (Math.log(trip.getRoute().getType()) / Math.log(2));
 		String urlString = "http://deco3801-010.uqcloud.net/tripstops.php?tripId="+trip.getTripId();
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
@@ -178,7 +181,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 			return output;
 		}
 			Object obj = JSONValue.parse(result);
-			//try {
+			try {
 				Log.d("Location", "result="+result);
 				JSONArray array = (JSONArray)((JSONObject)obj).get("Stops");
 				for (int i=0; i<array.size(); i++) {
@@ -212,9 +215,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 					output.add(stop);
 				}
 				return output;
-		//} catch (Exception e) {
-			//return null;
-		//}
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/**
@@ -230,15 +233,15 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 
 		}
 		stopMarkers.clear();*/
-		Log.d("Route", "about to add "+stops.size()+" stops to map");
+		
 		// Add new stop markers to map
 		if (stops != null) 
 		{
+			Log.d("Route", "about to add "+stops.size()+" stops to map");
 			for (Stop stop : stops)
 			{
-				int serviceType = stop.getServiceType();
+				serviceType = stop.getServiceType();
 				Log.d("serviceType", "" + serviceType);
-				
 				
 				// Get the time from the stopTrips
 				String snippet = "";
@@ -296,7 +299,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		Object obj = JSONValue.parse(result);
 		String output = null;
 		
-		//try {
+		try {
 			
 			if (state == State.POLYLINE) {
 				JSONArray array = (JSONArray)((JSONObject)obj).get("Paths");
@@ -321,9 +324,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 			
 			
 			
-		//} catch (Exception e) {
+		} catch (Exception e) {
 			//error loading data
-		//}
+		}
 		return output;
 	}
 	
@@ -371,15 +374,24 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		this.estimatedBuses = estimatedBuses;
 		estimatedBusMarkers = new ArrayList<Marker>();
 		estimatedBusMarkersMap = new HashMap<Marker, EstimatedBus>();
+		
+		String title = "Estimated ";
+		if(serviceType == 1)
+			title += "bus";
+		else if(serviceType == 2)
+			title += "ferry";
+		else
+			title += "train";
+		
 		for (EstimatedBus bus: estimatedBuses) {
 			Log.d("Bus", "adding the bus at "+bus.getPosition());
 			boolean visiboolean = bus.isActive();
 			Marker busMarker = map.addMarker(new MarkerOptions()
 				.position(bus.getPosition())
-				.title("Estimated Bus")
+				.title(title)
 				.visible(visiboolean)
 				.icon(BitmapDescriptorFactory
-						.fromResource(R.drawable.location_geo_border)));
+						.fromResource(roundMarkers[serviceType-1])));
 			estimatedBusMarkers.add(busMarker);
 			estimatedBusMarkersMap.put(busMarker, bus);
 			

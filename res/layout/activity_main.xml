@@ -6,7 +6,7 @@
     
    	<FrameLayout
 		 android:id="@+id/content_frame"
-		 android:layout_width="match_parent"
+		 android:layout_width="fill_parent"
 		 android:layout_height="match_parent" >
 		    	
 			<fragment 
@@ -16,7 +16,7 @@
 			 class="com.google.android.gms.maps.SupportMapFragment" />
 			
 			 <RelativeLayout
-   	    	    android:layout_width="match_parent"
+   	    	    android:layout_width="fill_parent"
         		android:layout_height="match_parent" >
         		
         		 <Button
@@ -29,18 +29,92 @@
 		            android:layout_marginTop="10dp"
 		            android:layout_marginRight="10dp"
 		            android:onClick="locateMeButtonOnClick"
-		            android:background="@drawable/selector_mylocation" />
+		            android:background="@drawable/selector_googlemyloc" />
         		 
-        		 <TextView 
-        		     android:id="@+id/routeInfoBox"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:layout_alignParentBottom="true"
-		            android:layout_centerVertical="true"
-		            android:layout_marginBottom="3dp"
-		            android:text="@string/temp"
-		            android:textColor="@color/black" 
-		            android:visibility="gone"/>
+        		 <TableLayout 
+				    android:id="@+id/trip_table"
+				    android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:layout_alignParentBottom="true"
+				    android:stretchColumns="*"
+				    android:visibility="visible" >
+				    
+        		    <TableRow
+				        android:id="@+id/color_row"
+				        android:layout_width="fill_parent"
+				        android:layout_height="wrap_content">
+				    
+	        		     <TextView 
+		        		    android:id="@+id/color_box"
+				            android:layout_height="20dp"
+					        android:layout_weight="1"
+					        android:layout_span="70"
+				            android:background="@color/ferry_blue" />
+        		     
+        		    </TableRow>
+			 
+				  	<TableRow
+				        android:id="@+id/trip_row"
+				        android:layout_width="fill_parent"
+				        android:layout_height="wrap_content"
+				        android:background="@color/grey_background" >
+				
+					     <TextView
+					        android:id="@+id/trip_code"
+					        android:layout_span="20"
+					        android:layout_height="60dp"
+					        android:layout_weight="1"
+					        android:text="@string/service_code"
+					        android:textSize="32sp" 
+					        android:textStyle="bold"
+					        android:gravity="bottom"
+					        android:paddingLeft="20dp" />
+					     
+					     <TextView
+					        android:id="@+id/trip_description"
+					        android:layout_span="50"
+					        android:layout_height="60dp"
+					        android:layout_weight="1"
+					        android:paddingRight="10dp"
+							android:text="@string/trip_description"
+							android:layout_gravity="center_vertical"
+							android:gravity="bottom"
+							android:textSize="17sp" />
+		  		        
+				    </TableRow>
+				    
+				  	  <TableRow
+				        android:id="@+id/trip_row2"
+				        android:layout_width="fill_parent"
+				        android:layout_height="wrap_content" 
+					    android:background="@color/grey_background" 
+					    android:paddingLeft="10dp"
+					    android:paddingBottom="10dp"
+					    android:paddingRight="10dp" >
+				
+					     <Spinner
+					        android:id="@+id/trip_choice"
+					        android:layout_span="20"
+					        android:layout_weight="1"
+					        android:layout_height="40dp"
+					        android:gravity="center"
+					        android:textSize="20sp"
+					        android:textColor="@color/black" />
+					     
+					     <TextView
+					        android:id="@+id/platform"
+					        android:layout_span="50"
+					        android:layout_height="40dp"
+							android:text="@string/platform"
+							android:textColor="@color/dark_grey"
+							android:textSize="14sp"
+							android:layout_weight="1"
+					        android:paddingLeft="10dp"
+					        android:visibility="invisible" />
+		  		        
+				    </TableRow>
+			
+				</TableLayout>
    	    	</RelativeLayout>   
 			
 			<android.support.v4.view.ViewPager

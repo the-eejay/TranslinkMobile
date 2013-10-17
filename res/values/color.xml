@@ -8,7 +8,9 @@
     <color name="selected_blue">#80ceea</color>
     <color name="bus_green">#80ba42</color>
     <color name="ferry_blue">#136ab1</color>
-	<color name="train_orange">#f4961f</color>    
+	<color name="train_orange">#f4961f</color>   
+	<color name="dark_grey">#888888</color> 
+	<color name="grey_background">#eeeeee</color>
     <color name="transparent_black">#88000000</color>
     <drawable name="transparent_color">#00000000</drawable>    
 

@@ -6,6 +6,8 @@ public class Trip implements Comparable<Trip> {
 	private Long departureTime;
 	//private ArrayList<StopRoute> stopRoutes;
 	
+	public Trip() {}
+	
 	public Trip(String tripId, Route route) {
 		this.tripId = tripId;
 		this.route = route;

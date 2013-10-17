@@ -29,6 +29,8 @@
     <string name="my_location_desc">My Location Button</string>
     <string name="vehicle_button_string">Vehicle type:</string>
     <string name="max_walk_string">Max. walking distance:</string>
+    <string name="trip_description">City, Milton, Toowong, St Lucia, Uni of Qld, St Lucia South </string>
+    <string name="platform">Platform E</string>
     
     <string name="title_template_step">Tutorial - Page <xliff:g id="step_number">%1$d</xliff:g></string>
     <string name="lorem_ipsum"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et magna ut erat elementum cursus in quis ipsum.]]></string>

@@ -39,20 +39,22 @@
 		        android:layout_marginRight="2dp"/>
 		    
 		    <Button
-	            android:id="@+id/from_myloc_button"
-	            android:layout_width="30dp"
-	            android:layout_height="30dp"
-	            android:layout_marginTop="5dp"
-	            android:layout_marginRight="5dp"
-	            android:background="@drawable/selector_mylocation" />
-		    
-		    <Button
 	            android:id="@+id/from_clear_button"
 	            android:layout_width="30dp"
 	            android:layout_height="30dp"
 	            android:layout_marginTop="5dp"
-	            android:layout_marginRight="22dp"
+	            android:layout_marginRight="5dp"
 	            android:background="@drawable/selector_clearbutton" />
+		    
+		    <Button
+	            android:id="@+id/from_myloc_button"
+	            android:layout_width="30dp"
+	            android:layout_height="30dp"
+	            android:layout_marginTop="5dp"
+	            android:layout_marginRight="22dp"
+	            android:background="@drawable/selector_mylocation" />
+		    
+		    
 	
 	    </LinearLayout>
 	    <TextView
@@ -86,20 +88,22 @@
 		        android:layout_marginRight="2dp" />
 		    
 		    <Button
-	            android:id="@+id/to_myloc_button"
-	            android:layout_width="30dp"
-	            android:layout_height="30dp"
-	            android:layout_marginTop="5dp"
-	            android:layout_marginRight="5dp"
-	            android:background="@drawable/selector_mylocation" />
-		    
-		    <Button
 	            android:id="@+id/to_clear_button"
 	            android:layout_width="30dp"
 	            android:layout_height="30dp"
 	            android:layout_marginTop="5dp"
-	            android:layout_marginRight="22dp"
+	            android:layout_marginRight="5dp"
 	            android:background="@drawable/selector_clearbutton" />
+		    
+		    <Button
+	            android:id="@+id/to_myloc_button"
+	            android:layout_width="30dp"
+	            android:layout_height="30dp"
+	            android:layout_marginTop="5dp"
+	            android:layout_marginRight="22dp"
+	            android:background="@drawable/selector_mylocation" />
+		    
+		    
 	
 	    </LinearLayout>
 	    

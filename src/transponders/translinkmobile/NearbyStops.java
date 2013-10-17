@@ -30,9 +30,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -100,6 +102,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	private ArrayList<Stop> selectedStops;
 	//private Route selectedRoute;
 	private Trip selectedTrip;
+	private Trip selectedTrip2;
 	private ArrayList<StopTrip> selectedTripsStopTrips;
 	//private String selectedTripId;
 	private LatLng userLatLng;
@@ -145,6 +148,11 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
             MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
     boolean mUpdatesRequested = true;
 
+    // For route display
+    TableLayout table;
+    TextView colorBox;
+	TextView tripCode;
+	TextView routeInfo;
 	
 	// For testing purposes
 	private JourneyPlanner jpFragment = null;
@@ -554,8 +562,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		if (showTut)
 			showFirstTimeTutorial();
 		
-		TextView routeInfo = (TextView) findViewById(R.id.routeInfoBox); 
-		routeInfo.setVisibility(View.GONE);
+		TableLayout table = (TableLayout) findViewById(R.id.trip_table); 
+		table.setVisibility(View.GONE);
 		mMap.setMyLocationEnabled(false);
 		final Button button = (Button) findViewById(R.id.bLocateMe);
 		button.setVisibility(View.VISIBLE);
@@ -579,9 +587,46 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	{
 		//routeStopsLoader.requestRouteStops(selectedRoute);
 		routeStopsLoader.requestTripStops(selectedTrip);
-		TextView routeInfo = (TextView) findViewById(R.id.routeInfoBox); 
-		routeInfo.setText(selectedTrip.getRoute().getCode() + ": "+selectedTrip.getRoute().getDescription());
-		routeInfo.setVisibility(View.VISIBLE);
+		
+		table = (TableLayout) findViewById(R.id.trip_table);
+		
+		colorBox = (TextView) findViewById(R.id.color_box);
+		tripCode = (TextView) findViewById(R.id.trip_code);
+		routeInfo = (TextView) findViewById(R.id.trip_description); 
+		
+		long stopType = selectedTrip.getRoute().getType();
+		 if(stopType == Route.TransportType.BUS)
+         	colorBox.setBackgroundResource(R.color.bus_green);
+         else if(stopType == Route.TransportType.TRAIN)
+        	 colorBox.setBackgroundResource(R.color.train_orange);
+         else
+        	 colorBox.setBackgroundResource(R.color.ferry_blue);
+		
+		tripCode.setText(selectedTrip.getRoute().getCode());
+		routeInfo.setText(selectedTrip.getRoute().getDescription());
+		
+		Spinner tripChoices = (Spinner) findViewById(R.id.trip_choice);
+		
+		String[] services;
+		if(selectedTrip2 != null)
+		{
+			services = new String[2];
+			services[0] = "Service 1";
+			services[1] = "Service 2";
+		}
+		else
+		{
+			services = new String[1];
+			services[0] = "Service 1";
+		}
+		
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, services);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tripChoices.setAdapter(adapter);
+        tripChoices.setOnItemSelectedListener(new TripDropdownListener());
+		
+		table.setVisibility(View.VISIBLE);
+		
 		mMap.setMyLocationEnabled(true);
 		final Button button = (Button) findViewById(R.id.bLocateMe);
 		button.setVisibility(View.GONE);
@@ -751,6 +796,12 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		selectedTrip = trip;
 	}
 	
+	public void setSelectedTrip(Trip trip, Trip trip2) {
+		selectedTrip = trip;
+		selectedTrip2 = trip2;
+	}
+	
+	
 	/*public void setSelectedTripsStopTrips(ArrayList<StopTrip> stopTrips) {
 		this.selectedTripsStopTrips = stopTrips;
 	}*/
@@ -881,6 +932,32 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private class TripDropdownListener implements OnItemSelectedListener 
+    {
+    	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
+    	{
+    		removeAllMarkers();
+    		
+    		if(pos == 0) 
+    		{
+    			routeStopsLoader.requestTripStops(selectedTrip);
+    			tripCode.setText(selectedTrip.getRoute().getCode());
+    			routeInfo.setText(selectedTrip.getRoute().getDescription());
+    		}
+    		else if(selectedTrip2 != null)
+    		{
+    			routeStopsLoader.requestTripStops(selectedTrip2);
+    			tripCode.setText(selectedTrip2.getRoute().getCode());
+    			routeInfo.setText(selectedTrip2.getRoute().getDescription());
+    		}
+    	}
+    	
+    	public void onNothingSelected(AdapterView<?> arg0)
+    	{
+    		
+    	}
+    }
 	
 
 	

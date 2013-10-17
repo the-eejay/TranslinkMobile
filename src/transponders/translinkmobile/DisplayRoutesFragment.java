@@ -44,6 +44,7 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * This class is the fragment that shows the service codes and estimated
@@ -82,7 +83,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	
 	private ArrayList<Route> availableRoutes = new ArrayList<Route>();
 	private ArrayList<Trip> firstTrips = new ArrayList<Trip>();
-	private ArrayList<Trip> secondTrips = new ArrayList<Trip>();
+	private HashMap<Route, Trip> secondTrips = new HashMap<Route, Trip>();
 	private JSONRequest request;
 	Calendar c = Calendar.getInstance();
 	Long currTime = c.getTimeInMillis();
@@ -92,6 +93,9 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		Log.d("DisplayRoutes", "DisplayRoutes: onCreate started");
 		super.onCreate(bundle);
 		//init();
+		
+		stops = ((NearbyStops) getActivity()).getSelectedStops();	
+		stopType = stops.get(0).getServiceType();
 		selectedStopName = getArguments().getString(NearbyStops.SELECTED_STOP_NAME);
 		Log.d("DisplayRoutes", selectedStopName);
 		thisVar = this;
@@ -138,20 +142,22 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 
         	@Override
 			public void onRefresh(final PullToRefreshBase<ScrollView> refreshView) {
-        		new GetDataTask().execute();
+        		//new GetDataTask().execute();
+        		//init();
+        		requestRouteTimes(stops);
 			}
         });
 		//showLines();
         
-        init();
+        //init();
+        requestRouteTimes(stops);
         //populateTable();
 				
 		return view;
 	}	
 	
 	private void init() {
-		stops = ((NearbyStops) getActivity()).getSelectedStops();	
-		stopType = stops.get(0).getServiceType();
+		
 		Log.d("DisplayRoutes", "Service type: " + stopType);
 		
 		positionTripMap = new HashMap<Integer, Trip>();
@@ -168,19 +174,38 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		//firstArrivalTexts.clear();
         //secondArrivalTexts.clear();
 		
+		Trip currentTrip;
+		Route currentRoute;
+		boolean endedServices = false;
+		int numOfEndedServices = availableRoutes.size();
+		int endedServiceIndex = 0;
+		
         Log.d("populateTable", "Num of first trips: " + firstTrips.size());
-		for(int i = 0; i < firstTrips.size(); i++)
+		for(int i = 0; i < firstTrips.size() || endedServiceIndex < numOfEndedServices; i++)
 		{
-			Trip currentTrip = firstTrips.get(i);
-			Log.d("populateTable", currentTrip.getRoute().getDescription());
+			if(i >= firstTrips.size())
+				endedServices = true;
 			
 			TableRow newRow = new TableRow(tableContext);
         	Context rowContext = newRow.getContext();
-        	newRow.setOnClickListener(new RouteListener(i));
-        	
         	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, scale);
         	newRow.setMinimumHeight(height);
-        	
+			
+			if(endedServices)
+			{
+				newRow.setClickable(true);
+				currentTrip = new Trip(); // currentTrip doesn't matter anymore
+				currentRoute = availableRoutes.get(endedServiceIndex);
+				endedServiceIndex++;
+			}
+			else
+			{
+				currentTrip = firstTrips.get(i);
+				currentRoute = currentTrip.getRoute();
+				newRow.setOnClickListener(new RouteListener(i));
+			}
+			Log.d("populateTable", currentRoute.getDescription());
+				
         	// Color bar (column 0)
         	TextView colorBar = new TextView(rowContext);
         	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
@@ -222,8 +247,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
             
             // Special code & direction for trains
             if(stopType == 2)
-			{
-            	String originalName = currentTrip.getRoute().getDescription();
+            {	
+            	String originalName = currentRoute.getDescription();
 				String[] getTo = originalName.split(" to ");
 				String[] getFrom = getTo;
 				
@@ -244,8 +269,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 			}
             else
             {
-            	serviceCode.setText(currentTrip.getRoute().getCode());
-            	direction.setText(currentTrip.getRoute().getDirectionAsString());
+            	serviceCode.setText(currentRoute.getCode());
+            	direction.setText(currentRoute.getDirectionAsString());
             }
 
             cell2.addView(serviceCode);
@@ -289,20 +314,14 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
             
             firstText.setText(formatTime(currentTrip.getDepartureTime()));
             
-            boolean foundSecond = false;
-            for(int j = 0; j < secondTrips.size(); j++)
-            {
-            	Trip currentSecondTrip = secondTrips.get(j);
-            	
-            	if(currentSecondTrip.getRoute().getCode().equals(currentTrip.getRoute().getCode()))
-            	{
-            		secondText.setText(formatTime(currentSecondTrip.getDepartureTime()));
-            		foundSecond = true;
-            	}
-            }
-            
-            if(!foundSecond)
+            Trip currentSecondTrip = secondTrips.get(currentRoute);
+            if(currentSecondTrip != null)
+            	secondText.setText(formatTime(currentSecondTrip.getDepartureTime()));
+            else
             	secondText.setText("End of Service");
+            
+            if(endedServices)
+            	secondText.setText("N/A");
             
             cell3.addView(firstText);
             cell3.addView(secondText);
@@ -343,6 +362,21 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
             newRow.setBackgroundResource(R.drawable.selector);
             table.addView(newRow);
             table.addView(separatorLine);
+            
+            // If the route is still available, remove it from the list of all routes,
+            // leaving the ended services in the list.
+            if(!endedServices && availableRoutes.remove(currentRoute))
+            	Log.d("populateTable", currentRoute.getCode() + " REMOVED");
+            
+            // After the last iteration, start processing the ended routes.
+            if(i == firstTrips.size() - 1 && !endedServices)
+            {
+            	Log.d("populateTable", "FINISHED LOOPING FIRSTTRIPS");
+            	
+            	numOfEndedServices = availableRoutes.size();
+            	i -= numOfEndedServices;
+            	endedServices = true;
+            }
 		}
 		
 		//routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
@@ -366,20 +400,24 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		
     	public void onClick(View v) 
 		{
-    		NearbyStops nearbyStops = (NearbyStops)getActivity();
-    		
-    		Trip trip = firstTrips.get(pos);
-    		nearbyStops.setSelectedTrip(trip);
-    		
-    		// Should move these steps to NearbyStops itself and add check whether need to refresh or not
-             nearbyStops.removeAllMarkers();
-             nearbyStops.showRoute();
-             nearbyStops.addStateToStack(StackState.ShowRoute);
-             
-    		FragmentTransaction transaction = manager.beginTransaction();
-    		 transaction.remove(thisVar);
-            transaction.addToBackStack(null);
-    		transaction.commit();
+    		if(firstTrips.size() > 0)
+    		{
+    			NearbyStops nearbyStops = (NearbyStops) getActivity();
+        		
+        		Trip trip1 = firstTrips.get(pos);
+        		Trip trip2 = secondTrips.get(trip1.getRoute());
+        		nearbyStops.setSelectedTrip(trip1, trip2);
+        		
+        		// Should move these steps to NearbyStops itself and add check whether need to refresh or not
+                nearbyStops.removeAllMarkers();
+                nearbyStops.showRoute();
+                nearbyStops.addStateToStack(StackState.ShowRoute);
+                 
+        		FragmentTransaction transaction = manager.beginTransaction();
+        		transaction.remove(thisVar);
+                transaction.addToBackStack(null);
+        		transaction.commit();
+    		}
 		}
     }
 	
@@ -559,26 +597,6 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	
 	}
 	
-	private class GetDataTask extends AsyncTask<Void, Void, String[]> {
-
-	    @Override
-	    protected void onPostExecute(String[] result) {
-	        // Call onRefreshComplete when the list has been refreshed.
-	        pullToRefreshView.onRefreshComplete();
-	        
-	        table.removeAllViews();
-	        //populateTable();
-	        super.onPostExecute(result);
-	    }
-
-		@Override
-		protected String[] doInBackground(Void... params) {
-			Log.d("GetDataTask", "INSIDE DOINBACKGROUND");
-			init();
-			return null;
-		}
-	}
-	
 	/*Testing methods*/
 	public ArrayAdapter<String> getAdapter() {
 		return adapter;
@@ -611,8 +629,11 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		request.execute(urlString);
 	}
 	
-	private String formatTime(long timeInMillis)
+	private String formatTime(Long timeInMillis)
 	{
+		if(timeInMillis == null) 
+			return "End of Service";
+		
 		long minutes = (timeInMillis - currTime) / 60000;
 		
 		// Rounding, if seconds > 30, add another minute
@@ -638,9 +659,21 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 
 	@Override
 	public void networkRequestCompleted(String result) {
-		loadSortedTripTimes(result);
-		//table.removeAllViews();
-		populateTable();
+		
+		try
+		{
+			loadSortedTripTimes(result);
+			table.removeAllViews();
+			populateTable();
+		}
+		catch(NullPointerException e)
+		{
+			Toast.makeText(getActivity(), "No internet connection!", Toast.LENGTH_SHORT).show();
+		}
+		finally
+		{
+			pullToRefreshView.onRefreshComplete();
+		}
 	}
 	
 	public void loadSortedTripTimes(String result) {
@@ -670,7 +703,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 			{
 				String code = (String) ((JSONObject) routes.get(i)).get("Code");
 				String name = (String) ((JSONObject) routes.get(i)).get("Name");
-				Long type = (Long) ((JSONObject) routes.get(i)).get("ServiceType");
+				Long type = (Long) ((JSONObject) routes.get(i)).get("Vehicle");
 				Long direction = (Long) ((JSONObject) routes.get(i)).get("Direction");
 				
 				availableRoutes.add(new Route(code, name, type, direction));
@@ -686,7 +719,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 				String routeName = (String) ((JSONObject) time.get("Route"))
 						.get("Name");
 				Long type = (Long) ((JSONObject) time.get("Route"))
-						.get("ServiceType");
+						.get("Vehicle");
 				long direction = (((Long) ((JSONObject) time.get("Route"))
 						.get("Direction")));
 				String tripId = (String) ( time.get("TripId"));
@@ -702,26 +735,25 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 					else
 						tripCount.put(routecode, tripCount.get(routecode) + 1);
 					
+					Route route = new Route(routecode, routeName, type, direction);
 					if(tripCount.get(routecode) == 1)
 					{
 						Log.d("loadSortedTripTimes", routecode + " " + direction + " " + departureTime + " arrival " + tripCount.get(routecode));
-						firstTrips.add(new Trip(tripId, new Route(routecode, routeName, type, direction), departureTime));
+						firstTrips.add(new Trip(tripId, route, departureTime));
 					}
 					if(tripCount.get(routecode) == 2)
 					{
 						Log.d("loadSortedTripTimes", routecode + " " + direction + " " + departureTime + " arrival " + tripCount.get(routecode));
-						secondTrips.add(new Trip(tripId, new Route(routecode, routeName, type, direction), departureTime));
+						secondTrips.put(route, new Trip(tripId, route, departureTime));
 					}
-				
 				}
 			}
-
-		}
-		
-		if(stops.size() > 1)
-		{
-			Log.d("loadSortedTripTimes", "GROUPED STOPS, DO ADDITIONAL SORTING");
-			Collections.sort(firstTrips);
+			
+			if(stops.size() > 1)
+			{
+				Log.d("loadSortedTripTimes", "GROUPED STOPS, DO ADDITIONAL SORTING");
+				Collections.sort(firstTrips);
+			}
 		}
 	}
 	

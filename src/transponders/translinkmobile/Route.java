@@ -75,4 +75,28 @@ public class Route {
 		Log.d("Route", "Direction:" + direction+ " = "+directionStr);
 		return directionStr;
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(!(obj instanceof Route))
+			return false;
+		
+		Route route2 = (Route) obj;
+		
+		if(this.getCode().equals(route2.getCode()) && this.getDirection() == route2.getDirection())
+			return true;
+		else
+			return false;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		int hash = 3;
+		hash = 7 * hash + (int) this.getDirection();
+		hash = 7 * hash + this.getCode().hashCode();
+		
+		return hash;
+	}
 }
