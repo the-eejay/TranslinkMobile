@@ -1,128 +1,141 @@
-<!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. --><android.support.v4.widget.DrawerLayout
+<!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
+<android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout_ns"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     
-   	<FrameLayout
-		 android:id="@+id/content_frame"
-		 android:layout_width="fill_parent"
-		 android:layout_height="match_parent" >
-		    	
+<FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+<LinearLayout
+       android:id="@+id/linear_layout"
+       android:orientation="vertical"
+       android:layout_width="match_parent"
+	   android:layout_height="match_parent" >
+	   
+	   	<FrameLayout
+			 android:id="@+id/map_frame"
+			 android:layout_width="fill_parent"
+			 android:layout_height="0dp"
+			 android:layout_weight="3" >
+			    	
 			<fragment 
-			 android:id="@+id/map"
-			 android:layout_width="match_parent"
-			 android:layout_height="match_parent"
-			 class="com.google.android.gms.maps.SupportMapFragment" />
+				 android:id="@+id/map"
+				 android:layout_width="match_parent"
+				 android:layout_height="match_parent"
+				 class="com.google.android.gms.maps.SupportMapFragment" />
 			
-			 <RelativeLayout
-   	    	    android:layout_width="fill_parent"
-        		android:layout_height="match_parent" >
-        		
-        		 <Button
-		            android:id="@+id/bLocateMe"
-		            android:layout_width="45dp"
-		            android:layout_height="45dp"
-		            android:layout_alignParentRight="true"
-		            android:layout_alignParentTop="true"
-		            android:layout_centerVertical="true"
-		            android:layout_marginTop="10dp"
-		            android:layout_marginRight="10dp"
-		            android:onClick="locateMeButtonOnClick"
-		            android:background="@drawable/selector_googlemyloc" />
-        		 
-        		 <TableLayout 
-				    android:id="@+id/trip_table"
-				    android:layout_width="fill_parent"
-				    android:layout_height="wrap_content"
-				    android:layout_alignParentBottom="true"
-				    android:stretchColumns="*"
-				    android:visibility="visible" >
-				    
-        		    <TableRow
-				        android:id="@+id/color_row"
-				        android:layout_width="fill_parent"
-				        android:layout_height="wrap_content">
-				    
-	        		     <TextView 
-		        		    android:id="@+id/color_box"
-				            android:layout_height="20dp"
-					        android:layout_weight="1"
-					        android:layout_span="70"
-				            android:background="@color/ferry_blue" />
-        		     
-        		    </TableRow>
-			 
-				  	<TableRow
-				        android:id="@+id/trip_row"
-				        android:layout_width="fill_parent"
-				        android:layout_height="wrap_content"
-				        android:background="@color/grey_background" >
-				
-					     <TextView
-					        android:id="@+id/trip_code"
-					        android:layout_span="20"
-					        android:layout_height="60dp"
-					        android:layout_weight="1"
-					        android:text="@string/service_code"
-					        android:textSize="32sp" 
-					        android:textStyle="bold"
-					        android:gravity="bottom"
-					        android:paddingLeft="20dp" />
-					     
-					     <TextView
-					        android:id="@+id/trip_description"
-					        android:layout_span="50"
-					        android:layout_height="60dp"
-					        android:layout_weight="1"
-					        android:paddingRight="10dp"
-							android:text="@string/trip_description"
-							android:layout_gravity="center_vertical"
-							android:gravity="bottom"
-							android:textSize="17sp" />
-		  		        
-				    </TableRow>
-				    
-				  	  <TableRow
-				        android:id="@+id/trip_row2"
-				        android:layout_width="fill_parent"
-				        android:layout_height="wrap_content" 
-					    android:background="@color/grey_background" 
-					    android:paddingLeft="10dp"
-					    android:paddingBottom="10dp"
-					    android:paddingRight="10dp" >
-				
-					     <Spinner
-					        android:id="@+id/trip_choice"
-					        android:layout_span="20"
-					        android:layout_weight="1"
-					        android:layout_height="40dp"
-					        android:gravity="center"
-					        android:textSize="20sp"
-					        android:textColor="@color/black" />
-					     
-					     <TextView
-					        android:id="@+id/platform"
-					        android:layout_span="50"
-					        android:layout_height="40dp"
-							android:text="@string/platform"
-							android:textColor="@color/dark_grey"
-							android:textSize="14sp"
-							android:layout_weight="1"
-					        android:paddingLeft="10dp"
-					        android:visibility="invisible" />
-		  		        
-				    </TableRow>
-			
-				</TableLayout>
-   	    	</RelativeLayout>   
+			<Button
+	             android:id="@+id/bLocateMe"
+	             android:layout_width="45dp"
+	             android:layout_height="45dp"
+	             android:layout_gravity="top|right"
+	             android:layout_marginTop="10dp"
+	             android:layout_marginRight="10dp"
+	             android:onClick="locateMeButtonOnClick"
+	             android:background="@drawable/selector_googlemyloc" />
 			
 			<android.support.v4.view.ViewPager
-		     android:id="@+id/pager"
-		     android:layout_width="match_parent"
-		     android:layout_height="match_parent" />
-
+			     android:id="@+id/pager"
+			     android:layout_width="match_parent"
+			     android:layout_height="match_parent" />
+	
 		</FrameLayout>
+        		
+        <TableLayout 
+			    android:id="@+id/triptable"
+			    android:layout_width="fill_parent"
+			    android:layout_height="0dp"
+				android:layout_weight="1"
+			    android:stretchColumns="*"
+			    android:visibility="visible" 
+			    android:background="@color/grey_background" >
+		    
+      		    <TableRow
+		        android:id="@+id/color_row"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content">
+		    
+       		    	<TextView 
+        		    android:id="@+id/color_box"
+		            android:layout_height="15dp"
+			        android:layout_weight="1"
+		            android:background="@color/ferry_blue" />
+      		     
+      		    </TableRow>
+	 
+		  		<TableRow
+		        android:id="@+id/trip_row"
+		        android:layout_width="fill_parent"
+		        android:layout_height="60dp"
+		        android:paddingBottom="-20dp"
+		        android:background="@color/grey_background" >
+		
+			     	<TextView
+			        android:id="@+id/trip_code"
+			        android:layout_span="18"
+			        android:layout_weight="1"
+			        android:layout_height="60dp"
+			        android:text="@string/service_code"
+			        android:textSize="30sp" 
+			        android:textStyle="bold"
+			        android:gravity="center"
+			        android:paddingLeft="15dp"
+			        android:paddingRight="15dp" />
+			     
+			     	<TextView
+			        android:id="@+id/trip_description"
+			        android:layout_marginTop="-12dp"
+			        android:layout_span="52"
+			        android:layout_weight="1"
+			        android:layout_height="60dp"
+			        android:layout_gravity="top"
+			        android:paddingRight="10dp"
+			        android:paddingTop="-10dp"
+					android:text="@string/trip_description"
+					android:textSize="16sp" />
+  		        
+		   	  </TableRow>
+		    
+		  	  <TableRow
+		        android:id="@+id/trip_row2"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+			    android:background="@color/grey_background" 
+			    android:paddingLeft="10dp"
+			    android:paddingRight="10dp" >
+		
+			     <Spinner
+			        android:id="@+id/trip_choice"
+			        android:layout_span="18"
+			        android:layout_weight="1"
+			        android:layout_height="36dp"
+			        android:gravity="bottom|center_horizontal"
+			        android:textSize="20sp"
+			        android:textColor="@color/black" />
+			     
+			     <TextView
+			        android:id="@+id/additional_info"
+			        android:layout_span="52"
+			        android:layout_height="36dp"
+					android:text="@string/platform"
+					android:textColor="@color/dark_grey"
+					android:textSize="14sp"
+					android:layout_weight="1"
+			        android:paddingLeft="10dp"
+			        android:paddingTop="10dp"
+			        android:layout_gravity="bottom|left"
+			        android:visibility="gone" />
+  		        
+		    </TableRow>
+	
+		</TableLayout>
+			
+	</LinearLayout>
+</FrameLayout>
 
 	<ListView
      android:id="@+id/left_drawer_ns"

@@ -1,6 +1,7 @@
 package transponders.translinkmobile;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
@@ -27,9 +28,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -100,7 +104,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	private SupportMapFragment mapFrag;
 	private boolean updatedOnce;
 	private ArrayList<Stop> selectedStops;
-	//private Route selectedRoute;
+	private Route selectedRoute;
 	private Trip selectedTrip;
 	private Trip selectedTrip2;
 	private ArrayList<StopTrip> selectedTripsStopTrips;
@@ -275,8 +279,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	 */
 	public void locationChanged(LatLng location) 
 	{
-		mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-		mMap.animateCamera(CameraUpdateFactory.zoomTo((float) 14.8), 2000, null);
+		//mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, (float) 14.8), 2000, null);
 		stopLoader.requestStopsNear(location.latitude, location.longitude, 1000);
 	}
 
@@ -352,7 +356,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		default:
 			break;
 		}
-
+		
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.content_frame, fragment);
 		transaction.addToBackStack(null);
@@ -562,7 +566,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		if (showTut)
 			showFirstTimeTutorial();
 		
-		TableLayout table = (TableLayout) findViewById(R.id.trip_table); 
+		TableLayout table = (TableLayout) findViewById(R.id.triptable); 
 		table.setVisibility(View.GONE);
 		mMap.setMyLocationEnabled(false);
 		final Button button = (Button) findViewById(R.id.bLocateMe);
@@ -582,30 +586,100 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 			}
 		});
 	}
-
-	public void showRoute() 
+	
+	public void showRoute()
 	{
-		//routeStopsLoader.requestRouteStops(selectedRoute);
+		routeStopsLoader.requestRouteStops(selectedRoute);
+		
+		FrameLayout mapFrame = (FrameLayout) findViewById(R.id.map_frame);
+		LinearLayout.LayoutParams frameParam = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 3);
+		mapFrame.setLayoutParams(frameParam);
+		
+		table = (TableLayout) findViewById(R.id.triptable);
+		LinearLayout.LayoutParams tableParam = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 1);
+		table.setLayoutParams(tableParam);
+		
+		colorBox = (TextView) findViewById(R.id.color_box);
+		tripCode = (TextView) findViewById(R.id.trip_code);
+		routeInfo = (TextView) findViewById(R.id.trip_description); 
+		
+		long stopType = selectedRoute.getType();
+		if(stopType == Route.TransportType.BUS)
+		{
+        	mMap.animateCamera(CameraUpdateFactory.zoomTo((float) 13.5), 2000, null);
+         	colorBox.setBackgroundResource(R.color.bus_green);
+		}
+		else if(stopType == Route.TransportType.TRAIN)
+		{
+			LatLng center = new LatLng(-27.471794, 153.029895);
+        	mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, (float) 11), 2000, null);
+			colorBox.setBackgroundResource(R.color.train_orange);
+        }
+        else
+        {
+        	LatLng center = new LatLng(-27.471999, 153.029895);
+        	mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, (float) 12.5), 2000, null);
+        	colorBox.setBackgroundResource(R.color.ferry_blue);
+        }
+		 
+		tripCode.setText(selectedRoute.getCode());
+		routeInfo.setText(selectedRoute.getDescription());
+		
+		Spinner tripChoices = (Spinner) findViewById(R.id.trip_choice);
+		tripChoices.setVisibility(View.INVISIBLE);
+		
+		TextView additionalInfo = (TextView) findViewById(R.id.additional_info);
+		Calendar c = Calendar.getInstance();
+		additionalInfo.setText("Showing route on " + c.get(Calendar.DAY_OF_MONTH) + "/" + (c.get(Calendar.MONTH)+1) + "/" + c.get(Calendar.YEAR));
+		additionalInfo.setVisibility(View.VISIBLE);
+		
+		table.setVisibility(View.VISIBLE);
+		
+		mMap.setMyLocationEnabled(true);
+		final Button button = (Button) findViewById(R.id.bLocateMe);
+		button.setVisibility(View.GONE);
+	}
+
+	public void showTrip() 
+	{	
 		routeStopsLoader.requestTripStops(selectedTrip);
 		
-		table = (TableLayout) findViewById(R.id.trip_table);
+		FrameLayout mapFrame = (FrameLayout) findViewById(R.id.map_frame);
+		LinearLayout.LayoutParams frameParam = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 3);
+		mapFrame.setLayoutParams(frameParam);
+		
+		table = (TableLayout) findViewById(R.id.triptable);
+		LinearLayout.LayoutParams tableParam = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 1);
+		table.setLayoutParams(tableParam);
 		
 		colorBox = (TextView) findViewById(R.id.color_box);
 		tripCode = (TextView) findViewById(R.id.trip_code);
 		routeInfo = (TextView) findViewById(R.id.trip_description); 
 		
 		long stopType = selectedTrip.getRoute().getType();
-		 if(stopType == Route.TransportType.BUS)
+		if(stopType == Route.TransportType.BUS)
+		{
+			mMap.animateCamera(CameraUpdateFactory.zoomTo((float) 13.5), 2000, null);
          	colorBox.setBackgroundResource(R.color.bus_green);
-         else if(stopType == Route.TransportType.TRAIN)
-        	 colorBox.setBackgroundResource(R.color.train_orange);
-         else
-        	 colorBox.setBackgroundResource(R.color.ferry_blue);
+		}
+		else if(stopType == Route.TransportType.TRAIN)
+		{
+			LatLng center = new LatLng(-27.471794, 153.029895);
+        	mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, (float) 11), 2000, null);
+			colorBox.setBackgroundResource(R.color.train_orange);
+        }
+        else
+        {
+        	LatLng center = new LatLng(-27.471999, 153.029895);
+        	mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, (float) 12.5), 2000, null);
+        	colorBox.setBackgroundResource(R.color.ferry_blue);
+        }
 		
 		tripCode.setText(selectedTrip.getRoute().getCode());
 		routeInfo.setText(selectedTrip.getRoute().getDescription());
 		
 		Spinner tripChoices = (Spinner) findViewById(R.id.trip_choice);
+		tripChoices.setVisibility(View.VISIBLE);
 		
 		String[] services;
 		if(selectedTrip2 != null)
@@ -625,6 +699,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
         tripChoices.setAdapter(adapter);
         tripChoices.setOnItemSelectedListener(new TripDropdownListener());
 		
+        TextView additionalInfo = (TextView) findViewById(R.id.additional_info);
+        additionalInfo.setVisibility(View.INVISIBLE);
 		table.setVisibility(View.VISIBLE);
 		
 		mMap.setMyLocationEnabled(true);
@@ -740,7 +816,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 								} else if (state == StackState.ShowRoute) {
 									// Should check if need to refresh or not
 									Log.d("Drawer", "starting showroute");
-									showRoute();
+									showTrip();
 								}
 								//stackStates.remove(stackStates.size()-1);
 							} else {
@@ -783,14 +859,14 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		this.selectedStops = stops;
 	}
 
-	/*public Route getSelectedRoute() {
+	public Route getSelectedRoute() {
 		return selectedRoute;
-	}*/
+	}
 
-	/*
+	
 	public void setSelectedRoute(Route route) {
 		selectedRoute = route;
-	}*/
+	}
 	
 	public void setSelectedTrip(Trip trip) {
 		selectedTrip = trip;
@@ -800,7 +876,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		selectedTrip = trip;
 		selectedTrip2 = trip2;
 	}
-	
 	
 	/*public void setSelectedTripsStopTrips(ArrayList<StopTrip> stopTrips) {
 		this.selectedTripsStopTrips = stopTrips;
@@ -958,8 +1033,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
     		
     	}
     }
-	
-
 	
 	/*public void setSelectedTripId(String tripId) {
 		selectedTripId = tripId;

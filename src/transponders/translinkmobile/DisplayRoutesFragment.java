@@ -34,9 +34,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -193,10 +195,10 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 			
 			if(endedServices)
 			{
-				newRow.setClickable(true);
 				currentTrip = new Trip(); // currentTrip doesn't matter anymore
 				currentRoute = availableRoutes.get(endedServiceIndex);
-				endedServiceIndex++;
+				newRow.setOnClickListener(new RouteListener(firstTrips.size() + endedServiceIndex));
+				endedServiceIndex++;		
 			}
 			else
 			{
@@ -400,30 +402,37 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		
     	public void onClick(View v) 
 		{
-    		if(firstTrips.size() > 0)
+    		NearbyStops nearbyStops = (NearbyStops) getActivity();
+    		
+    		if(pos < firstTrips.size())
     		{
-    			NearbyStops nearbyStops = (NearbyStops) getActivity();
-        		
+    			Log.d("RouteListener", "Pos: " + pos + " firstTrips.size(): " + firstTrips.size());
         		Trip trip1 = firstTrips.get(pos);
         		Trip trip2 = secondTrips.get(trip1.getRoute());
         		nearbyStops.setSelectedTrip(trip1, trip2);
         		
         		// Should move these steps to NearbyStops itself and add check whether need to refresh or not
                 nearbyStops.removeAllMarkers();
-                nearbyStops.showRoute();
-                nearbyStops.addStateToStack(StackState.ShowRoute);
-                 
-        		FragmentTransaction transaction = manager.beginTransaction();
-        		transaction.remove(thisVar);
-                transaction.addToBackStack(null);
-        		transaction.commit();
+                nearbyStops.showTrip();
     		}
+    		else
+    		{
+    			Log.d("RouteListener", "Pos: " + pos + " firstTrips.size(): " + firstTrips.size());
+    			nearbyStops.setSelectedRoute(availableRoutes.get(pos - firstTrips.size()));
+    			nearbyStops.removeAllMarkers();
+    			nearbyStops.showRoute();
+    		}
+    		
+    		nearbyStops.addStateToStack(StackState.ShowRoute);  
+     		FragmentTransaction transaction = manager.beginTransaction();
+     		transaction.remove(thisVar);
+            transaction.addToBackStack(null);
+     		transaction.commit();
 		}
     }
 	
 	@Override
 	public void onResume() {
-		Log.d("Drawer", "DisplayRoutes: onResume started");
 		super.onResume();
 	}
 	
@@ -454,7 +463,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
         		 NearbyStops nearbyStops =  (NearbyStops)getActivity();
                  // Should move these steps to NearbyStops itself and add check whether need to refresh or not
                  nearbyStops.removeAllMarkers();
-                 nearbyStops.showRoute();
+                 nearbyStops.showTrip();
                  nearbyStops.addStateToStack(StackState.ShowRoute);
                  
         		FragmentTransaction transaction = manager.beginTransaction();
@@ -658,8 +667,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	}
 
 	@Override
-	public void networkRequestCompleted(String result) {
-		
+	public void networkRequestCompleted(String result) 
+	{	
 		try
 		{
 			loadSortedTripTimes(result);
