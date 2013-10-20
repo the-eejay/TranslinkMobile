@@ -24,8 +24,16 @@
         android:id="@+id/tut_container"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content" 
-	    android:layout_gravity="center"
-	    android:layout_marginLeft="25dp">
+	    android:layout_gravity="center">
+	    
+        <ImageView
+            android:id="@+id/previous_arrow"
+            android:layout_width="50dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="150dp"
+            android:gravity="center"
+            android:src="@drawable/prev_arrow" 
+            android:contentDescription="@string/next_arrow_desc"/>
 	    
 	    <LinearLayout 
 	         android:id="@+id/tutorial_box"
@@ -33,6 +41,7 @@
 		     android:layout_height="wrap_content"
 		     android:orientation="vertical"
 		     android:padding="12dp"
+             android:layout_toRightOf="@id/previous_arrow"
 		     android:background="@color/drawer_background"
 		     android:layout_gravity="center">
 	
@@ -69,7 +78,7 @@
 	            android:layout_toRightOf="@id/tutorial_box"
 	            android:layout_marginTop="150dp"
 	            android:gravity="center"
-	            android:src="@drawable/list_item_arrow" 
+	            android:src="@drawable/next_arrow" 
 	            android:contentDescription="@string/next_arrow_desc"/>
     
     </RelativeLayout>

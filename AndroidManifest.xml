@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="transponders.translinkmobile"
+    package="transponders.transmob"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -19,26 +19,19 @@
         android:targetSdkVersion="18" />
 
     <application
-        android:name="transponders.translinkmobile.MainApplication"
         android:allowBackup="true"
         android:icon="@drawable/applogo"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.Light" >
-
+ 
         <activity
-            android:name="transponders.translinkmobile.JourneyPlanner"
-            android:label="@string/app_name" />
-        <activity
-            android:name="transponders.translinkmobile.NearbyStops"
+            android:name="transponders.transmob.NearbyStops"
             android:label="@string/app_name"
             android:configChanges="keyboardHidden|orientation|screenSize">           
         </activity>
-        <activity
-            android:name="transponders.translinkmobile.ShowJourneyPage"
-            android:label="@string/app_name" />
         
         <activity
-            android:name="transponders.translinkmobile.SplashScreen"
+            android:name="transponders.transmob.SplashScreen"
             android:label="@string/app_name" >
            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

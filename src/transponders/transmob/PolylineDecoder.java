@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import java.util.ArrayList;
 import java.util.List;

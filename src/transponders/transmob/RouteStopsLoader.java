@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,7 +12,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -25,7 +24,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private enum State {
@@ -358,7 +356,23 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		}
 	}
 	
+	public void removeEstimatedServicesFromMap() {
+		if (estimatedBusMarkers != null) {
+			for(Marker m : estimatedBusMarkers)
+			{
+				m.setVisible(false);
+				m.remove();
+			}
+			
+			estimatedBusMarkers.clear();
+			estimatedBuses.clear();
+			estimatedBusMarkersMap.clear();
+		}
+	}
+	
 	public ArrayList<EstimatedBus> setUpBuses() {
+		removeEstimatedServicesFromMap();
+		
 		ArrayList<EstimatedBus> estimatedBuses = new ArrayList<EstimatedBus>();
 		for (int i =1; i < stopTrips.size(); i++) {
 			StopTrip stStart = stopTrips.get(i-1);

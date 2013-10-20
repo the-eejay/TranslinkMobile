@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 /*
  * Copyright 2012 The Android Open Source Project
@@ -19,6 +19,7 @@ package transponders.translinkmobile;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,12 +45,12 @@ public class TutorialFragment extends Fragment implements OnClickListener {
      * The fragment's page number, which is set to the argument value for {@link #ARG_PAGE}.
      */
     private int mPageNumber;
-    private static View pagerView;
+    private static ViewPager pagerView;
 
     /**
      * Factory method for this fragment class. Constructs a new fragment for the given page number.
      */
-    public static TutorialFragment create(int pageNumber, View parent) {
+    public static TutorialFragment create(int pageNumber, ViewPager parent) {
     	TutorialFragment fragment = new TutorialFragment();
     	pagerView = parent;
         Bundle args = new Bundle();
@@ -73,6 +74,13 @@ public class TutorialFragment extends Fragment implements OnClickListener {
         // Inflate the layout containing a title and body text.
         ViewGroup rootView = (ViewGroup) inflater
                 .inflate(R.layout.tutorial_fragment, container, false);
+        
+        ImageView previousArrow = (ImageView) rootView.findViewById(R.id.previous_arrow);
+        previousArrow.setVisibility(View.INVISIBLE);
+        previousArrow.setOnClickListener(this);
+        
+        ImageView nextArrow = (ImageView) rootView.findViewById(R.id.next_arrow);
+        nextArrow.setOnClickListener(this);
 
         // Set the title view to show the page number.
         ((TextView) rootView.findViewById(R.id.tutorial_title)).setText(
@@ -97,13 +105,17 @@ public class TutorialFragment extends Fragment implements OnClickListener {
         		break;
         }
         
+        if(mPageNumber + 1 > 1)
+        {
+        	previousArrow.setVisibility(View.VISIBLE);
+        }
+        
         if(mPageNumber + 1 == NearbyStops.NUM_PAGES)
         {
         	Button button = (Button) rootView.findViewById(R.id.finish_tut_button);
         	button.setVisibility(View.VISIBLE);
         	
-        	ImageView arrow = (ImageView) rootView.findViewById(R.id.next_arrow);
-        	arrow.setVisibility(View.INVISIBLE);
+        	nextArrow.setVisibility(View.INVISIBLE);
         	
         	button.setOnClickListener(this);
         }
@@ -134,8 +146,15 @@ public class TutorialFragment extends Fragment implements OnClickListener {
 
         		ViewGroup vg = (ViewGroup)(pagerView.getParent());
         		vg.removeView(pagerView);
-            break;
+        		break;
+        		
+        	case R.id.next_arrow:
+        		pagerView.setCurrentItem(mPageNumber + 1, true);
+        		break;
+        		
+        	case R.id.previous_arrow:
+        		pagerView.setCurrentItem(mPageNumber - 1, true);
+        		break;
         }
     }
 }
-

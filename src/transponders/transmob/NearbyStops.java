@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -85,7 +85,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	 * current location of the device.
 	 */
 	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823);
-	private final String TITLE = "Nearby Stops & Service ETA";
+	private final String TITLE = "Nearby Stops";
 	public static final int NUM_PAGES = 4;
 	public static final String PREFS_NAME = "MyPrefsFile";
 	public static final String TUTORIAL_SETTING = "SHOW_TUTORIAL";
@@ -427,8 +427,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		}
 
 		//Reload the stops if any from previous nearbystops
-		//test
+		
 		stopLoader.addSavedStopMarkersToMap(true);
+		routeStopsLoader.removeEstimatedServicesFromMap();
 		routeStopsLoader.removeLineFromMap();
 		getActionBar().setTitle(TITLE);
 
@@ -554,17 +555,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		}
 	*/
 		// map2Fragment = new ShowRouteFragment();
-
-
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
-
-		// For debugging, uncomment this line below so that the tutorial doesn't
-		// show at all.
-		// showTut = false;
-
-		if (showTut)
-			showFirstTimeTutorial();
 		
 		TableLayout table = (TableLayout) findViewById(R.id.triptable); 
 		table.setVisibility(View.GONE);
@@ -591,6 +581,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	{
 		routeStopsLoader.requestRouteStops(selectedRoute);
 		
+		setTitle("Service Route Map");
 		FrameLayout mapFrame = (FrameLayout) findViewById(R.id.map_frame);
 		LinearLayout.LayoutParams frameParam = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 3);
 		mapFrame.setLayoutParams(frameParam);
@@ -644,6 +635,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	{	
 		routeStopsLoader.requestTripStops(selectedTrip);
 		
+		setTitle("Service Route Map");
 		FrameLayout mapFrame = (FrameLayout) findViewById(R.id.map_frame);
 		LinearLayout.LayoutParams frameParam = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 3);
 		mapFrame.setLayoutParams(frameParam);
@@ -670,8 +662,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
         }
         else
         {
-        	LatLng center = new LatLng(-27.471999, 153.029895);
-        	mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, (float) 12.5), 2000, null);
+        	LatLng center = new LatLng(-27.464000, 153.029895);
+        	mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, (float) 12.7), 2000, null);
         	colorBox.setBackgroundResource(R.color.ferry_blue);
         }
 		
@@ -700,7 +692,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
         tripChoices.setOnItemSelectedListener(new TripDropdownListener());
 		
         TextView additionalInfo = (TextView) findViewById(R.id.additional_info);
-        additionalInfo.setVisibility(View.INVISIBLE);
+        additionalInfo.setText("Current service location is estimated based on schedule.");
+        additionalInfo.setVisibility(View.VISIBLE);
 		table.setVisibility(View.VISIBLE);
 		
 		mMap.setMyLocationEnabled(true);
@@ -752,7 +745,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		transaction.addToBackStack(null);
 		transaction.commitAllowingStateLoss();
 
-		// update selected item and title, then close the drawer
 		setTitle("Timetable");
 	}
 
@@ -905,9 +897,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 
 	private class TutorialPagerAdapter extends FragmentStatePagerAdapter 
 	{
-		private View pagerView;
+		private ViewPager pagerView;
 
-		public TutorialPagerAdapter(FragmentManager fm, View parent) 
+		public TutorialPagerAdapter(FragmentManager fm, ViewPager parent) 
 		{
 			super(fm);
 			pagerView = parent;
@@ -971,7 +963,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 
 	@Override
 	public void onDisconnected() {
-		// TODO Auto-generated method stub
 		
 	}
 	
@@ -1004,7 +995,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 
 	@Override
 	public void onConnectionFailed(ConnectionResult arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 	

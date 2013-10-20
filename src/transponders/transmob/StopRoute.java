@@ -1,21 +1,28 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class StopTrip {
+/**
+ * A class that represents a specific route at a specific stop.
+ * The class have a list of Date object to represent the 
+ * timetable of that specific route at a specific stop.
+ * 
+ * @author Transponders
+ * @version 1.0
+ */
+public class StopRoute {
 	private Stop stop;
-	private Trip trip;
-	//private ArrayList<Date> times;
-	private Date time;
+	private Route route;
+	private ArrayList<Date> times;
 	//private HashMap<Date, String> tripIds;
 	
-	public StopTrip(Stop stop, Trip trip) {
-		//times = new ArrayList<Date>();
+	/*public StopRoute(Stop stop, Route route) {
+		times = new ArrayList<Date>();
 		this.stop = stop;
-		this.trip = trip;
+		this.route = route;
 		//this.tripId = tripId;
-	}
+	}*/
 
 	/**
      * Getter method of the Stop object.
@@ -31,8 +38,8 @@ public class StopTrip {
      *
      * @return Route the specific route of this object.
      */
-	public Trip getTrip() {
-		return trip;
+	public Route getRoute() {
+		return route;
 	}
 
 	/**
@@ -40,8 +47,8 @@ public class StopTrip {
      *
      * @return ArrayList<Date> the ArrayList containing all the dates.
      */
-	public Date getTime() {
-		return time;
+	public ArrayList<Date> getTimes() {
+		return times;
 	}
 
 	/**
@@ -49,8 +56,8 @@ public class StopTrip {
      *
      * @param time The String result from the PHP service request.
      */
-	public void setTime(Date time) {
-		this.time=time;
+	public void addTime(Date time) {
+		times.add(time);
 	}
 	
 	/*public String getTripId() {

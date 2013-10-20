@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -32,7 +32,7 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 	String URL = null;
 	private JSONRequest request;
 	
-	@SuppressLint("NewApi")
+	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{

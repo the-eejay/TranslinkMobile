@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +31,6 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	//private List<String> list; //list - a list of Strings for use by the ArrayAdapter
 	//private ArrayList<StopRoute> stopRoutes;
 	private ArrayList<StopTrip> stopTrips;
-	private ArrayAdapter<String> adapter; 
 	//private HashMap<Integer, Route> positionRouteMap;
 	private HashMap<Integer, Trip> positionTripMap;
 	private ArrayList<Trip> trips;

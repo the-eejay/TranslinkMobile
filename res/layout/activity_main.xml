@@ -126,7 +126,7 @@
 					android:textSize="14sp"
 					android:layout_weight="1"
 			        android:paddingLeft="10dp"
-			        android:paddingTop="10dp"
+			        android:paddingTop="0dp"
 			        android:layout_gravity="bottom|left"
 			        android:visibility="gone" />
   		        

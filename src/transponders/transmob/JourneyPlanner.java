@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -225,15 +225,13 @@ public class JourneyPlanner extends Fragment implements
 	    	    break;	
 	    	    
 	        case R.id.from_myloc_button:
-	        	String fromDisplay = "" + userLoc[0] + ", " + userLoc[1];
-	        	fromText.setText(fromDisplay);
-	        	locationsToID.put(fromDisplay, "GP:" + fromDisplay);
+	        	fromText.setText("Current location");
+	        	locationsToID.put("Current location", "GP:" + userLoc[0] + ", " + userLoc[1]);
 	        	break;
 	        	
 	        case R.id.to_myloc_button:
-	        	String toDisplay = "" + userLoc[0] + ", " + userLoc[1];
-	        	destText.setText(toDisplay);
-	        	locationsToID.put(toDisplay, "GP:" + toDisplay);
+	        	destText.setText("Current location");
+	        	locationsToID.put("Current location", "GP:" + userLoc[0] + ", " + userLoc[1]);
 	        	break;
 	        	
 	        case R.id.from_clear_button:
@@ -300,7 +298,7 @@ public class JourneyPlanner extends Fragment implements
 						return;
 					}
 					
-					Calendar dayLimit = (Calendar) currentDate.clone();
+					Calendar dayLimit = Calendar.getInstance();
 					dayLimit.add(Calendar.DAY_OF_MONTH, 30);
 					if(selectedDate.after(dayLimit))
 					{
@@ -315,8 +313,7 @@ public class JourneyPlanner extends Fragment implements
 					paramList.add("" + maxWalkDistance);
 					Log.d("LeaveOption: ", "" + leaveOption);
 					Object[] paramArray = paramList.toArray();
-					String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length,
-							String[].class);
+					String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length, String[].class);
 					
 					showJPFragment = new ShowJourneyPage();
 					
@@ -524,7 +521,7 @@ public class JourneyPlanner extends Fragment implements
 					  try
 					  {
 						  Log.d("performFiltering", "TYPED TEXT LENGTH: " + typedText.length());
-						  if(typedText.length() >= 3)
+						  if(typedText.length() >= 3 && !typedText.equals("Current location"))
 						  {
 							  String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" 
 								  		+ Uri.encode(typedText)

@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

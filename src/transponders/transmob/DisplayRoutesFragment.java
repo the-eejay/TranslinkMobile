@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,7 +16,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
 
-import transponders.translinkmobile.NearbyStops.StackState;
+import transponders.transmob.NearbyStops.StackState;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -109,8 +109,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		Log.d("DisplayRoutes", "DisplayRoutes: onCreateView started");
 		super.onCreate(savedInstanceState);
 		
+		getActivity().getActionBar().setTitle("Timetable");
 		scale = getActivity().getResources().getDisplayMetrics();
-		
 		 manager = getActivity().getSupportFragmentManager();
 		/*View view = inflater.inflate(R.layout.activity_timetable, container, false);
 		listView = (ListView) view.findViewById(R.id.listview);
@@ -123,7 +123,6 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
         
         TextView title = (TextView) view.findViewById(R.id.stop_name);
         String displayName = selectedStopName;
-        title.setText(displayName);
         
         String[] splittedByStop = selectedStopName.split(", stop ");
         String[] splittedByNear = selectedStopName.split(" near ");
@@ -131,13 +130,12 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
         if(splittedByStop.length == 2)
         {
         	displayName = splittedByStop[0] + "\n Stop " + splittedByStop[1];
-        	title.setText(displayName);
         }
         else if(splittedByNear.length == 2)
         {
         	displayName = splittedByNear[0] + "\n near " + splittedByNear[1];
-        	title.setText(displayName);
         }
+        title.setText(displayName);
         
         pullToRefreshView = (PullToRefreshScrollView) view.findViewById(R.id.timetable_scrollview);
         pullToRefreshView.setOnRefreshListener(new OnRefreshListener<ScrollView>(){
@@ -149,12 +147,12 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
         		requestRouteTimes(stops);
 			}
         });
-		//showLines();
-        
+		
+        //showLines();
         //init();
-        requestRouteTimes(stops);
         //populateTable();
-				
+        
+        requestRouteTimes(stops);	
 		return view;
 	}	
 	

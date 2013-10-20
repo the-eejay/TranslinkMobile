@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 public class Trip implements Comparable<Trip> {
 	private String tripId;

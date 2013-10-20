@@ -1,4 +1,4 @@
-package transponders.translinkmobile;
+package transponders.transmob;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
