@@ -161,6 +161,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	// For testing purposes
 	private JourneyPlanner jpFragment = null;
 	private MaintenanceNewsFragment mnFragment = null;
+	private GocardLoginFragment gclFragment;
 
 	@SuppressLint("NewApi")
 
@@ -353,6 +354,9 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 			mnFragment = new MaintenanceNewsFragment();
 			fragment = mnFragment;
 			break;
+		case 3:
+			gclFragment = new GocardLoginFragment();
+			fragment = gclFragment;
 		default:
 			break;
 		}
@@ -366,7 +370,6 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		mDrawerList.setItemChecked(pos, true);
 		setTitle(menuList[pos]);
 		mDrawerLayout.closeDrawer(mDrawerList);
-
 	}
 	
 	public void mapInit() 

@@ -67,7 +67,7 @@ public class JSONRequest extends AsyncTask<String, Void, String>{
 	 
 	    @Override
 	    protected void onPostExecute(String result) {
-	    	Log.d("JSONRequest", "postexecture");
+	    	Log.d("JSONRequest", "postexecute");
 	        super.onPostExecute(result);
 	 
 	        if(_listener != null) {

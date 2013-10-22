@@ -1,0 +1,107 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:background="@drawable/background_others">
+
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" 
+	    android:paddingTop="30dp"
+	    android:paddingBottom="30dp"
+	    android:paddingLeft="30dp"
+	    android:paddingRight="30dp" >
+	
+	    <TextView
+	        android:id="@+id/gcnum_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/gcnum_label" 
+	        android:textStyle="bold"
+	        android:layout_marginRight="22dp"
+	        android:textSize="18sp"/>
+	    
+	    <LinearLayout
+	        android:id="@+id/gcnum_wrapper"
+	        android:layout_width="match_parent"
+	    	android:layout_height="wrap_content" 
+	    	android:orientation="horizontal"
+	    	android:layout_below="@id/gcnum_label" >
+	    
+		    <EditText
+		        android:id="@+id/gcnum_input"
+		        android:layout_width="0px"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="6"
+		        android:inputType="number" 
+		        android:layout_marginTop="5dp"
+		        android:layout_marginRight="2dp"/>
+		    
+		    <Button
+	            android:id="@+id/gcnum_clear_button"
+	            android:layout_width="20dp"
+	            android:layout_height="20dp"
+	            android:layout_marginTop="5dp"
+	            android:background="@drawable/selector_clearbutton" />
+		    
+	    </LinearLayout>
+	    
+	    <TextView
+	        android:id="@+id/password_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/password_label" 
+	        android:textStyle="bold"
+	        android:layout_below="@id/gcnum_wrapper"
+	        android:layout_marginTop="20dp"
+	        android:layout_marginRight="22dp"
+	        android:textSize="18sp"/>
+	   	
+	    <LinearLayout
+	        android:id="@+id/password_wrapper"
+	        android:layout_width="match_parent"
+	    	android:layout_height="wrap_content" 
+	    	android:orientation="horizontal"
+	    	android:layout_below="@id/password_label" >
+	    	
+		    <EditText
+		        android:id="@+id/password_input"
+		        android:layout_width="0px"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="6"     
+		        android:inputType="textPassword" 
+		        android:layout_marginTop="5dp"
+		        android:layout_marginRight="2dp" />
+		    
+		    <Button
+	            android:id="@+id/password_clear_button"
+	            android:layout_width="20dp"
+	            android:layout_height="20dp"
+	            android:layout_marginTop="5dp"
+	            android:background="@drawable/selector_clearbutton" />
+	
+	    </LinearLayout>
+	    
+	    <CheckBox
+	        android:id="@+id/check_remember"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="15dp"
+	        android:layout_below="@id/password_wrapper"
+	        android:text="@string/check_remember"
+	        android:checked="true" />
+	
+	    <Button
+	        android:id="@+id/login_button"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/check_remember"
+	        android:text="@string/login_label" 
+	        android:layout_marginTop="30dp"
+	        android:textColor="@color/white"
+	        android:textStyle="bold"
+	        android:background="@drawable/selector_jp" />
+	</RelativeLayout>
+	
+</ScrollView>
+
