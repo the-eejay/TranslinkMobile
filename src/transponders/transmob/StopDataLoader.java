@@ -7,6 +7,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import android.app.ProgressDialog;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -28,6 +29,11 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 	private enum State {
 		STOPS_NEAR
 	}
+	
+	public interface Listener {
+		public void onStateChange (boolean state);
+	}
+	private Listener loadingListener= null;
 
 	private boolean isLoading;
 	private State state;
@@ -37,12 +43,18 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
 	private int[] markerIcons = {R.drawable.bus_geo_border, R.drawable.train_geo_border, R.drawable.ferry_geo_border};
+	
+	
 
 	public StopDataLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap) {
 		isLoading = false;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		this.map = map;
 		this.stopMarkers = stopMarkers;
 		this.stopMarkersMap = stopMarkersMap;
+		
 	}
 
 	/**
@@ -64,6 +76,10 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 		request.execute(urlString);
 		state = State.STOPS_NEAR;
 		isLoading = true;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
+		
 
 	}
 
@@ -96,7 +112,9 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 			//((NearbyStops)getActivity()).setSavedStops(stops);
 			addStopMarkersToMap(stops);
 			isLoading = false;
-				
+			if (loadingListener != null) {
+				loadingListener.onStateChange(isLoading);
+			}
 		}
 
 	}
@@ -254,6 +272,9 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 		
 	}
 	
+	public void registerListener (Listener listener) {
+		loadingListener = listener;
+	}
 	
 	/*Testing functions*/
 	public ArrayList<Stop> getStops() {

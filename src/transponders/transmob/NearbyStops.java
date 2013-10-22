@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
@@ -17,6 +18,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -29,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -66,7 +69,8 @@ import com.google.android.gms.maps.model.Polyline;
  * @version 1.0
  */
 public class NearbyStops extends FragmentActivity implements
-GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
+StopDataLoader.Listener{
 
 	/*nearbystops  -> stopdataloader
 				<- (stops with each stop having list of route)
@@ -112,6 +116,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	private LatLng userLatLng;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
+	private CountDownTimer splashScreenTimer;
 	
 	private Polyline polyline;
 
@@ -168,6 +173,8 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		
 		setContentView(R.layout.activity_main);
 
 		stopMarkers = new ArrayList<Marker>();
@@ -223,6 +230,23 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		
 		mapInit();
 		showNearbyStops();
+		
+		splashScreenTimer = new CountDownTimer (3000, 1000) {
+
+			@Override
+			public void onFinish() {
+				closeSplashScreen();
+				
+			}
+
+			@Override
+			public void onTick(long arg0) {
+				
+				;
+				
+			}
+			
+		}.start();
 	}
 	
 	public void initializeNavigationDrawer()
@@ -388,7 +412,10 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		}
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
 		mMap.setMyLocationEnabled(false);
+		setProgressBarIndeterminateVisibility(true);
+		
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
+		stopLoader.registerListener(this);
 		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
 				stopMarkersMap, polyline);
 		userLatLng = new LatLng(0,0);
@@ -566,6 +593,7 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
 		button.setVisibility(View.VISIBLE);
 	}
 
+	
 	public void showFirstTimeTutorial() 
 	{
 		mPager = (ViewPager) findViewById(R.id.pager);
@@ -1027,8 +1055,30 @@ GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.go
     	}
     }
 	
+	public void closeSplashScreen() {
+		/*
+		FragmentManager manager = getSupportFragmentManager();
+		
+		Fragment splashScreen = manager.findFragmentById(R.id.splash_screen);
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.remove(splashScreen);
+		transaction.commit();
+		splashScreen.set*/
+		FrameLayout frame = (FrameLayout) findViewById(R.id.splash_screen_container); 
+		frame.setVisibility(View.GONE);
+		
+	}
+
+	@Override
+	public void onStateChange(boolean state) {
+		setProgressBarIndeterminateVisibility(state);
+		
+	}
+	
 	/*public void setSelectedTripId(String tripId) {
 		selectedTripId = tripId;
 	}*/
+	
+	
 
 }

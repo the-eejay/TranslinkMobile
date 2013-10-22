@@ -12,6 +12,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import transponders.transmob.StopTrip;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -103,6 +105,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	}
 	
 	public void requestTripStops(Trip trip) {
+		stopTrips.clear();
 		serviceType = (int) (Math.log(trip.getRoute().getType()) / Math.log(2));
 		String urlString = "http://deco3801-010.uqcloud.net/tripstops.php?tripId="+trip.getTripId();
 		JSONRequest request = new JSONRequest();
@@ -151,9 +154,10 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 			for (Stop stop: stops) {
 				stopTimesMap.put(stop, stopTrips.find(stop).getTime());
 			}*/
-			setEstimatedBuses(setUpBuses());
+			
 			addMarkersToMap(stops);
 			requestTripLine(trip2);
+			setEstimatedBuses(setUpBuses());
 		}
 	}
 
@@ -437,7 +441,11 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		Calendar c = Calendar.getInstance();
 		Long currTime = c.getTimeInMillis();
 		for (EstimatedBus bus: estimatedBuses) {
-			bus.update(new Date(currTime));
+			if (polyline == null) {
+				bus.update(new Date(currTime));
+			} else {
+				bus.updateOnLine(new Date(currTime), polyline);
+			}
 			if (bus.isActive())
 			Log.d("Bus", "Bus at "+bus.getPosition()+" isActive="+bus.isActive());
 		}
