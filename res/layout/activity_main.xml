@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
+   
 <LinearLayout
        android:id="@+id/linear_layout"
        android:orientation="vertical"
@@ -135,6 +136,16 @@
 		</TableLayout>
 			
 	</LinearLayout>
+	<FrameLayout
+	    android:id="@+id/splash_screen_container"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent">
+	 <fragment 
+	     android:id="@+id/splash_screen"
+        android:name="transponders.transmob.SplashScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+	 </FrameLayout>
 </FrameLayout>
 
 	<ListView
@@ -147,3 +158,5 @@
      android:dividerHeight="1dp"
      android:background="@color/drawer_background"/>
 </android.support.v4.widget.DrawerLayout>
+
+
