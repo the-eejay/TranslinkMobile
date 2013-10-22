@@ -140,11 +140,14 @@
 	    android:id="@+id/splash_screen_container"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent">
-	 <fragment 
-	     android:id="@+id/splash_screen"
-        android:name="transponders.transmob.SplashScreen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        
+        <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/splashscreen" 
+        android:contentDescription="@string/splashdesc"/>
 	 </FrameLayout>
 </FrameLayout>
 

@@ -29,7 +29,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -134,6 +136,7 @@ StopDataLoader.Listener{
 	private CharSequence mTitle;
 	String[] menuList;
 
+	FrameLayout splashFrame;
 	private ViewPager mPager;
 	private PagerAdapter mPagerAdapter;
 	
@@ -175,14 +178,21 @@ StopDataLoader.Listener{
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
+		getActionBar().hide();
+		
 		setContentView(R.layout.activity_main);
-
+		splashFrame = (FrameLayout) findViewById(R.id.splash_screen_container); 
+		splashFrame.setOnTouchListener(new OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return true;
+			}	
+		});
+		
 		stopMarkers = new ArrayList<Marker>();
 		stopMarkersMap = new HashMap<Marker, Stop>();
 		
-		
-		
-
 		// Set the fragment manager so it will pop elements from the stackStates
 		FragmentManager manager = getSupportFragmentManager();
 		manager.addOnBackStackChangedListener(getBackListener());
@@ -231,7 +241,7 @@ StopDataLoader.Listener{
 		mapInit();
 		showNearbyStops();
 		
-		splashScreenTimer = new CountDownTimer (3000, 1000) {
+		splashScreenTimer = new CountDownTimer (2000, 1000) {
 
 			@Override
 			public void onFinish() {
@@ -241,8 +251,6 @@ StopDataLoader.Listener{
 
 			@Override
 			public void onTick(long arg0) {
-				
-				;
 				
 			}
 			
@@ -262,6 +270,8 @@ StopDataLoader.Listener{
 		// opens
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
+		
+		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
 		// set up the drawer's list view with items and click listener
 		ArrayAdapter<String> adapter = new MenuAdapter(this, menuList);
@@ -1056,17 +1066,10 @@ StopDataLoader.Listener{
     }
 	
 	public void closeSplashScreen() {
-		/*
-		FragmentManager manager = getSupportFragmentManager();
-		
-		Fragment splashScreen = manager.findFragmentById(R.id.splash_screen);
-		FragmentTransaction transaction = manager.beginTransaction();
-		transaction.remove(splashScreen);
-		transaction.commit();
-		splashScreen.set*/
-		FrameLayout frame = (FrameLayout) findViewById(R.id.splash_screen_container); 
-		frame.setVisibility(View.GONE);
-		
+
+		splashFrame.setVisibility(View.GONE);
+		getActionBar().show();
+		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 	}
 
 	@Override
@@ -1078,7 +1081,4 @@ StopDataLoader.Listener{
 	/*public void setSelectedTripId(String tripId) {
 		selectedTripId = tripId;
 	}*/
-	
-	
-
 }
