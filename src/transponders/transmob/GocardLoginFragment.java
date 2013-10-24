@@ -59,6 +59,8 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	
 	private String gcNumber, password, result;
 	
+	private DefaultHttpClient httpClient;
+	
 	/*private enum State {
 		BALANCE_TABLE, 
 	};*/
@@ -147,7 +149,10 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	
 	public String postData(String url) {
 	    // Create a new HttpClient and Post Header
-	    HttpClient httpclient = createHttpClient();
+	    if(httpClient == null) {
+	    	httpClient = createHttpClient();
+	    }
+	    
 	    HttpPost httppost = new HttpPost(url);
 	    
 	    Log.d("postData()", "inside postData()");
@@ -166,7 +171,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 	        // Execute HTTP Post Request
-	        HttpResponse response = httpclient.execute(httppost);
+	        HttpResponse response = httpClient.execute(httppost);
 	        
 	        if (response != null) {
                 result = EntityUtils.toString(response.getEntity());
@@ -271,8 +276,8 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		int indexOfHistory = result.indexOf("<table id=\"travel-history\"");
 		int indexOfEndOfHistory = result.indexOf("</table>", indexOfHistory);
 		String tableSubstr = result.substring(indexOfHistory, indexOfEndOfHistory);
-		String[] tableRowStrings = tableSubstr.split("<tr>"); 
-		for (int i = 2; i < tableRowStrings.length; i++) {
+		String[] tableRowStrings = tableSubstr.split("<tr class=\"sub-heading\">"); 
+		for (int i = 1; i < tableRowStrings.length; i++) {
 			String rowStr = tableRowStrings[i];
 			TableLayout table = (TableLayout) getView().findViewById(R.id.history_table);
 	        Context tableContext = table.getContext();
