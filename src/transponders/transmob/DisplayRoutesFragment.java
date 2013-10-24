@@ -55,7 +55,7 @@ import android.widget.Toast;
  * @author Transponders
  * @version 1.0
  */
-public class DisplayRoutesFragment extends Fragment implements JSONRequest.NetworkListener {
+public class DisplayRoutesFragment extends Fragment implements JSONRequest.NetworkListener, LoadingListener {
 	
 	public final static String ARGS_SELECTED_STOPS = "SELECTED_STOPS";
 	//private List<String> lines = new ArrayList<String>();
@@ -617,6 +617,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	
 	public void requestRouteTimes(ArrayList<Stop> stops) {
 		//Build the retrieve route schedule URL
+		getActivity().setProgressBarIndeterminateVisibility(true);
 		String stopString = "";
 		boolean isFirst = true;
 		for (Stop stop : stops) {
@@ -681,6 +682,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		{
 			pullToRefreshView.onRefreshComplete();
 		}
+		getActivity().setProgressBarIndeterminateVisibility(false);
 	}
 	
 	public void loadSortedTripTimes(String result) {
@@ -772,5 +774,11 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	    	this.request.cancel(true);
 	    
 	    super.onStop();
+	}
+
+	@Override
+	public void onStateChange(boolean state) {
+		getActivity().setProgressBarIndeterminateVisibility(state);
+		
 	}
 }

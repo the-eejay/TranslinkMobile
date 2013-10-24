@@ -51,10 +51,14 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private ArrayList<Marker> estimatedBusMarkers;
 	private HashMap<Marker, EstimatedBus> estimatedBusMarkersMap;
 	private CountDownTimer estimatedBusTimer;
-	int serviceType;
+	private int serviceType;
+	private LoadingListener loadingListener;
 
 	public RouteStopsLoader(GoogleMap map, ArrayList<Marker> stopMarkers, HashMap<Marker,Stop> stopMarkersMap, Polyline polyline) {
 		isLoading = false;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		this.map = map;
 		this.stopMarkers = stopMarkers;
 		this.stopMarkersMap = stopMarkersMap;
@@ -84,6 +88,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		request.setListener(this);
 		request.execute(urlString);
 		isLoading = true;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		state = State.STOPS;
 		route2=route;
 
@@ -100,6 +107,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		request.setListener(this);
 		request.execute(urlString);
 		isLoading = true;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		state = State.POLYLINE;
 
 	}
@@ -112,6 +122,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		request.setListener(this);
 		request.execute(urlString);
 		isLoading = true;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		state = State.STOPS_BY_TRIP;
 		this.trip2 = trip;
 	}
@@ -122,6 +135,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		request.setListener(this);
 		request.execute(urlString);
 		isLoading = true;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		state = State.POLYLINE_BY_TRIP;
 	}
 
@@ -135,6 +151,9 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	@Override
 	public void networkRequestCompleted(String result) {
 		isLoading = false;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		this.result = result;
 
 		if (state == State.POLYLINE || state == State.POLYLINE_BY_TRIP) {
@@ -459,6 +478,10 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 				m.setVisible(false);
 			}
 		}
+	}
+	
+	public void registerListener(LoadingListener listener) {
+		this.loadingListener = listener;
 	}
 	
 	/*Test methods*/

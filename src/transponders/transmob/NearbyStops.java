@@ -72,17 +72,9 @@ import com.google.android.gms.maps.model.Polyline;
  */
 public class NearbyStops extends FragmentActivity implements
 GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
-StopDataLoader.Listener{
+LoadingListener{
 
-	/*nearbystops  -> stopdataloader
-				<- (stops with each stop having list of route)
-	(single  stop) -> routedataloader   set up list of stoptrips where StopTrip:{Stop, Trip:{id, route}, Time}
-						combine the stoptrips with common routes to find time to display
-						the closest time to now is also the Trip to assign
-						assign position in ListView to the soonest Trip by finding the Route, 
-						user clicks position, get that Trip
-			<-(Trip)
-		-> (Trip) routeStopsLoader	use the trip to find the stops and line as opposed to the route */
+	
 	
 	
 	
@@ -422,12 +414,13 @@ StopDataLoader.Listener{
 		}
 		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
 		mMap.setMyLocationEnabled(false);
-		setProgressBarIndeterminateVisibility(true);
+		
 		
 		stopLoader = new StopDataLoader(mMap, stopMarkers, stopMarkersMap);
 		stopLoader.registerListener(this);
 		routeStopsLoader = new RouteStopsLoader(mMap, stopMarkers,
 				stopMarkersMap, polyline);
+		routeStopsLoader.registerListener(this);
 		userLatLng = new LatLng(0,0);
 		updatedOnce = false;
 		

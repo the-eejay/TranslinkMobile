@@ -30,10 +30,8 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 		STOPS_NEAR
 	}
 	
-	public interface Listener {
-		public void onStateChange (boolean state);
-	}
-	private Listener loadingListener= null;
+	
+	private LoadingListener loadingListener= null;
 
 	private boolean isLoading;
 	private State state;
@@ -272,7 +270,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 		
 	}
 	
-	public void registerListener (Listener listener) {
+	public void registerListener (LoadingListener listener) {
 		loadingListener = listener;
 	}
 	
