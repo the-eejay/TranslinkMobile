@@ -136,8 +136,8 @@ public class JourneyPlanner extends Fragment implements
 		
 		fromText.setAdapter(fromAdapter);
 		destText.setAdapter(destAdapter);
-		fromText.setThreshold(3);
-		destText.setThreshold(3);
+		fromText.setThreshold(2);
+		destText.setThreshold(2);
 		
 		fromMyLocButton = (Button) view.findViewById(R.id.from_myloc_button);
 		toMyLocButton = (Button) view.findViewById(R.id.to_myloc_button);
@@ -521,7 +521,7 @@ public class JourneyPlanner extends Fragment implements
 					  try
 					  {
 						  Log.d("performFiltering", "TYPED TEXT LENGTH: " + typedText.length());
-						  if(typedText.length() >= 3 && !typedText.equals("Current location"))
+						  if(!typedText.equals("Current location"))
 						  {
 							  String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" 
 								  		+ Uri.encode(typedText)
