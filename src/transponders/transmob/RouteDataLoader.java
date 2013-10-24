@@ -37,6 +37,7 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	
 	private List<TextView> codeTexts, directionTexts, firstArrivalTexts, secondArrivalTexts;
 	private CountDownLatch lock; //to perform unit tests
+	private LoadingListener loadingListener;
 
 	public RouteDataLoader(List<String> list, ArrayAdapter<String> adapter, HashMap<Integer,Trip> positionTripMap) {
 		/*isLoading = false;
@@ -50,6 +51,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	
 	public RouteDataLoader(List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Trip> positionRouteMap) {
 		isLoading = false;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		stopTrips = new ArrayList<StopTrip>();
 		this.positionTripMap = positionRouteMap;
 		trips = new ArrayList<Trip>();
@@ -59,6 +63,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 	
 	public RouteDataLoader(List<TextView> codes, List<TextView> directions, List<TextView> firsts, List<TextView> seconds, HashMap<Integer,Trip> positionRouteMap) {
 		isLoading = false;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		stopTrips = new ArrayList<StopTrip>();
 		this.positionTripMap = positionRouteMap;
 		trips = new ArrayList<Trip>();
@@ -77,6 +84,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
      */
 	public void requestRouteTimes(ArrayList<Stop> stops) {
 		isLoading = true;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 		//Build the retrieve route schedule URL
 		this.stops = stops;
 		String stopString = "";
@@ -113,6 +123,9 @@ public class RouteDataLoader implements JSONRequest.NetworkListener {
 		setStopTripTimes();
 		addTimesToList();
 		isLoading = false;
+		if (loadingListener != null) {
+			loadingListener.onStateChange(isLoading);
+		}
 	}
 
 	/**
