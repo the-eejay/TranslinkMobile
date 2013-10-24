@@ -244,24 +244,27 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
         	newRow.setMinimumHeight(height);
         	TextView text = new TextView(rowContext);
         	int endOfFirstColumn = rowStr.indexOf("</td>");
-        	String dateText = rowStr.substring(rowStr.indexOf("<td>")+3, endOfFirstColumn);
+        	String dateText = rowStr.substring(rowStr.indexOf("<td>")+4, endOfFirstColumn);
         	text.setText(dateText);
         	//text.setText(result);
         	 TableRow.LayoutParams param0 = new TableRow.LayoutParams();
              param0.column = 0;
-             param0.span = 30;
+             param0.span = 1;
              param0.weight = 1;
              text.setLayoutParams(param0);
         	newRow.addView(text);
         	
         	TextView text1 = new TextView(rowContext);
-        	String costText = rowStr.substring(rowStr.indexOf("<td>", endOfFirstColumn)+3, rowStr.indexOf("</td>", endOfFirstColumn+3));
+        	String costText = rowStr.substring(rowStr.indexOf("<td>", endOfFirstColumn)+4, rowStr.indexOf("</td>", endOfFirstColumn+4));
         	text1.setText(costText);
         	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
             param1.column = 1;
-            param1.span = 30;
+            param1.span = 1;
             param1.weight = 1;
             text1.setLayoutParams(param1);
+            Log.d("GoCard", "dateText="+dateText);
+            Log.d("GoCard", "costText="+costText);
+            newRow.addView(text1);
             
         	table.addView(newRow);
 		}
@@ -288,26 +291,94 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
         	newRow.setMinimumHeight(height);
         	TextView text = new TextView(rowContext);
         	int endOfFirstColumn = rowStr.indexOf("</td>");
-        	String dateText = rowStr.substring(rowStr.indexOf("<td>")+3, endOfFirstColumn);
+        	String dateText = rowStr.substring(rowStr.indexOf("<td colspan")+16, endOfFirstColumn).trim();
         	text.setText(dateText);
         	//text.setText(result);
         	 TableRow.LayoutParams param0 = new TableRow.LayoutParams();
              param0.column = 0;
-             param0.span = 30;
+             param0.span = 5;
              param0.weight = 1;
              text.setLayoutParams(param0);
         	newRow.addView(text);
-        	
-        	TextView text1 = new TextView(rowContext);
-        	String costText = rowStr.substring(rowStr.indexOf("<td>", endOfFirstColumn)+3, rowStr.indexOf("</td>", endOfFirstColumn+3));
-        	text1.setText(costText);
-        	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
-            param1.column = 1;
-            param1.span = 30;
-            param1.weight = 1;
-            text1.setLayoutParams(param1);
-            
         	table.addView(newRow);
+        	
+        	String[] rowsInDate = rowStr.split("<tr>");
+        	
+   
+        	for (int j=1; j<rowsInDate.length; j++) {
+        		TableRow newRow2 = new TableRow(tableContext);
+        		Context rowContext2 = newRow2.getContext();
+        		String[] rowInDateCols = rowsInDate[j].split("<td");
+        		
+        		//debug
+        		for (int k=0;k<rowInDateCols.length; k++) {
+        			if (k!=0) {
+        				Log.d("GoCard", "parsed rowInDateCols["+k+"]= "+ rowInDateCols[k].
+        						substring(rowInDateCols[k].indexOf(">")+1, rowInDateCols[k].
+        		        				indexOf("</td>")).trim());
+        			}
+        		}
+        		
+        		
+        		String timeText = rowInDateCols[1].substring(rowInDateCols[1].indexOf(">")+1, rowInDateCols[1].
+        				indexOf("</td>")).trim();
+        		String touchOnText = rowInDateCols[2].substring(rowInDateCols[2].indexOf(">")+1, rowInDateCols[2].
+        				indexOf("</td>")).trim();
+        		String time2Text = rowInDateCols[3].substring(rowInDateCols[3].indexOf(">")+1, rowInDateCols[3].
+        				indexOf("</td>")).trim();
+        		String touchOffText = rowInDateCols[4].substring(rowInDateCols[4].indexOf(">")+1, rowInDateCols[4].
+        				indexOf("</td>")).trim();
+        		String priceText = rowInDateCols[5].substring(rowInDateCols[5].indexOf(">")+1, rowInDateCols[5].
+        				indexOf("</td>")).trim();
+        		
+        		
+	        	TextView text1 = new TextView(rowContext2);
+	        	text1.setText(timeText);
+	        	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
+	            param1.column = 0;
+	            param1.span = 1;
+	            param1.weight = 1;
+	            text1.setLayoutParams(param1);
+	            newRow2.addView(text1);
+	            
+	            TextView text2 = new TextView(rowContext2);
+	        	text2.setText(touchOnText);
+	        	TableRow.LayoutParams param2 = new TableRow.LayoutParams();
+	            param2.column = 1;
+	            param2.span = 1;
+	            param2.weight = 1;
+	            text2.setLayoutParams(param2);
+	            newRow2.addView(text2);
+	            
+	            TextView text3 = new TextView(rowContext2);
+	        	text3.setText(time2Text);
+	        	TableRow.LayoutParams param3 = new TableRow.LayoutParams();
+	            param3.column = 2;
+	            param3.span = 1;
+	            param3.weight = 1;
+	            text3.setLayoutParams(param3);
+	            newRow2.addView(text3);
+	            
+	            TextView text4 = new TextView(rowContext2);
+	        	text4.setText(touchOffText);
+	        	TableRow.LayoutParams param4 = new TableRow.LayoutParams();
+	            param4.column = 3;
+	            param4.span = 1;
+	            param4.weight = 1;
+	            text4.setLayoutParams(param4);
+	            newRow2.addView(text4);
+	            
+	            TextView text5 = new TextView(rowContext2);
+	        	text5.setText(priceText);
+	        	TableRow.LayoutParams param5 = new TableRow.LayoutParams();
+	            param4.column = 4;
+	            param4.span = 1;
+	            param4.weight = 1;
+	            text5.setLayoutParams(param5);
+	            newRow2.addView(text5);
+	            
+	        	table.addView(newRow2);
+        	}
 		}
 		
 	}
