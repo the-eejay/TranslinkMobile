@@ -1,8 +1,72 @@
-<?xml version="1.0" encoding="utf-8"?>
-<WebView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/webView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-    
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:background="@drawable/background_others">
 
-</WebView>
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" 
+	    android:paddingTop="30dp"
+	    android:paddingBottom="30dp"
+	    android:paddingLeft="30dp"
+	    android:paddingRight="30dp" >
+	
+	    
+	    
+	    <TableLayout 
+		    android:id="@+id/balance_table"
+		    android:layout_below="@id/login_button"
+		    android:layout_marginTop="30dp"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:stretchColumns="0">
+	 
+		   <TableRow
+		        android:id="@+id/balanceTableRow1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content">
+		        
+		     <TextView
+		        android:id="@+id/balanceCol1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:paddingLeft="10dp"
+		        android:text="@string/news"
+		        android:textAppearance="?android:attr/textAppearanceLarge" 
+		        android:visibility="gone" />
+  		        
+		    </TableRow>
+	
+		</TableLayout>
+		
+	    <TableLayout 
+		    android:id="@+id/history_table"
+		    android:layout_below="@id/balance_table"
+		    android:layout_marginTop="30dp"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:stretchColumns="0">
+	 
+		   <TableRow
+		        android:id="@+id/historyTableRow1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content">
+		        
+		     <TextView
+		        android:id="@+id/historyCol1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:paddingLeft="10dp"
+		        android:text="@string/news"
+		        android:textAppearance="?android:attr/textAppearanceLarge" 
+		        android:visibility="gone" />
+  		        
+		    </TableRow>
+	
+		</TableLayout>
+		
+	    
+	</RelativeLayout>
+	
+</ScrollView>
