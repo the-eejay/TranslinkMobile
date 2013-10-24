@@ -205,9 +205,11 @@ public class GocardDisplayFragment extends Fragment {
         	table.addView(newRow);
         	getActivity().setProgressBarIndeterminateVisibility(false);
         	//Toast.makeText(getActivity().getApplicationContext(), "Something went wrong.", Toast.LENGTH_LONG).show();
-        	
+        	FragmentManager manager = getActivity().getSupportFragmentManager();
+    		manager.popBackStack();
+    		
         	AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        	builder.setMessage("Something went wrong. Either server is down, or has changed or  \nan incorrect username/password was entered.")
+        	builder.setMessage("Something went wrong. Either server is down, or has changed or an incorrect username/password was entered.")
         			.setCancelable(false)
         			.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
 						
@@ -392,5 +394,8 @@ public class GocardDisplayFragment extends Fragment {
  		transaction.remove(this);
  		transaction.addToBackStack(null);
  		transaction.commit();*/
+		
+		/*FragmentManager manager = getActivity().getSupportFragmentManager();
+		manager.popBackStack();*/
 	}
 }
