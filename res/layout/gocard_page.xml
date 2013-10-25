@@ -1,72 +1,148 @@
-<ScrollView
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" 
-    android:background="@drawable/background_others">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" 
+    android:paddingTop="15dp"
+    android:background="@drawable/background_others" >
 
-	<RelativeLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content" 
-	    android:paddingTop="30dp"
-	    android:paddingBottom="30dp"
-	    android:paddingLeft="30dp"
-	    android:paddingRight="30dp" >
-	
-	    
-	    
 	    <TableLayout 
 		    android:id="@+id/balance_table"
 		    android:layout_below="@id/login_button"
-		    android:layout_marginTop="30dp"
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
-		    android:stretchColumns="0">
+		    android:stretchColumns="0"
+		    android:paddingLeft="30dp"
+	    	android:paddingRight="30dp" >
 	 
 		   <TableRow
 		        android:id="@+id/balanceTableRow1"
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content">
 		        
-		     <TextView
-		        android:id="@+id/balanceCol1"
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:paddingLeft="10dp"
-		        android:text="@string/news"
-		        android:textAppearance="?android:attr/textAppearanceLarge" 
-		        android:visibility="gone" />
+			     <TextView
+			        android:id="@+id/balanceCol1"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:text="@string/current_balance"
+			        android:textSize="30sp"
+			        android:textStyle="bold"
+			        android:visibility="visible" />
+			     
+			     <TextView
+			        android:id="@+id/balancenum_label"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:paddingLeft="10dp"
+			        android:text="@string/balance_num"
+			        android:textSize="30sp"
+			        android:textStyle="bold"
+			        android:textColor="@color/ferry_blue"
+			        android:visibility="visible" />
   		        
+		    </TableRow>
+		    
+		   <TableRow
+		        android:id="@+id/balanceTableRow2"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content">
+		        
+			     <TextView
+			        android:id="@+id/asof_label"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:paddingTop="10dp"
+			        android:paddingLeft="4dp"
+			        android:text="@string/as_of"
+			        android:textSize="15sp"
+			        android:visibility="visible" />
+
 		    </TableRow>
 	
 		</TableLayout>
 		
+	     <View
+	    android:id="@+id/topLine"
+	    android:layout_width="fill_parent"
+	    android:layout_height="1dip"
+	    android:layout_below="@id/balance_table"
+	    android:layout_marginTop="15dp"
+	    android:background="@color/separator_line" />
+	     
+	    <ScrollView
+	    android:layout_below="@id/topLine"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent" > 
+	    
 	    <TableLayout 
 		    android:id="@+id/history_table"
-		    android:layout_below="@id/balance_table"
-		    android:layout_marginTop="30dp"
+		    android:layout_marginTop="0dp"
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
-		    android:stretchColumns="0">
+		    android:stretchColumns="*">
+		   
+	        <TableRow
+		        android:id="@+id/historyDateRow"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:visibility="gone" >
+		   
+	        <TextView
+		        android:id="@+id/dateLabel"
+		        android:layout_span="85"
+		        android:layout_weight="1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="30dp"
+		        android:background="@color/ferry_blue"
+		        android:paddingLeft="10dp"
+		        android:text="@string/sample_date"
+		        android:textSize="18sp"
+		        android:textColor="@color/white" 
+		        android:gravity="center_vertical"
+		        android:visibility="gone" />
+	        </TableRow>
 	 
 		   <TableRow
 		        android:id="@+id/historyTableRow1"
 		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content">
-		        
-		     <TextView
-		        android:id="@+id/historyCol1"
-		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
+		        android:visibility="gone" >
+		        
+		      <TextView
+		        android:id="@+id/service_code"
+		        android:layout_span="15"
+		        android:layout_height="70dp"
 		        android:paddingLeft="10dp"
-		        android:text="@string/news"
-		        android:textAppearance="?android:attr/textAppearanceLarge" 
+		        android:layout_weight="1"
+		        android:text="@string/service_code"
+		        android:textAppearance="?android:attr/textAppearanceLarge"  
+		        android:visibility="gone" />
+		     
+		     <TextView
+		        android:id="@+id/service_time"
+		        android:layout_span="55"
+		        android:layout_height="70dp"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:layout_weight="1"
+		        android:paddingLeft="10dp" 
+		        android:background="@color/transparent_black" 
+		        android:visibility="gone" />
+		     
+		     <TextView
+		        android:id="@+id/mini_arrow"
+		        android:layout_span="15"
+		        android:layout_height="70dp"
+		        android:paddingLeft="10dp"
+		        android:layout_weight="1"
+		        android:textAppearance="?android:attr/textAppearanceLarge"  
 		        android:visibility="gone" />
   		        
 		    </TableRow>
 	
 		</TableLayout>
 		
+	</ScrollView>
 	    
-	</RelativeLayout>
+</RelativeLayout>
 	
-</ScrollView>
+

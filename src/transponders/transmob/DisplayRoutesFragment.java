@@ -109,6 +109,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		Log.d("DisplayRoutes", "DisplayRoutes: onCreateView started");
 		super.onCreate(savedInstanceState);
 		
+		getActivity().setProgressBarIndeterminateVisibility(true);
+		
 		getActivity().getActionBar().setTitle("Timetable");
 		scale = getActivity().getResources().getDisplayMetrics();
 		 manager = getActivity().getSupportFragmentManager();
@@ -121,7 +123,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		table = (TableLayout) view.findViewById(R.id.service_table);
         tableContext = table.getContext();
         
-        TextView title = (TextView) view.findViewById(R.id.stop_name);
+        final TextView title = (TextView) view.findViewById(R.id.stop_name);
         String displayName = selectedStopName;
         
         String[] splittedByStop = selectedStopName.split(", stop ");
@@ -136,6 +138,22 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
         	displayName = splittedByNear[0] + "\n near " + splittedByNear[1];
         }
         title.setText(displayName);
+        
+        title.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                int lineCount = title.getLineCount();
+                if(lineCount == 3)
+                {
+                	String displayName = (String) title.getText();
+                	displayName = displayName.replaceFirst("\n", "");
+                	title.setText(displayName);
+                }
+            }
+        });
+       
         
         pullToRefreshView = (PullToRefreshScrollView) view.findViewById(R.id.timetable_scrollview);
         pullToRefreshView.setOnRefreshListener(new OnRefreshListener<ScrollView>(){
@@ -378,6 +396,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
             	endedServices = true;
             }
 		}
+		
+		getActivity().setProgressBarIndeterminateVisibility(false);
 		
 		//routeLoader = new RouteDataLoader(lines, adapter, positionRouteMap);
 

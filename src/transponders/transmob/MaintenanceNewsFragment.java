@@ -77,6 +77,8 @@ public class MaintenanceNewsFragment extends Fragment {
 		newsDate = (TextView) view.findViewById(R.id.newsDate);
 		scale = getActivity().getResources().getDisplayMetrics();
 		
+		getActivity().setProgressBarIndeterminateVisibility(true);
+		
 		checkConnection();
         return view;
     }
@@ -282,6 +284,8 @@ public class MaintenanceNewsFragment extends Fragment {
 			toast.show();
 			e.printStackTrace();
     	}
+		
+		getActivity().setProgressBarIndeterminateVisibility(false);
 	}
 	
 	private class NewsListener implements OnClickListener
@@ -295,6 +299,8 @@ public class MaintenanceNewsFragment extends Fragment {
 		
     	public void onClick(View v) 
 		{
+    		getActivity().setProgressBarIndeterminateVisibility(true);
+    		
     		Fragment fragment2 = new NewsFragment();
     		Bundle args = new Bundle();
             args.putString(NewsFragment.ARG_NEWS_URL, linkURL);

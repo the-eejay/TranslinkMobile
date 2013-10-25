@@ -1,6 +1,7 @@
 package transponders.transmob;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,12 @@ import org.apache.http.util.EntityUtils;
 
 import transponders.transmob.NearbyStops.StackState;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -41,10 +47,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The Fragment class that displays the input form for the journey planner.
@@ -56,14 +64,19 @@ import android.widget.TextView;
  */
 public class GocardLoginFragment extends Fragment implements OnClickListener 
 {	
+	public final String GOCARD_NUMBER = "GOCARD_NUMBER";
+	public final String GOCARD_PASSWORD = "GOCARD_PASSWORD";
+	
 	// UI elements
 	private EditText gcnumText;
 	private EditText passwordText;
 	private Button loginButton;
+	private TextView wrongpassWarning;
+	private CheckBox rememberBox;
 	
 	private String gcNumber, password, result;
 	
-	private DefaultHttpClient httpClient;
+	private static DefaultHttpClient httpClient;
 	
 	
 	/*private enum State {
@@ -77,21 +90,25 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		
 		gcnumText = (EditText) view.findViewById(R.id.gcnum_input);
 		passwordText = (EditText) view.findViewById(R.id.password_input);
-
-		gcnumText.setText("0160041933728206");
+		wrongpassWarning = (TextView) view.findViewById(R.id.wrongpass_warning);
+		rememberBox = (CheckBox) view.findViewById(R.id.check_remember);
 		
+		SharedPreferences settings = getActivity().getSharedPreferences(NearbyStops.PREFS_NAME, 0);
+		String savedNum = settings.getString(GOCARD_NUMBER, "");
+		String savedPassword = settings.getString(GOCARD_PASSWORD, "");
+		
+		gcnumText.setText(savedNum);
+		passwordText.setText(savedPassword);
 		
 		loginButton = (Button) view.findViewById(R.id.login_button);
 		loginButton.setOnClickListener(this);
 		
 		Button gcnumClear = (Button) view.findViewById(R.id.gcnum_clear_button);
 		Button passwordClear = (Button) view.findViewById(R.id.password_clear_button);
-		
+
 		gcnumClear.setOnClickListener(this);
 		passwordClear.setOnClickListener(this);
-		
-		
-		
+	
 		return view;
 	}
 
@@ -107,29 +124,161 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 			case R.id.password_clear_button:
 				passwordText.setText("");
 				break;
-			
+				
 			case R.id.login_button:
-				gcNumber = gcnumText.getText().toString();
-				password = passwordText.getText().toString();
-				
-				
-					Fragment fragment = new GocardDisplayFragment();
-					Bundle args = new Bundle();
-					args.putString("goCardNumber", gcNumber);
-					args.putString("password", password);
-					fragment.setArguments(args);
+				if(isNetworkAvailable())
+				{
+					gcNumber = gcnumText.getText().toString();
+					password = passwordText.getText().toString();
 					
-					FragmentManager manager = getActivity().getSupportFragmentManager();
-			   		FragmentTransaction transaction = manager.beginTransaction();
-		     		transaction.replace(R.id.content_frame, fragment);
-		            transaction.addToBackStack(null);
-		     		transaction.commit();
-		     		
-		     		
+					if(rememberBox.isChecked())
+					{
+						SharedPreferences settings = getActivity().getSharedPreferences(NearbyStops.PREFS_NAME, 0);
+
+						SharedPreferences.Editor editor = settings.edit();
+		        	    editor.putString(GOCARD_NUMBER, gcNumber);
+		        	    editor.putString(GOCARD_PASSWORD, password);
+		        	    editor.commit();
+					}
+					else
+					{
+						SharedPreferences settings = getActivity().getSharedPreferences(NearbyStops.PREFS_NAME, 0);
+
+						SharedPreferences.Editor editor = settings.edit();
+		        	    editor.putString(GOCARD_NUMBER, "");
+		        	    editor.putString(GOCARD_PASSWORD, "");
+		        	    editor.commit();
+					}
+
+					getActivity().setProgressBarIndeterminateVisibility(true);
+					HttpThread ht = new HttpThread();
+					String url = "https://gocard.translink.com.au/webtix/welcome/welcome.do";
+					ht.execute(url);
+				}
+				else
+					Toast.makeText(getActivity().getApplicationContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
 				
 				break;
 		}
 	}
 	
+	private class HttpThread extends AsyncTask<String, Void, String>
+	{
+		@Override
+		protected String doInBackground(String... params) 
+		{
+			String res = postData(params[0]);
+			return res;
+		}
+		
+		@Override
+	    protected void onPostExecute(String result) {
+	    	Log.d("JSONRequest", "postexecute");
+	    	
+	    	super.onPostExecute(result);
+	    	parseResult(result);
+	    }	
+	}
+	
+	public String postData(String url) 
+	{
+	    // Create a new HttpClient and Post Header
+	    if(httpClient == null) {
+	    	httpClient = createHttpClient();
+	    }
+	    
+	    HttpPost httppost = new HttpPost(url);
+	    
+	    Log.d("postData()", "inside postData()");
+	    String result = "not yet...";
+
+	    try 
+	    {
+	        // Add your data
+	        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+	        Log.d( "GoCard", "Number Entered="+ gcNumber );
+	        nameValuePairs.add(new BasicNameValuePair("cardNum", gcNumber ));
+	        nameValuePairs.add(new BasicNameValuePair("cardOps", "Display"));
+	        nameValuePairs.add(new BasicNameValuePair("pass", password ));
+	        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+	        // Execute HTTP Post Request
+	        HttpResponse response = httpClient.execute(httppost);
+	        
+	        if (response != null) {
+                result = EntityUtils.toString(response.getEntity());
+            }
+	        
+	    } catch (ClientProtocolException e) {
+	        result = "ClientProtocolException";
+	    } catch (IOException e) {
+	        result = "IOException";
+	    }
+	    
+	    return result;
+	} 
+	
+	public void parseResult(String result) {
+		Log.d("GoCard", result);
+		Log.d("GoCard", "resultEndOfFile=" + result.substring(result.length()-20));
+		
+		getActivity().setProgressBarIndeterminateVisibility(false);
+		
+		if (result.contains("<table id=\"balance-table\"")) {
+			//parseResultAsBalance(result);
+			wrongpassWarning.setVisibility(View.INVISIBLE);
+			
+			Fragment fragment = new GocardDisplayFragment();
+			Bundle args = new Bundle();
+			Log.d("Password sent", password);
+			args.putString("BALANCE_RESULT", result);
+			fragment.setArguments(args);
+			
+			FragmentManager manager = getActivity().getSupportFragmentManager();
+	   		FragmentTransaction transaction = manager.beginTransaction();
+     		transaction.replace(R.id.content_frame, fragment);
+            transaction.addToBackStack(null);
+     		transaction.commit();	
+		} 
+		else 
+		{	
+			wrongpassWarning.setVisibility(View.VISIBLE);
+		}
+		
+	}
+	
+	private DefaultHttpClient createHttpClient()
+	{	
+		DefaultHttpClient ret = null;
+		
+		 //sets up parameters
+        HttpParams params = new BasicHttpParams();
+        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+        HttpProtocolParams.setContentCharset(params, "utf-8");
+        params.setBooleanParameter("http.protocol.expect-continue", false);
+
+        //registers schemes for both http and https
+        SchemeRegistry registry = new SchemeRegistry();
+        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        final SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
+        sslSocketFactory.setHostnameVerifier(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+        registry.register(new Scheme("https", sslSocketFactory, 443));
+
+        ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params, registry);
+        ret = new DefaultHttpClient(manager, params);
+        return ret;
+	}
+	
+	public static DefaultHttpClient getHttpClient()
+	{
+		return httpClient;
+	}
+	
+	private boolean isNetworkAvailable() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo activeNetworkInfo = connectivityManager
+				.getActiveNetworkInfo();
+		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
 	
 }

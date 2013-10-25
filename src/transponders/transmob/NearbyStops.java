@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
@@ -173,6 +174,7 @@ LoadingListener{
 		getActionBar().hide();
 		
 		setContentView(R.layout.activity_main);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		splashFrame = (FrameLayout) findViewById(R.id.splash_screen_container); 
 		splashFrame.setOnTouchListener(new OnTouchListener()
 		{
@@ -1061,6 +1063,7 @@ LoadingListener{
 	public void closeSplashScreen() {
 
 		splashFrame.setVisibility(View.GONE);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 		getActionBar().show();
 		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 	}

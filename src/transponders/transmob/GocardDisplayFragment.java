@@ -27,6 +27,8 @@ import org.apache.http.util.EntityUtils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -35,11 +37,14 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -50,22 +55,22 @@ public class GocardDisplayFragment extends Fragment {
 	
 	private DefaultHttpClient httpClient;
 	
-	private String goCardNumber;
-	private String password;
+	private String balanceResult;
+	private TableLayout balanceTable, historyTable;
+	
+	private TextView balancenumLabel, asofLabel;
 	
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		
 		if (getArguments() == null) {
-			goCardNumber ="";
-			password = "";
+			balanceResult ="";
+
 		} else {
-			if (goCardNumber == null) {
-				goCardNumber = getArguments().getString("goCardNumber");
-			}
-			if (password == null) {
-				password = getArguments().getString("password");
+			if (balanceResult == null) {
+				balanceResult = getArguments().getString("BALANCE_RESULT");
+				httpClient = GocardLoginFragment.getHttpClient();
 			}
 		}
 	}
@@ -75,58 +80,20 @@ public class GocardDisplayFragment extends Fragment {
 	{
 		View view = inflater.inflate(R.layout.gocard_page, container, false);
 		
-		super.onCreate(savedInstanceState);
-		HttpThread ht = new HttpThread();
-		String url = "https://gocard.translink.com.au/webtix/welcome/welcome.do";
+		balanceTable = (TableLayout) view.findViewById(R.id.balance_table);
+		historyTable = (TableLayout) view.findViewById(R.id.history_table);
+		
+		balancenumLabel = (TextView) view.findViewById(R.id.balancenum_label);
+		asofLabel = (TextView) view.findViewById(R.id.asof_label);
+		
 		getActivity().setProgressBarIndeterminateVisibility(true);
-		ht.execute(url);
-		
-		
+		parseResultAsBalance(balanceResult);
 		
 		return view;
 	}
 	
-	
-	private DefaultHttpClient createHttpClient()
-	{
-	    /*HttpParams params = new BasicHttpParams();
-	    HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-	    HttpProtocolParams.setContentCharset(params, HTTP.DEFAULT_CONTENT_CHARSET);
-	    HttpProtocolParams.setUseExpectContinue(params, true);
-
-	    SchemeRegistry schReg = new SchemeRegistry();
-	    schReg.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-	    schReg.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-	    ClientConnectionManager conMgr = new ThreadSafeClientConnManager(params, schReg);
-
-	    return new DefaultHttpClient(conMgr, params);*/
-		
-		DefaultHttpClient ret =null;
-		
-		 //sets up parameters
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setContentCharset(params, "utf-8");
-        params.setBooleanParameter("http.protocol.expect-continue", false);
-
-        //registers schemes for both http and https
-        SchemeRegistry registry = new SchemeRegistry();
-        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        final SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
-        sslSocketFactory.setHostnameVerifier(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
-        registry.register(new Scheme("https", sslSocketFactory, 443));
-
-        ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params, registry);
-        ret = new DefaultHttpClient(manager, params);
-        return ret;
-	}
-	
-	public String postData(String url) {
-	    // Create a new HttpClient and Post Header
-	    if(httpClient == null) {
-	    	httpClient = createHttpClient();
-	    }
-	    
+	public String postData(String url) 
+	{	    
 	    HttpPost httppost = new HttpPost(url);
 	    
 	    Log.d("postData()", "inside postData()");
@@ -134,16 +101,6 @@ public class GocardDisplayFragment extends Fragment {
 
 	    try 
 	    {
-	        // Add your data
-	        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-	        Log.d( "GoCard", "Number Entered="+ goCardNumber );
-	        /*nameValuePairs.add(new BasicNameValuePair("CardNumber", gcnumText.getText().toString()));
-	        nameValuePairs.add(new BasicNameValuePair("Password", passwordText.getText().toString()));*/
-	        nameValuePairs.add(new BasicNameValuePair("cardNum", goCardNumber ));
-	        nameValuePairs.add(new BasicNameValuePair("cardOps", "Display"));
-	        nameValuePairs.add(new BasicNameValuePair("pass", password ));
-	        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
 	        // Execute HTTP Post Request
 	        HttpResponse response = httpClient.execute(httppost);
 	        
@@ -184,14 +141,10 @@ public class GocardDisplayFragment extends Fragment {
 		Log.d("GoCard", result);
 		Log.d("GoCard", "resultEndOfFile=" + result.substring(result.length()-20));
 		
-		if (result.contains("<table id=\"balance-table\"")) {
-			parseResultAsBalance(result);
-			getActivity().setProgressBarIndeterminateVisibility(true);
-			
-			
-			
-		} else if (result.contains("<table id=\"travel-history\"")) {
+		if (result.contains("<table id=\"travel-history\"")) 
+		{
 			parseResultAsHistory(result);
+<<<<<<< HEAD
 			getActivity().setProgressBarIndeterminateVisibility(false);
 			
 		} else {
@@ -225,8 +178,14 @@ public class GocardDisplayFragment extends Fragment {
         	
         	
         	
+=======
+			getActivity().setProgressBarIndeterminateVisibility(false);	
+		} 
+		else 
+		{	
+        	Toast.makeText(getActivity().getApplicationContext(), "Something went wrong.", Toast.LENGTH_SHORT).show();	
+>>>>>>> Finalized the Go Card Login Feature
 		}
-		
 	}
 	
 	public void parseResultAsBalance(String result) {
@@ -234,82 +193,72 @@ public class GocardDisplayFragment extends Fragment {
 		int indexOfEndOfCardBalance = result.indexOf("</table>", indexOfCardBalance);
 		String tableSubstr = result.substring(indexOfCardBalance, indexOfEndOfCardBalance);
 		String[] tableRowStrings = tableSubstr.split("<tr>"); 
-		for (int i = 2; i < tableRowStrings.length; i++) {
-			String rowStr = tableRowStrings[i];
-			TableLayout table = (TableLayout) getView().findViewById(R.id.balance_table);
-	        Context tableContext = table.getContext();
-			TableRow newRow = new TableRow(tableContext);
-			Context rowContext = newRow.getContext();
-			DisplayMetrics scale = getActivity().getResources().getDisplayMetrics();
-        	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, scale);
-        	newRow.setMinimumHeight(height);
-        	TextView text = new TextView(rowContext);
-        	int endOfFirstColumn = rowStr.indexOf("</td>");
-        	String dateText = rowStr.substring(rowStr.indexOf("<td>")+4, endOfFirstColumn);
-        	text.setText(dateText);
-        	//text.setText(result);
-        	 TableRow.LayoutParams param0 = new TableRow.LayoutParams();
-             param0.column = 0;
-             param0.span = 1;
-             param0.weight = 1;
-             text.setLayoutParams(param0);
-        	newRow.addView(text);
-        	
-        	TextView text1 = new TextView(rowContext);
-        	String costText = rowStr.substring(rowStr.indexOf("<td>", endOfFirstColumn)+4, rowStr.indexOf("</td>", endOfFirstColumn+4));
-        	text1.setText(costText);
-        	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
-            param1.column = 1;
-            param1.span = 1;
-            param1.weight = 1;
-            text1.setLayoutParams(param1);
-            Log.d("GoCard", "dateText="+dateText);
-            Log.d("GoCard", "costText="+costText);
-            newRow.addView(text1);
-            
-        	table.addView(newRow);
-		}
+			
+		Log.d("tableRowStrings i", 2 + "");
+		String rowStr = tableRowStrings[2];
+    	int endOfFirstColumn = rowStr.indexOf("</td>");
+    	String dateText = rowStr.substring(rowStr.indexOf("<td>")+4, endOfFirstColumn);
+    	asofLabel.setText("As of " + dateText.trim());
+  
+        String costText = rowStr.substring(rowStr.indexOf("<td>", endOfFirstColumn)+4, rowStr.indexOf("</td>", endOfFirstColumn+4));
+    	balancenumLabel.setText(costText);
+        Log.d("GoCard", "dateText="+dateText);
+        Log.d("GoCard", "costText="+costText);
+
 		HttpThread ht = new HttpThread();
-		//ht.execute(gcNumber, password);
 		
 		String url = "https://gocard.translink.com.au/webtix/tickets-and-fares/go-card/online/history";
 		ht.execute(url);
 	}
 	
-	public void parseResultAsHistory(String result) {
-		
+	public void parseResultAsHistory(String result) 
+	{	
 		int indexOfHistory = result.indexOf("<table id=\"travel-history\"");
 		int indexOfEndOfHistory = result.indexOf("</table>", indexOfHistory);
 		String tableSubstr = result.substring(indexOfHistory, indexOfEndOfHistory);
 		String[] tableRowStrings = tableSubstr.split("<tr class=\"sub-heading\">"); 
-		for (int i = 1; i < tableRowStrings.length; i++) {
+		
+		for (int i = 1; i < tableRowStrings.length; i++) 
+		{
 			String rowStr = tableRowStrings[i];
-			TableLayout table = (TableLayout) getView().findViewById(R.id.history_table);
-	        Context tableContext = table.getContext();
+	        Context tableContext = historyTable.getContext();
 			TableRow newRow = new TableRow(tableContext);
 			Context rowContext = newRow.getContext();
+			
 			DisplayMetrics scale = getActivity().getResources().getDisplayMetrics();
-        	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, scale);
+        	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, scale);
         	newRow.setMinimumHeight(height);
-        	TextView text = new TextView(rowContext);
+        	TextView transactionDate = new TextView(rowContext);
         	int endOfFirstColumn = rowStr.indexOf("</td>");
         	String dateText = rowStr.substring(rowStr.indexOf("<td colspan")+16, endOfFirstColumn).trim();
-        	text.setText(dateText);
-        	//text.setText(result);
-        	 TableRow.LayoutParams param0 = new TableRow.LayoutParams();
-             param0.column = 0;
-             param0.span = 5;
-             param0.weight = 1;
-             text.setLayoutParams(param0);
-        	newRow.addView(text);
-        	table.addView(newRow);
+        	transactionDate.setText(dateText);
+        	transactionDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        	 
+        	TableRow.LayoutParams param0 = new TableRow.LayoutParams();
+            param0.column = 0;
+            param0.span = 85;
+            param0.weight = 1;
+            
+            transactionDate.setLayoutParams(param0);
+            transactionDate.setPadding(15, 2, 0, 2);
+            transactionDate.setBackgroundResource(R.color.ferry_blue);
+            transactionDate.setTextColor(Color.WHITE);
+        	newRow.addView(transactionDate);
+        	historyTable.addView(newRow);
         	
         	String[] rowsInDate = rowStr.split("<tr>");
         	
-   
+        	Log.d("goCard table", "rowsInDate " + rowsInDate.length);
         	for (int j=1; j<rowsInDate.length; j++) {
+        		
+        		Log.d("goCard table", "j " + j);
         		TableRow newRow2 = new TableRow(tableContext);
         		Context rowContext2 = newRow2.getContext();
+        		
+        		//int rowHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, scale);
+            	//newRow.setMinimumHeight(rowHeight);
+            	newRow2.setPadding(5, 7, 5, 9);
+        		
         		String[] rowInDateCols = rowsInDate[j].split("<td");
         		
         		//debug
@@ -321,67 +270,114 @@ public class GocardDisplayFragment extends Fragment {
         			}
         		}
         		
-        		
         		String timeText = rowInDateCols[1].substring(rowInDateCols[1].indexOf(">")+1, rowInDateCols[1].
-        				indexOf("</td>")).trim();
-        		String touchOnText = rowInDateCols[2].substring(rowInDateCols[2].indexOf(">")+1, rowInDateCols[2].
         				indexOf("</td>")).trim();
         		String time2Text = rowInDateCols[3].substring(rowInDateCols[3].indexOf(">")+1, rowInDateCols[3].
         				indexOf("</td>")).trim();
+        		
+        		String touchOnText = rowInDateCols[2].substring(rowInDateCols[2].indexOf(">")+1, rowInDateCols[2].
+        				indexOf("</td>")).trim();
+        		touchOnText = touchOnText.replace("&#039;", "");
         		String touchOffText = rowInDateCols[4].substring(rowInDateCols[4].indexOf(">")+1, rowInDateCols[4].
         				indexOf("</td>")).trim();
+        		touchOffText = touchOffText.replace("&#039;", "");
+        		
         		String priceText = rowInDateCols[5].substring(rowInDateCols[5].indexOf(">")+1, rowInDateCols[5].
         				indexOf("</td>")).trim();
         		
+        		////////////////////////////////////////////////////////////////
         		
-	        	TextView text1 = new TextView(rowContext2);
-	        	text1.setText(timeText);
-	        	TableRow.LayoutParams param1 = new TableRow.LayoutParams();
+	            LinearLayout cell1 = new LinearLayout(rowContext);
+	            cell1.setOrientation(LinearLayout.VERTICAL);
+	            cell1.setMinimumHeight(height);
+	            cell1.setGravity(Gravity.CENTER_VERTICAL);
+	 
+	            TableRow.LayoutParams param1 = new TableRow.LayoutParams();
 	            param1.column = 0;
-	            param1.span = 1;
+	            param1.span = 18;
 	            param1.weight = 1;
-	            text1.setLayoutParams(param1);
-	            newRow2.addView(text1);
+	            cell1.setLayoutParams(param1);
 	            
-	            TextView text2 = new TextView(rowContext2);
-	        	text2.setText(touchOnText);
-	        	TableRow.LayoutParams param2 = new TableRow.LayoutParams();
+	            TextView onTime = new TextView(rowContext2);
+	            /*onTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+	            onTime.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);*/
+	            onTime.setPadding(10, 0, -10, 0);            	
+	      
+	            TextView offTime = new TextView(rowContext2);
+	            offTime.setPadding(10, 0, -10, 0);
+	            
+	            onTime.setText(timeText);
+	            offTime.setText(time2Text);
+	            
+	            cell1.addView(onTime);
+	            cell1.addView(offTime);
+	            
+	            newRow2.addView(cell1);
+	            
+	            ////////////////////////////////////////////////////////////////
+	            
+	            LinearLayout cell2 = new LinearLayout(rowContext);
+	            cell2.setOrientation(LinearLayout.VERTICAL);
+	            cell2.setMinimumHeight(height);
+	            cell2.setGravity(Gravity.CENTER_VERTICAL);
+	 
+	            TableRow.LayoutParams param2 = new TableRow.LayoutParams();
 	            param2.column = 1;
-	            param2.span = 1;
+	            param2.span = 57;
 	            param2.weight = 1;
-	            text2.setLayoutParams(param2);
-	            newRow2.addView(text2);
+	            cell2.setLayoutParams(param2);
 	            
-	            TextView text3 = new TextView(rowContext2);
-	        	text3.setText(time2Text);
-	        	TableRow.LayoutParams param3 = new TableRow.LayoutParams();
+	            TextView touchOnLabel = new TextView(rowContext);
+	            TextView touchOffLabel = new TextView(rowContext);
+	            touchOnLabel.setPadding(0, 0, 0, 0);
+	            touchOffLabel.setPadding(3, 0, 0, 0);
+	            
+	            /*touchOnLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+	            touchOnLabel.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);*/
+	            
+	            touchOnLabel.setText(touchOnText);
+	            touchOffLabel.setText(touchOffText);
+	            
+	            cell2.addView(touchOnLabel);
+	            cell2.addView(touchOffLabel);
+	            
+	            newRow2.addView(cell2);
+	            
+	            ////////////////////////////////////////////////////////////////////
+	            
+	            LinearLayout cell3 = new LinearLayout(rowContext);
+	            cell3.setOrientation(LinearLayout.VERTICAL);
+	            cell3.setMinimumHeight(height);
+	            cell3.setGravity(Gravity.CENTER_VERTICAL);
+	            
+	            TableRow.LayoutParams param3 = new TableRow.LayoutParams();
 	            param3.column = 2;
-	            param3.span = 1;
+	            param3.span = 10;
 	            param3.weight = 1;
-	            text3.setLayoutParams(param3);
-	            newRow2.addView(text3);
+	            cell3.setLayoutParams(param3);
 	            
-	            TextView text4 = new TextView(rowContext2);
-	        	text4.setText(touchOffText);
-	        	TableRow.LayoutParams param4 = new TableRow.LayoutParams();
-	            param4.column = 3;
-	            param4.span = 1;
-	            param4.weight = 1;
-	            text4.setLayoutParams(param4);
-	            newRow2.addView(text4);
+	            TextView fareLabel = new TextView(rowContext2);
+	            fareLabel.setText(priceText);
+	            fareLabel.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+	            fareLabel.setTextColor(getActivity().getResources().getColor(R.color.train_orange));
 	            
-	            TextView text5 = new TextView(rowContext2);
-	        	text5.setText(priceText);
-	        	TableRow.LayoutParams param5 = new TableRow.LayoutParams();
-	            param4.column = 4;
-	            param4.span = 1;
-	            param4.weight = 1;
-	            text5.setLayoutParams(param5);
-	            newRow2.addView(text5);
+	            cell3.addView(fareLabel);
+	            newRow2.addView(cell3);
 	            
-	        	table.addView(newRow2);
+	            ///////////////////////////////////////////////////////////////////////////
+	            
+	            View separatorLine = new View(tableContext);
+	            separatorLine.setBackgroundColor(getResources().getColor(R.color.separator_line));
+	            separatorLine.setPadding(0, 0, 0, 0);
+	            TableLayout.LayoutParams lineParam = new TableLayout.LayoutParams();
+	            lineParam.height = 2;
+	            separatorLine.setLayoutParams(lineParam);
+	            
+	            historyTable.addView(newRow2);
+	            historyTable.addView(separatorLine);
         	}
 		}
+<<<<<<< HEAD
 		
 	}
 	
@@ -397,5 +393,7 @@ public class GocardDisplayFragment extends Fragment {
 		
 		/*FragmentManager manager = getActivity().getSupportFragmentManager();
 		manager.popBackStack();*/
+=======
+>>>>>>> Finalized the Go Card Login Feature
 	}
 }

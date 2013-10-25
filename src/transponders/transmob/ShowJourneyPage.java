@@ -38,6 +38,8 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 	{
 		View view = inflater.inflate(R.layout.journey_page, container, false);
 
+		getActivity().setProgressBarIndeterminateVisibility(true);
+		
 		wv = (WebView) view.findViewById(R.id.webView);
 		WebSettings settings = wv.getSettings();
 		settings.setDomStorageEnabled(true);
@@ -84,6 +86,8 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 		Log.d("URL: ", URL.toString());
 		/* Got the URL, time to load it into the web view */
 		wv.loadUrl(URL);
+		
+		getActivity().setProgressBarIndeterminateVisibility(false);
 	}
 	
 	class CustomWebViewClient extends WebViewClient
