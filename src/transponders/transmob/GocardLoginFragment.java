@@ -208,13 +208,12 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		
 		getActivity().setProgressBarIndeterminateVisibility(false);
 		
-		if (result.contains("<table id=\"balance-table\"")) {
-			//parseResultAsBalance(result);
+		if (result.contains("<table id=\"balance-table\"")) 
+		{
 			wrongpassWarning.setVisibility(View.INVISIBLE);
 			
 			Fragment fragment = new GocardDisplayFragment();
 			Bundle args = new Bundle();
-			Log.d("Password sent", password);
 			args.putString("BALANCE_RESULT", result);
 			fragment.setArguments(args);
 			
