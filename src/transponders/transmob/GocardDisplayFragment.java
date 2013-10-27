@@ -51,7 +51,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class GocardDisplayFragment extends Fragment {
-
 	
 	private DefaultHttpClient httpClient;
 	
@@ -144,47 +143,11 @@ public class GocardDisplayFragment extends Fragment {
 		if (result.contains("<table id=\"travel-history\"")) 
 		{
 			parseResultAsHistory(result);
-<<<<<<< HEAD
-			getActivity().setProgressBarIndeterminateVisibility(false);
-			
-		} else {
-			TableLayout table = (TableLayout) getView().findViewById(R.id.history_table);
-	        Context tableContext = table.getContext();
-			TableRow newRow = new TableRow(tableContext);
-			Context rowContext = newRow.getContext();
-			TextView text = new TextView(rowContext);
-        	text.setText(result);
-        	newRow.addView(text);
-        	table.addView(newRow);
-        	getActivity().setProgressBarIndeterminateVisibility(false);
-        	//Toast.makeText(getActivity().getApplicationContext(), "Something went wrong.", Toast.LENGTH_LONG).show();
-        	FragmentManager manager = getActivity().getSupportFragmentManager();
-    		manager.popBackStack();
-    		
-        	AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        	builder.setMessage("Something went wrong. Either server is down, or has changed or an incorrect username/password was entered.")
-        			.setCancelable(false)
-        			.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							goBackWithError();
-							
-						}
-					});
-        	
-        	AlertDialog alert = builder.create();
-        	alert.show();
-        	
-        	
-        	
-=======
 			getActivity().setProgressBarIndeterminateVisibility(false);	
 		} 
 		else 
 		{	
-        	Toast.makeText(getActivity().getApplicationContext(), "Something went wrong.", Toast.LENGTH_SHORT).show();	
->>>>>>> Finalized the Go Card Login Feature
+        	Toast.makeText(getActivity().getApplicationContext(), "Something went wrong.", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -377,23 +340,6 @@ public class GocardDisplayFragment extends Fragment {
 	            historyTable.addView(separatorLine);
         	}
 		}
-<<<<<<< HEAD
 		
-	}
-	
-	public void goBackWithError() {
-		//This breaks things so it'll be gone for now
-		
-		/*
-		FragmentManager manager = getActivity().getSupportFragmentManager();
-    	FragmentTransaction transaction = manager.beginTransaction();
- 		transaction.remove(this);
- 		transaction.addToBackStack(null);
- 		transaction.commit();*/
-		
-		/*FragmentManager manager = getActivity().getSupportFragmentManager();
-		manager.popBackStack();*/
-=======
->>>>>>> Finalized the Go Card Login Feature
 	}
 }
