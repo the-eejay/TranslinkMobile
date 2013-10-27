@@ -8,12 +8,11 @@
 
 	    <TableLayout 
 		    android:id="@+id/balance_table"
-		    android:layout_below="@id/login_button"
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
-		    android:stretchColumns="0"
-		    android:paddingLeft="30dp"
-	    	android:paddingRight="30dp" >
+		    android:stretchColumns="1"
+		    android:paddingLeft="20dp"
+	    	android:paddingRight="20dp" >
 	 
 		   <TableRow
 		        android:id="@+id/balanceTableRow1"
@@ -25,7 +24,7 @@
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
 			        android:text="@string/current_balance"
-			        android:textSize="30sp"
+			        android:textSize="28sp"
 			        android:textStyle="bold"
 			        android:visibility="visible" />
 			     
@@ -33,9 +32,9 @@
 			        android:id="@+id/balancenum_label"
 			        android:layout_width="fill_parent"
 			        android:layout_height="wrap_content"
-			        android:paddingLeft="10dp"
+			        android:gravity="center_vertical|right"
 			        android:text="@string/balance_num"
-			        android:textSize="30sp"
+			        android:textSize="28sp"
 			        android:textStyle="bold"
 			        android:textColor="@color/ferry_blue"
 			        android:visibility="visible" />

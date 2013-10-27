@@ -39,8 +39,10 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -84,6 +86,14 @@ public class GocardDisplayFragment extends Fragment {
 		
 		balancenumLabel = (TextView) view.findViewById(R.id.balancenum_label);
 		asofLabel = (TextView) view.findViewById(R.id.asof_label);
+		
+		balanceTable.setOnTouchListener(new OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return true;
+			}	
+		});
 		
 		getActivity().setProgressBarIndeterminateVisibility(true);
 		parseResultAsBalance(balanceResult);
@@ -218,8 +228,6 @@ public class GocardDisplayFragment extends Fragment {
         		TableRow newRow2 = new TableRow(tableContext);
         		Context rowContext2 = newRow2.getContext();
         		
-        		//int rowHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, scale);
-            	//newRow.setMinimumHeight(rowHeight);
             	newRow2.setPadding(5, 7, 5, 9);
         		
         		String[] rowInDateCols = rowsInDate[j].split("<td");
@@ -248,7 +256,10 @@ public class GocardDisplayFragment extends Fragment {
         		String priceText = rowInDateCols[5].substring(rowInDateCols[5].indexOf(">")+1, rowInDateCols[5].
         				indexOf("</td>")).trim();
         		
-        		////////////////////////////////////////////////////////////////
+        		if(priceText.equalsIgnoreCase("$0.00"))
+        			priceText = "$ 0.00";
+        		
+        		////////////////////////////////////////////////////////////////////////
         		
 	            LinearLayout cell1 = new LinearLayout(rowContext);
 	            cell1.setOrientation(LinearLayout.VERTICAL);
@@ -262,8 +273,6 @@ public class GocardDisplayFragment extends Fragment {
 	            cell1.setLayoutParams(param1);
 	            
 	            TextView onTime = new TextView(rowContext2);
-	            /*onTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-	            onTime.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);*/
 	            onTime.setPadding(10, 0, -10, 0);            	
 	      
 	            TextView offTime = new TextView(rowContext2);
@@ -277,7 +286,7 @@ public class GocardDisplayFragment extends Fragment {
 	            
 	            newRow2.addView(cell1);
 	            
-	            ////////////////////////////////////////////////////////////////
+	            /////////////////////////////////////////////////////////////////////////
 	            
 	            LinearLayout cell2 = new LinearLayout(rowContext);
 	            cell2.setOrientation(LinearLayout.VERTICAL);
@@ -295,9 +304,6 @@ public class GocardDisplayFragment extends Fragment {
 	            touchOnLabel.setPadding(0, 0, 0, 0);
 	            touchOffLabel.setPadding(3, 0, 0, 0);
 	            
-	            /*touchOnLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-	            touchOnLabel.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);*/
-	            
 	            touchOnLabel.setText(touchOnText);
 	            touchOffLabel.setText(touchOffText);
 	            
@@ -306,13 +312,13 @@ public class GocardDisplayFragment extends Fragment {
 	            
 	            newRow2.addView(cell2);
 	            
-	            ////////////////////////////////////////////////////////////////////
+	            //////////////////////////////////////////////////////////////////////////
 	            
 	            LinearLayout cell3 = new LinearLayout(rowContext);
 	            cell3.setOrientation(LinearLayout.VERTICAL);
 	            cell3.setMinimumHeight(height);
 	            cell3.setGravity(Gravity.CENTER_VERTICAL);
-	            
+
 	            TableRow.LayoutParams param3 = new TableRow.LayoutParams();
 	            param3.column = 2;
 	            param3.span = 10;
@@ -340,6 +346,5 @@ public class GocardDisplayFragment extends Fragment {
 	            historyTable.addView(separatorLine);
         	}
 		}
-		
 	}
 }

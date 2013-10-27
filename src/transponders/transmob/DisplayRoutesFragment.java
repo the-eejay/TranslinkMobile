@@ -31,9 +31,11 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -138,6 +140,14 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
         	displayName = splittedByNear[0] + "\n near " + splittedByNear[1];
         }
         title.setText(displayName);
+        
+        title.setOnTouchListener(new OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return true;
+			}	
+		});
         
         title.post(new Runnable() {
 

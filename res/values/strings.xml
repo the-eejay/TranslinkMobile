@@ -37,9 +37,9 @@
     <string name="login_label">Login!</string>
     <string name="check_remember">Remember me</string>
     <string name="wrongpass_warning">Incorrect username / password!</string>
-    <string name="current_balance">Current Balance:</string>
+    <string name="current_balance">GoCard Balance:</string>
  	<string name="as_of">As of 24 Oct 2013 04:17 PM</string>
- 	<string name="balance_num">$4.62</string>
+ 	<string name="balance_num">$999.99</string>
  	<string name="sample_date">24 Oct 2013</string>
     
     <string-array name="menu_array">

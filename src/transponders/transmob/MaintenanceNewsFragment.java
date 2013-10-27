@@ -40,9 +40,11 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -76,6 +78,14 @@ public class MaintenanceNewsFragment extends Fragment {
 		tableContext = newsTable.getContext();
 		newsDate = (TextView) view.findViewById(R.id.newsDate);
 		scale = getActivity().getResources().getDisplayMetrics();
+		
+		newsDate.setOnTouchListener(new OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return true;
+			}	
+		});
 		
 		getActivity().setProgressBarIndeterminateVisibility(true);
 		

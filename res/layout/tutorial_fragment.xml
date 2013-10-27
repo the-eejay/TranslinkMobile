@@ -64,9 +64,14 @@
 	            android:id="@+id/finish_tut_button"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_marginTop="20dp"
+	            android:layout_marginTop="12dp"
 	            android:layout_gravity="center"
-	            android:text="@string/finish_tutorial" 
+	            android:paddingLeft="10dp"
+	            android:paddingRight="10dp"
+	            android:text="@string/finish_tutorial"
+	            android:textColor="@color/white"
+		        android:textStyle="bold"
+		        android:background="@drawable/selector_jp" 
 	            android:visibility="invisible"/>
 	
 	    </LinearLayout>

@@ -1,7 +1,6 @@
 package transponders.transmob;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,10 +8,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -23,14 +20,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import transponders.transmob.NearbyStops.StackState;
-
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -39,9 +31,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,8 +39,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,14 +62,9 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	private TextView wrongpassWarning;
 	private CheckBox rememberBox;
 	
-	private String gcNumber, password, result;
+	private String gcNumber, password;
 	
 	private static DefaultHttpClient httpClient;
-	
-	
-	/*private enum State {
-		BALANCE_TABLE, 
-	};*/
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) 
@@ -138,6 +121,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 						SharedPreferences.Editor editor = settings.edit();
 		        	    editor.putString(GOCARD_NUMBER, gcNumber);
 		        	    editor.putString(GOCARD_PASSWORD, password);
+		        	  
 		        	    editor.commit();
 					}
 					else
@@ -244,7 +228,6 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		{	
 			wrongpassWarning.setVisibility(View.VISIBLE);
 		}
-		
 	}
 	
 	private DefaultHttpClient createHttpClient()
@@ -280,5 +263,4 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 				.getActiveNetworkInfo();
 		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
-	
 }
