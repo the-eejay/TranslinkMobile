@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -20,6 +21,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -73,22 +75,19 @@ import com.google.android.gms.maps.model.Polyline;
  */
 public class NearbyStops extends FragmentActivity implements
 GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
-LoadingListener{
-
-	
-	
-	
-	
+LoadingListener
+{
 	/**
 	 * Set the default location in case the application cannot detect the
 	 * current location of the device.
 	 */
 	private static final LatLng DEFAULT_LOCATION = new LatLng(-27.498037,153.017823);
 	private final String TITLE = "Nearby Stops";
-	public static final int NUM_PAGES = 4;
-	public static final String PREFS_NAME = "MyPrefsFile";
+	public static final int NUM_PAGES = 5;
 	public static final String TUTORIAL_SETTING = "SHOW_TUTORIAL";
 	public static final String SELECTED_STOP_NAME = "SELECTED_STOP_NAME";
+	int RADIUS = 1000;
+	int NUM_OF_STOPS = 25;
 
 	public enum StackState {
 		NearbyStops, ShowRoute
@@ -136,7 +135,7 @@ LoadingListener{
 	private LocationClient mLocationClient;
 	private LocationRequest mLocationRequest;
 	// Handle to SharedPreferences for this app
-    SharedPreferences mPrefs;
+	SharedPreferences settings;
     // Handle to a SharedPreferences editor
     SharedPreferences.Editor mEditor;
  // Milliseconds per second
@@ -163,8 +162,6 @@ LoadingListener{
 	private JourneyPlanner jpFragment = null;
 	private MaintenanceNewsFragment mnFragment = null;
 	private GocardLoginFragment gclFragment;
-
-	@SuppressLint("NewApi")
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -199,8 +196,10 @@ LoadingListener{
 
 		initializeNavigationDrawer();
 
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean showTut = settings.getBoolean(TUTORIAL_SETTING, true);
+		RADIUS = Integer.parseInt(settings.getString("pref_radius", "1000"));
+		NUM_OF_STOPS = settings.getInt("pref_num_of_stops", 25);
 
 		// For debugging, uncomment this line below so that the tutorial doesn't show at all.
 		// showTut = false;
@@ -214,11 +213,6 @@ LoadingListener{
         mLocationRequest.setInterval(UPDATE_INTERVAL);
         // Set the fastest update interval to 1 second
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-        // Open the shared preferences
-        mPrefs = getSharedPreferences("SharedPreferences",
-                Context.MODE_PRIVATE);
-        // Get a SharedPreferences editor
-        mEditor = mPrefs.edit();
         /*
          * Create a new location client, using the enclosing class to
          * handle callbacks.
@@ -310,7 +304,12 @@ LoadingListener{
 	{
 		//mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
 		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, (float) 14.8), 2000, null);
-		stopLoader.requestStopsNear(location.latitude, location.longitude, 1000);
+		
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		RADIUS = Integer.parseInt(settings.getString("pref_radius", "1000"));
+		NUM_OF_STOPS = settings.getInt("pref_num_of_stops", 25);
+		
+		stopLoader.requestStopsNear(location.latitude, location.longitude, RADIUS, NUM_OF_STOPS);
 	}
 
 	/**
@@ -323,6 +322,18 @@ LoadingListener{
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
 			return true;
+		}
+		else
+		{
+			switch (item.getItemId()) 
+			{
+				case R.id.action_settings:
+					Intent intent = new Intent(this, SettingsActivity.class);
+					startActivity(intent);
+					break;
+				default:
+					break;
+			}
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -379,12 +390,17 @@ LoadingListener{
 			fragment.setArguments(args);
 			break;
 		case 2:
+			gclFragment = new GocardLoginFragment();
+			fragment = gclFragment;
+			break;
+		case 3:
 			mnFragment = new MaintenanceNewsFragment();
 			fragment = mnFragment;
 			break;
-		case 3:
-			gclFragment = new GocardLoginFragment();
-			fragment = gclFragment;
+		case 4:
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+			break;
 		default:
 			break;
 		}

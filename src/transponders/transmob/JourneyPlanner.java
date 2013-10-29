@@ -260,8 +260,16 @@ public class JourneyPlanner extends Fragment implements
 						
 						if(originID == null)
 						{
-							Toast.makeText(getActivity().getApplicationContext(), "Please select a valid location from the dropdown!", Toast.LENGTH_SHORT).show();
-							return;
+							originID = resolveLocation(origin);
+							
+							if(originID == null)
+							{
+								Toast.makeText(getActivity().getApplicationContext(), 
+									"Origin location is not found.", Toast.LENGTH_SHORT).show();
+								return;
+							}
+							else
+								paramList.add(0, originID);
 						}
 						else
 						{
@@ -282,8 +290,16 @@ public class JourneyPlanner extends Fragment implements
 						
 						if(destinationID == null)
 						{
-							Toast.makeText(getActivity().getApplicationContext(), "Please select a valid location from the dropdown!", Toast.LENGTH_SHORT).show();
-							return;
+							destinationID = resolveLocation(destination);
+							
+							if(destinationID == null)
+							{
+								Toast.makeText(getActivity().getApplicationContext(), 
+										"Destination location is not found.", Toast.LENGTH_SHORT).show();
+								return;
+							}
+							else
+								paramList.add(1, destinationID);
 						}
 						else
 						{
@@ -575,5 +591,44 @@ public class JourneyPlanner extends Fragment implements
 			
 			return filter;
 		}	
+	}
+	
+	public String resolveLocation(String input)
+	{
+		getActivity().setProgressBarIndeterminateVisibility(true);
+		
+		 String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" 
+			  		+ Uri.encode(input)
+			  		+ "&maxResults=" + Uri.encode("1");
+		 request = new JSONRequest();
+		 request.setListener(JourneyPlanner.this);
+		 request.execute(url);
+		  
+		 JSONArray array = new JSONArray();
+		 try
+		 {
+			 String result = request.get();
+			  
+			 Object obj = JSONValue.parse(result);
+			 array = (JSONArray)((JSONObject)obj).get("Locations");
+		 }
+		 catch (Exception e)
+		 {
+			 e.printStackTrace();
+		 }
+		 
+		 getActivity().setProgressBarIndeterminateVisibility(false);
+		 if(array.size() == 0)
+		 {
+			 return null;
+		 }
+		 else
+		 {
+			 JSONObject location = (JSONObject) array.get(0);
+			 String id = (String) location.get("Id");
+			 Log.d("filterResults", "ID: " + id);
+			
+			 return id;
+		 }
 	}
 }

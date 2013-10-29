@@ -57,7 +57,7 @@
 	            android:id="@+id/tutorial_image"
 	            android:layout_width="250dp"
 	            android:layout_height="250dp"
-	            android:src="@drawable/tutorial1" 
+	            android:src="@drawable/tut2" 
 	            android:contentDescription="@string/tutorial_image_desc"/>
 	  
 	        <Button

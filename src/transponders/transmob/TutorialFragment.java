@@ -18,6 +18,7 @@ package transponders.transmob;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -93,13 +94,16 @@ public class TutorialFragment extends Fragment implements OnClickListener {
         	case 1:
         		break;
         	case 2:
-        		tutorialImage.setImageResource(R.drawable.tutorial2);
+        		tutorialImage.setImageResource(R.drawable.tut3);
         		break;
         	case 3:
-        		tutorialImage.setImageResource(R.drawable.tutorial3);
+        		tutorialImage.setImageResource(R.drawable.tut4);
         		break;
         	case 4:
-        		tutorialImage.setImageResource(R.drawable.tutorial4);
+        		tutorialImage.setImageResource(R.drawable.tut5);
+        		break;
+        	case 5:
+        		tutorialImage.setImageResource(R.drawable.tut1);
         		break;
         	default:
         		break;
@@ -137,7 +141,7 @@ public class TutorialFragment extends Fragment implements OnClickListener {
         {
         	case R.id.finish_tut_button:
         		
-        		SharedPreferences settings = getActivity().getSharedPreferences(NearbyStops.PREFS_NAME, 0);
+        		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
         	    SharedPreferences.Editor editor = settings.edit();
         	    editor.putBoolean(NearbyStops.TUTORIAL_SETTING, false);
 

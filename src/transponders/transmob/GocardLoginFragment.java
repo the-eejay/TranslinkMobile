@@ -28,6 +28,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -76,10 +77,10 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		wrongpassWarning = (TextView) view.findViewById(R.id.wrongpass_warning);
 		rememberBox = (CheckBox) view.findViewById(R.id.check_remember);
 		
-		SharedPreferences settings = getActivity().getSharedPreferences(NearbyStops.PREFS_NAME, 0);
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());;
 		String savedNum = settings.getString(GOCARD_NUMBER, "");
 		String savedPassword = settings.getString(GOCARD_PASSWORD, "");
-		
+	
 		gcnumText.setText(savedNum);
 		passwordText.setText(savedPassword);
 		
@@ -116,7 +117,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 					
 					if(rememberBox.isChecked())
 					{
-						SharedPreferences settings = getActivity().getSharedPreferences(NearbyStops.PREFS_NAME, 0);
+						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());;
 
 						SharedPreferences.Editor editor = settings.edit();
 		        	    editor.putString(GOCARD_NUMBER, gcNumber);
@@ -126,7 +127,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 					}
 					else
 					{
-						SharedPreferences settings = getActivity().getSharedPreferences(NearbyStops.PREFS_NAME, 0);
+						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());;
 
 						SharedPreferences.Editor editor = settings.edit();
 		        	    editor.putString(GOCARD_NUMBER, "");

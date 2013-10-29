@@ -40,7 +40,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	private ArrayList<StopTrip> stopTrips;
 	//private HashMap<Stop, Date> stopTimesMap;
 	private int[] markerIcons = {R.drawable.bus_geo_border, R.drawable.train_geo_border, R.drawable.ferry_geo_border};
-	private int[] roundMarkers= {R.drawable.bus_purple_circle_pin_border35x35, R.drawable.train_purple_circle_pin_border35x35, R.drawable.ferry_purple_circle_pin_border35x35}; 
+	private int[] roundMarkers= {R.drawable.bus_circle, R.drawable.train_circle, R.drawable.ferry_circle}; 
 	private Route route2;
 	private Trip trip2;
 	private Polyline polyline;

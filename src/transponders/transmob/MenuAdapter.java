@@ -37,11 +37,14 @@ public class MenuAdapter extends ArrayAdapter<String> {
 					icon = context.getResources().getDrawable(R.drawable.planner_icon);
 					break;	
 				case 2:
-					icon = context.getResources().getDrawable(R.drawable.news_icon);
-					break;	
-				case 3:
 					icon = context.getResources().getDrawable(R.drawable.go_card_icon);
 					break;	
+				case 3:
+					icon = context.getResources().getDrawable(R.drawable.news_icon);
+					break;	
+				case 4:
+					icon = context.getResources().getDrawable(R.drawable.setting_icon);
+					break;
 			}
 			
 			text.setCompoundDrawablePadding(20);

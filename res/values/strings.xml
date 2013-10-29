@@ -4,8 +4,8 @@
     <string name="app_name">TransMob</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    <string name="jpButtonString">Journey Planner</string>
-    <string name="nsButtonString">Nearby Stops</string>
+    <string name="jp_title">Journey Planner</string>
+    <string name="ns_title">Nearby Stops</string>
     <string name="toLocation">Enter your destination</string>
     <string name="sendDest">Find journey!</string>
     <string name="news">Maintenance News</string>
@@ -41,12 +41,22 @@
  	<string name="as_of">As of 24 Oct 2013 04:17 PM</string>
  	<string name="balance_num">$999.99</string>
  	<string name="sample_date">24 Oct 2013</string>
+ 	<string name="settings_label">Settings</string>
+ 	<string name="general_settings">General Settings</string>
+ 	<string name="tutorial_setting">Show First-Time Tutorial</string>
+ 	<string name="tutorial_summary">Show the tutorial during start up</string>
+ 	<string name="ns_number_pref">Number of Nearby Stops</string>
+ 	<string name="ns_number_summary">Maximum number of stops to be displayed (Default: 25)</string>
+ 	<string name="ns_radius_pref">Radius</string>
+ 	<string name="ns_radius_summary">Maximum detection range from current location (Default: 1000m)</string>
+ 	<string name="do_not_show">Do not show the tutorial again</string>
     
     <string-array name="menu_array">
         <item>Nearby Stops</item>
         <item>Journey Planner</item>
-        <item>Maintenance News</item>
         <item>GoCard Login</item>
+        <item>Maintenance News</item>
+        <item>Settings</item>
     </string-array>
     
     <string-array name="leave_options_array">
@@ -71,6 +81,24 @@
         <item>2000 m</item>
         <item>2500 m</item>
         <item>3000 m</item>
+    </string-array>
+    
+    <string-array name="radius_array">
+        <item>500 m</item>
+        <item>1000 m</item>
+        <item>1500 m</item>
+        <item>2000 m</item>
+        <item>2500 m</item>
+        <item>3000 m</item>
+    </string-array>
+    
+    <string-array name="radius_values">
+        <item>500</item>
+        <item>1000</item>
+        <item>1500</item>
+        <item>2000</item>
+        <item>2500</item>
+        <item>3000</item>
     </string-array>
 
 </resources>
