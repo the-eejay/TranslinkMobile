@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 /**
  * The Android activity that shows the result of the journey planner
@@ -80,12 +81,22 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 		parseResult(result);
 	}
 
-	private void parseResult(String result) {
-		Object obj = JSONValue.parse(result);
-		URL = (String) ((JSONObject) obj).get("JourneyPlannerUrl");
-		Log.d("URL: ", URL.toString());
-		/* Got the URL, time to load it into the web view */
-		wv.loadUrl(URL);
+	private void parseResult(String result) 
+	{
+		try
+		{
+			Object obj = JSONValue.parse(result);
+			URL = (String) ((JSONObject) obj).get("JourneyPlannerUrl");
+			Log.d("URL: ", URL.toString());
+			
+			// Got the URL, time to load it into the web view 
+			wv.loadUrl(URL);
+		}
+		catch(ClassCastException e)
+		{
+			Toast.makeText(getActivity().getApplicationContext(), 
+					"Invalid input. Please go back and reenter your input.", Toast.LENGTH_LONG).show();
+		}
 		
 		getActivity().setProgressBarIndeterminateVisibility(false);
 	}
