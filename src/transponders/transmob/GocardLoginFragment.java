@@ -152,6 +152,11 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		}
 	}
 	
+	/**
+	 * The class to handle https requests
+	 * 
+	 *
+	 */
 	private class HttpThread extends AsyncTask<String, Void, String>
 	{
 		@Override
@@ -169,7 +174,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	    	parseResult(result);
 	    	if (lock != null) {
 	    		lock.countDown();
-	    		Log.d("TestCase", "releasing GoCardLogin lock");
+	    		
 	    	}
 	    }	
 	}
@@ -212,6 +217,10 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	    return result;
 	} 
 	
+	/**
+	 * Given an HTML page, determine whether the login was successful
+	 * @param result HTML page returned from previous call
+	 */
 	public void parseResult(String result) {
 		Log.d("GoCard", result);
 		if (result.length() < 21) {
@@ -222,6 +231,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		
 		getActivity().setProgressBarIndeterminateVisibility(false);
 		
+		//If the HTML page shows the balance table then the loging was successful
 		if (result.contains("<table id=\"balance-table\"")) 
 		{
 			wrongpassWarning.setVisibility(View.INVISIBLE);
@@ -231,6 +241,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 			args.putString("BALANCE_RESULT", result);
 			fragment.setArguments(args);
 			
+			// Switch to the GocardLoginDisplayFragment
 			FragmentManager manager = getActivity().getSupportFragmentManager();
 	   		FragmentTransaction transaction = manager.beginTransaction();
      		transaction.replace(R.id.content_frame, fragment);

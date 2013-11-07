@@ -51,6 +51,11 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Displays Translink's service notice rss feed in a Fragment as a TableLayout
+ * 
+ *
+ */
 public class MaintenanceNewsFragment extends Fragment {
 
 	//private final String url = "http://jp.translink.com.au/travel-information/service-updates/rss";
@@ -106,6 +111,9 @@ public class MaintenanceNewsFragment extends Fragment {
 		activity.getSupportActionBar().setTitle(TITLE);
 	}
 	
+	/**
+	 * If a connection is available execute the DownloadWebpageTask(), otherwise give an error
+	 */
 	public void checkConnection() 
     {
 		parent = activity;
@@ -225,6 +233,10 @@ public class MaintenanceNewsFragment extends Fragment {
         }
     }
 	
+	/** 
+	 * Reads an XML file of the expected format and puts the data in the TableLayout
+	 * @param fis the file to parse as a FileInputStream
+	 */
 	public void readXMLFile(FileInputStream fis)
 	{
 		try

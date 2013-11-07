@@ -417,6 +417,10 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		}
     }
 	
+	/**
+	 * called to start the request to the Translink API to find the info for the table
+	 * @param stops The listed of stops to retrieve information for.
+	 */
 	public void requestRouteTimes(ArrayList<Stop> stops) 
 	{
 		//Build the retrieve route schedule URL
@@ -501,6 +505,10 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		}
 	}
 	
+	/**
+	 * Edits the firstTrips string based on results read
+	 * @param result a JSON object with format {StopTimetables: [Trips:[DepartureTime, Route: {Code}]]}
+	 */
 	public void loadSortedTripTimes(String result) 
 	{
 		/* Parse the JSON received from the server. The format is shown below for the parts used:

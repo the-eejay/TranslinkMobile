@@ -597,6 +597,11 @@ public class JourneyPlanner extends Fragment implements
 		}	
 	}
 	
+	/**
+	 * Estimate the location name from the input
+	 * @param input the in
+	 * @return
+	 */
 	public String resolveLocation(String input)
 	{
 		activity.setProgressBarIndeterminateVisibility(true);
