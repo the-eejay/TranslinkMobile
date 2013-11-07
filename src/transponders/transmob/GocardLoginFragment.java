@@ -95,6 +95,8 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 
 		gcnumClear.setOnClickListener(this);
 		passwordClear.setOnClickListener(this);
+		
+		
 	
 		return view;
 	}
@@ -167,6 +169,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	    	parseResult(result);
 	    	if (lock != null) {
 	    		lock.countDown();
+	    		Log.d("TestCase", "releasing GoCardLogin lock");
 	    	}
 	    }	
 	}
@@ -211,6 +214,10 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	
 	public void parseResult(String result) {
 		Log.d("GoCard", result);
+		if (result.length() < 21) {
+			wrongpassWarning.setVisibility(View.VISIBLE);
+			return;
+		}
 		Log.d("GoCard", "resultEndOfFile=" + result.substring(result.length()-20));
 		
 		getActivity().setProgressBarIndeterminateVisibility(false);
@@ -228,11 +235,13 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	   		FragmentTransaction transaction = manager.beginTransaction();
      		transaction.replace(R.id.content_frame, fragment);
             transaction.addToBackStack(null);
-     		transaction.commit();	
+     		transaction.commit();
+     		Log.d("TestCase","leaving parse result invisible");
 		} 
 		else 
 		{	
 			wrongpassWarning.setVisibility(View.VISIBLE);
+			Log.d("TestCase","leaving parse result visible");
 		}
 		
 	}

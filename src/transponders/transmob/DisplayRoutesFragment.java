@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -54,7 +55,6 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	
 	public final static String ARGS_SELECTED_STOPS = "SELECTED_STOPS";
 	private ArrayList<Stop> stops;
-	private ArrayAdapter<String> adapter;
 	private FragmentManager manager;
 	private DisplayRoutesFragment thisVar;
 	private PullToRefreshScrollView pullToRefreshView;
@@ -72,6 +72,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	Long currTime = c.getTimeInMillis();
 	
 	ActionBarActivity activity;
+	
+	private CountDownLatch lock;
 	
 	@Override
 	public void onCreate(Bundle bundle) {
@@ -494,6 +496,9 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 			pullToRefreshView.onRefreshComplete();
 		}
 		activity.setProgressBarIndeterminateVisibility(false);
+		if (lock != null) {
+			lock.countDown();
+		}
 	}
 	
 	public void loadSortedTripTimes(String result) 
@@ -601,7 +606,11 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		return availableRoutes;
 	}
 	
-	public ArrayAdapter<String> getAdapter() {
-		return adapter;
+	public ArrayList<Trip> getFirstTrips() {
+		return firstTrips;
+	}
+	
+	public void setCountDownLatch(CountDownLatch lock) {
+		this.lock = lock;
 	}
 }
