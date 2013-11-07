@@ -53,6 +53,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * The Fragment for displaying the Go card balance and history.
+ * Must be opened from GocardLoginFragment after a successful login only. 
+ * 
+ *
+ */
 public class GocardDisplayFragment extends Fragment {
 	
 	private DefaultHttpClient httpClient;
@@ -152,6 +158,10 @@ public class GocardDisplayFragment extends Fragment {
 	    }	
 	}
 	
+	/**
+	 * parse the result given by HttpClient. Calls other functions based on the determined format
+	 * @param result HTML page for either history or balance pages
+	 */
 	public void parseResult(String result) {
 		Log.d("GoCard", result);
 		Log.d("GoCard", "resultEndOfFile=" + result.substring(result.length()-20));
@@ -167,6 +177,11 @@ public class GocardDisplayFragment extends Fragment {
 		}
 	}
 	
+	/**
+	 * Takes the results of the balance table and adds them to the TableLayout.
+	 * Proceeds to execute another HttpThread for the history table.
+	 * @param result a HTML page. It must be in the expected format.
+	 */
 	public void parseResultAsBalance(String result) {
 		int indexOfCardBalance = result.indexOf("<table id=\"balance-table\"");
 		int indexOfEndOfCardBalance = result.indexOf("</table>", indexOfCardBalance);
@@ -190,6 +205,10 @@ public class GocardDisplayFragment extends Fragment {
 		ht.execute(url);
 	}
 	
+	/**
+	 * Takes the results of the history table and adds them to the TableLayout.
+	 * @param result a HTML page. It must be in the expected format.
+	 */
 	public void parseResultAsHistory(String result) 
 	{	
 		int indexOfHistory = result.indexOf("<table id=\"travel-history\"");
@@ -365,4 +384,5 @@ public class GocardDisplayFragment extends Fragment {
 	public TableLayout getHistoryTable() {
 		return historyTable;
 	}
+	/*end of testing functions */
 }

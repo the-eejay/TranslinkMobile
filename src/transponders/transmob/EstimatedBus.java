@@ -10,15 +10,32 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 
-
+/**
+ * A class representing an estimated position between two points.
+ * The two points and hence the EstimatedBus are given a time. 
+ * Optionally there is a line defining path between points
+ * 
+ *
+ */
 public class EstimatedBus {
+	
+	//LINE_TO_END_POINT_TOLERANCE = Metres tolerance for which to snap a line to the startPosition and endPosition
+	private static final double LINE_TO_END_POINT_TOLERANCE = 40;
+	
 	private LatLng position;
 	private LatLng startPosition;
 	private LatLng endPosition;
 	private long startTime;
 	private long endTime;
-	private boolean isActive;
+	private boolean isActive; //isActive should be true only when curent time is between startTime and endTime
 	
+	/**
+	 * 
+	 * @param startPosition the position at which the EstimatedBus will be at startTime
+	 * @param endPosition the position at which the EstimatedBus will be at endTime
+	 * @param startTime the time at which the EstimatedBus will be at startPosition
+	 * @param endTime the time at which the EstimatedBus will be at endPosition
+	 */
 	public EstimatedBus(LatLng startPosition, LatLng endPosition, Date startTime, Date endTime) {
 		this.startPosition = startPosition;
 		this.startTime = startTime.getTime();
@@ -29,6 +46,10 @@ public class EstimatedBus {
 		
 	}
 	
+	/**
+	 * The method to call to move the bus linearly between the give start and end points
+	 * @param currentTime the current time to determine current position between points
+	 */
 	public void update(Date currentTime) {
 		long currentTimeLong = currentTime.getTime();
 		if (currentTimeLong > startTime && currentTimeLong < endTime) {
@@ -45,6 +66,12 @@ public class EstimatedBus {
 		}
 	}
 	
+	/**
+	 * The method to call to update the EstimatedBus position between start and end points based
+	 * on a given Polyline.
+	 * @param currentTime the current time to determine position
+	 * @param line the Polyline to determine path
+	 */
 	public void updateOnLine(Date currentTime, Polyline line) {
 		long currentTimeLong = currentTime.getTime();
 		if (currentTimeLong > startTime && currentTimeLong < endTime) {
@@ -59,13 +86,20 @@ public class EstimatedBus {
 		}
 	}
 	
+	/**
+	 * Called by updateOnLine() to do the calculations
+	 * @param line the Polyline to determine path
+	 * @param percentage percentage between two times to find position for
+	 * @return true if the EstimatedBus still exists for the given time
+	 */
 	public boolean snapToClosestPositionOnLine(Polyline line, double percentage) {
 		
 		boolean foundPosition = false;
 		
 		List<LatLng> points = line.getPoints();
+		
 		//find section on line list corresponding to this EstimatedBus
-		double tolerance = 40; // metres to check for connecting points
+		double tolerance = LINE_TO_END_POINT_TOLERANCE; // metres to check for connecting points
 		int startIndex =0;
 		int endIndex=0;
 		
@@ -97,21 +131,17 @@ public class EstimatedBus {
 			lastPos = points.get(i);
 		}
 		double distanceFromStart = distanceTotal*percentage;
-		Log.d("EstBus", "distance between start and end points ="+distanceTotal+" distanceFromStart="+distanceFromStart);
+		
+		//find final position along the line segments 
 		distanceTotal = 0;
-		int lineIndex = -1;
 		lastPos = points.get(startIndex);
-		LatLng output;
 		for (int i=startIndex+1; i<=endIndex; i++) {
 			float[] results = new float[1];
 			Location.distanceBetween(points.get(i).latitude, points.get(i).longitude, lastPos.latitude, lastPos.longitude, results);
 			float distanceOfThisSegment = Math.abs(results[0]);
 			distanceTotal += distanceOfThisSegment;
 			if (distanceTotal >= distanceFromStart) {
-				Log.d("EstBus", "Found segment i="+i);
 				double percentageAlongThisSegment = (distanceFromStart - (distanceTotal - distanceOfThisSegment)) / distanceOfThisSegment;
-				Log.d("EstBus", "percentageAlongThisSegment="+percentageAlongThisSegment);
-				Log.d("EstBus", "points["+i+"]="+points.get(i)+" points["+(i-1)+"]="+points.get(i-1));
 				LatLng directionVector = new LatLng(points.get(i).latitude-points.get(i-1).latitude, points.get(i).longitude-points.get(i-1).longitude);
 				LatLng directionVectorReduced = new LatLng(directionVector.latitude*percentageAlongThisSegment, directionVector.longitude*percentageAlongThisSegment);
 				//Log.d("EstBus", "directionvector"
@@ -131,10 +161,18 @@ public class EstimatedBus {
 		
 	}
 	
+	/**
+	 * 
+	 * @return position of EstimatedBus. Requires update call
+	 */
 	public LatLng getPosition() {
 		return position;
 	}
 	
+	/**
+	 * 
+	 * @return true if EstimatedBus is still within its timeFrame. Requires update call
+	 */
 	public boolean isActive() {
 		return isActive;
 	}
