@@ -96,7 +96,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	public void onCreate(Bundle bundle) {
 		Log.d("DisplayRoutes", "DisplayRoutes: onCreate started");
 		super.onCreate(bundle);
-		
+		//init();
 		
 		stops = ((NearbyStops) getActivity()).getSelectedStops();	
 		stopType = stops.get(0).getServiceType();
@@ -116,7 +116,10 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		getActivity().getActionBar().setTitle("Timetable");
 		scale = getActivity().getResources().getDisplayMetrics();
 		 manager = getActivity().getSupportFragmentManager();
-		
+		/*View view = inflater.inflate(R.layout.activity_timetable, container, false);
+		listView = (ListView) view.findViewById(R.id.listview);
+		listView.setBackgroundColor(Color.WHITE);
+		listView.setCacheColorHint(Color.TRANSPARENT);*/
 		 
 		View view = inflater.inflate(R.layout.service_timetable, container, false);
 		table = (TableLayout) view.findViewById(R.id.service_table);
@@ -167,23 +170,37 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 
         	@Override
 			public void onRefresh(final PullToRefreshBase<ScrollView> refreshView) {
+        		//new GetDataTask().execute();
+        		//init();
         		requestRouteTimes(stops);
 			}
         });
 		
-       
+        //showLines();
+        //init();
+        //populateTable();
         
         requestRouteTimes(stops);	
 		return view;
 	}	
 	
-
-	/**
-	 * populates the TableView with the data. Will be called after the network async request is completed
-	 */
+	private void init() {
+		
+		Log.d("DisplayRoutes", "Service type: " + stopType);
+		
+		positionTripMap = new HashMap<Integer, Trip>();
+		//makeLines();
+		requestRouteTimes(stops);
+		/*adapter = new ArrayAdapter<String>(
+        		getActivity().getApplicationContext(), R.layout.route_list_item, lines);*/
+		
+	}
+	
 	public void populateTable()
 	{
-		
+		Log.d("populateTable", "POPULATE TABLE CALLED");
+		//firstArrivalTexts.clear();
+        //secondArrivalTexts.clear();
 		
 		Trip currentTrip;
 		Route currentRoute;
@@ -191,8 +208,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		int numOfEndedServices = availableRoutes.size();
 		int endedServiceIndex = 0;
 		
-		// Add services one at a time to the View
-        for(int i = 0; i < firstTrips.size() || endedServiceIndex < numOfEndedServices; i++)
+        Log.d("populateTable", "Num of first trips: " + firstTrips.size());
+		for(int i = 0; i < firstTrips.size() || endedServiceIndex < numOfEndedServices; i++)
 		{
 			if(i >= firstTrips.size())
 				endedServices = true;
@@ -382,6 +399,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
             // After the last iteration, start processing the ended routes.
             if(i == firstTrips.size() - 1 && !endedServices)
             {
+            	Log.d("populateTable", "FINISHED LOOPING FIRSTTRIPS");
             	
             	numOfEndedServices = availableRoutes.size();
             	i -= numOfEndedServices;
@@ -401,14 +419,9 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		}*/
 	}
 	
-	/**
-	 * The listener class for click events on the individual list items
-	 * 
-	 *
-	 */
 	private class RouteListener implements OnClickListener
     {		
-		int pos; // the list index clicked
+		int pos;
 		
 		public RouteListener(int selectedPosition)
 		{
@@ -419,10 +432,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		{
     		NearbyStops nearbyStops = (NearbyStops) getActivity();
     		
-    		// Set selection to the position clicked and return to NearbyStops main Fragment
     		if(pos < firstTrips.size())
     		{
-    			
     			Log.d("RouteListener", "Pos: " + pos + " firstTrips.size(): " + firstTrips.size());
         		Trip trip1 = firstTrips.get(pos);
         		Trip trip2 = secondTrips.get(trip1.getRoute());
@@ -453,11 +464,175 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 		super.onResume();
 	}
 	
+	/**
+     * A method to set the the content of the list into the ListView. 
+     *
+     */
+    public void showLines() 
+    {
+    	listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new OnItemClickListener() {
+        	@Override
+        	public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
+        		//Set selected route in NearbyStops then change view back to it
+        		Trip trip = positionTripMap.get(pos);
+        		NearbyStops act = (NearbyStops)getActivity();
+        		act.setSelectedTrip(trip);
+        		//Fragment fragment = null;
+        		/*if (act.getMap2Fragment() == null) {
+        			Log.d("Drawer", "map2 is NULL");
+        			fragment = new ShowRouteFragment();
+        			act.setMap2Fragment((ShowRouteFragment)fragment);
+        		} else {
+        			Log.d("Drawer", "map2 already exists");
+        			fragment = act.getMap2Fragment();
+        		}*/
+        		
+        		 NearbyStops nearbyStops =  (NearbyStops)getActivity();
+                 // Should move these steps to NearbyStops itself and add check whether need to refresh or not
+                 nearbyStops.removeAllMarkers();
+                 nearbyStops.showTrip();
+                 nearbyStops.addStateToStack(StackState.ShowRoute);
+                 
+        		FragmentTransaction transaction = manager.beginTransaction();
+        		 transaction.remove(thisVar);
+                transaction.addToBackStack(null);
+        		transaction.commit();
+                
+                
+        		/*
+        		FragmentTransaction transaction = manager.beginTransaction();
+        		transaction.remove(manager.findFragmentById(R.id.content_frame));
+        		transaction.commit();
+        		manager.executePendingTransactions();
+        		transaction = manager.beginTransaction();
+        		transaction.add(R.id.content_frame, fragment);
+        		transaction.addToBackStack(null);
+        		transaction.commit();*/
+        	}
+        });
+    	adapter.notifyDataSetChanged();
+    }
+    
+    /**
+     * A method to initialize the content of the list, that is the route code and
+     * the estimated time of arrival for each route.
+     * 
+     */
+    private void makeLines()
+    {
+    	Log.d("Route", "Making Lines.  stops.size()="+stops.size());
+    	services.clear();
+    	directions.clear();
+    	
+    	if (stops.size()>1) {
+    		//Looking at a group of stops
+    		//ArrayList<String> routeIdsAlready = new ArrayList<String>();
+    		for (Stop stop: stops) {
+    			
+    			ArrayList<Route> routes = stop.getRoutes();
+    			Log.d("Route", "stop "+stop.getDescription()+" has routes.size()=" + routes.size());
+    			for (Route route: routes) {
+	    			/*boolean foundRouteIdMatch = false;
+	    			for (String routeIdAlready: routeIdsAlready) {
+	    				if (routeIdAlready.equals(route.getCode())) {
+	    					foundRouteIdMatch = true;
+	    					break;
+	    				}
+	    			}
+	    			if (!foundRouteIdMatch) {
+	    				routeIdsAlready.add(route.getCode());
+	    				lines.add(route.getCode() + "\t\t");
+	    				positionRouteMap.put(lines.size()-1, route);
+
+	    			}*/
+
+    				//lines.add(route.getCode()+"\t"+directionStr);
+    				//positionRouteMap.put(lines.size()-1, route);
+    							
+    				// Special route code and direction for trains
+    				if(stopType == 2)
+    				{
+    					String name = route.getDescription();
+    					String[] getTo = name.split(" to ");
+    					String[] getFrom = getTo;
+    					
+    					String to = getTo[1];
+    					if(to.contains(" - "))
+    					{
+    						to = to.split(" - ")[0];
+    					}
+    					
+    					if(getFrom[0].contains(" via "))
+    					{
+    						getFrom = getFrom[0].split(" via ");
+    					}
+    					
+    					services.add(to);
+    					directions.add("From " + getFrom[0]);
+    				}
+    				else
+    				{
+    					String directionStr = route.getDirectionAsString();
+    					services.add(route.getCode());
+        				directions.add(directionStr);
+    				}
+    				
+    				//positionTripMap.put(services.size()-1, new Trip("NOT_AN_ACTUAL_TRIP", route));
+    			}
+    		}
+    	} else {
+    		ArrayList<Route> routes = stops.get(0).getRoutes();
+    		Log.d("Route", "stop "+stops.get(0).getDescription()+" has routes.size()=" + routes.size());
+    		for (int i=0; i<routes.size(); i++) {
+    			String code = routes.get(i).getCode();
+    			String directionStr = routes.get(i).getDirectionAsString();
+
+    			//lines.add(code + "\t"+directionStr);
+    			//positionRouteMap.put(lines.size()-1, routes.get(i));
+    			//routeMap.put(routes.get(i), code);
+    			
+    			services.add(code);
+				directions.add(directionStr);
+				//positionTripMap.put(services.size()-1, new Trip("NOT_AN_ACTUAL_TRIP", routes.get(i)));
+    		}
+    	}
+    }
+    
+    /**
+     * The ArrayAdapter class for the container of the route and estimated
+     * time of arrival data.
+     *
+     * @author Transponders
+     * @version 1.0
+     */
+	public class CustomArrayAdapter extends ArrayAdapter<String> {
+
+	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
+
+	    public CustomArrayAdapter(Context context, int textViewResourceId,
+	    			List<String> objects) {
+	    	super(context, textViewResourceId, objects);
+	    	for (int i = 0; i < objects.size(); ++i) {
+	    		mIdMap.put(objects.get(i), i);
+	    	}
+	    }
 	
-    
-   
-    
-   
+	    @Override
+	    public long getItemId(int position) {
+	    	Log.d("AdapterPosition", Integer.toString(position));
+	    	String item = getItem(position);
+	    	Log.d("AdapterPosition", "mIdMap="+mIdMap);
+	    	Log.d("AdapterPosition", "item="+item);
+	    	return mIdMap.get(item);
+	    }
+	
+	    @Override
+	    public boolean hasStableIds() {
+	    	return false;
+	    }
+	
+	}
 	
 	/*Testing methods*/
 	public ArrayAdapter<String> getAdapter() {
@@ -469,7 +644,6 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	public void setCompletedAsyncTasksLatch(CountDownLatch lock) {
 		this.lock =lock;
 	}
-	/*end Testing methods*/
 	
 	public void requestRouteTimes(ArrayList<Stop> stops) {
 		//Build the retrieve route schedule URL
