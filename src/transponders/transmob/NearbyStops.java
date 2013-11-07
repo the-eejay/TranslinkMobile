@@ -180,8 +180,6 @@ LoadingListener
 		// Set the fragment manager so it will pop elements from the stackStates
 		FragmentManager manager = getSupportFragmentManager();
 		manager.addOnBackStackChangedListener(getBackListener());
-		//stackStates = new ArrayList<StackState>();
-		//stackStates.add(StackState.NearbyStops);
 		stackStatesMap = new HashMap<Integer,StackState>();
 		stackStatesMap.put(0, StackState.NearbyStops);
 		previousBackStackPosition = 0;
@@ -218,9 +216,11 @@ LoadingListener
 		if (showTut)
 			showFirstTimeTutorial();
 		
+		// initialise the map and show the default initial function: NearbyStops
 		mapInit();
 		showNearbyStops();
 		
+		// Show the splash screen for 2.5 seconds
 		splashScreenTimer = new CountDownTimer (2500, 1000) {
 
 			@Override
@@ -457,6 +457,10 @@ LoadingListener
 	}
 
 
+	/**
+	 * Sets the map to showing nearby stops. Expects to be called when the backstack indicates the 
+	 * reaching of the initial position
+	 */
 	public void showNearbyStops() {
 		if (userPos == null) {
 			userPos = mMap.addMarker(new MarkerOptions()
@@ -486,6 +490,8 @@ LoadingListener
 
 			@Override
 			public void onInfoWindowClick(Marker marker) {
+				
+				//When the marker's info window is clicked, open the DisplayTimetableFragment
 				Stop stop = stopLoader.getIdOfMarker(marker);
 				if (stop != null) {
 					ArrayList<Stop> stops;
@@ -506,27 +512,13 @@ LoadingListener
 
 			@Override
 			public void onMapClick(LatLng arg0) {
+				//When a map location is clicked, show the selected location marker and start change
 				clickPos.setVisible(true);
 				clickPos.setPosition(arg0);
 				locationChanged(arg0);
 			}
 		});
-		/*
-		mMap.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
-
-			@Override
-			public boolean onMyLocationButtonClick() 
-			{
-				updatedOnce = false;
-				showNearbyStops();
-				if (userLatLng.latitude != 0 && userLatLng.longitude != 0) {
-					locationChanged(userLatLng);
-				}
-				
-				return true;
-			}
-			
-		});*/
+		
 			
 		// Acquire a reference to the system Location Manager
 		LocationManager locationManager = (LocationManager) this
@@ -535,15 +527,15 @@ LoadingListener
 		// Define a listener that responds to location updates
 		LocationListener locationListener = new LocationListener() {
 			public void onLocationChanged(Location location) {
+				
 				// Called when a new location is found by the network location
 				// provider.
 				userLatLng = new LatLng(location.getLatitude(),
 						location.getLongitude());
 				userPos.setVisible(true);
 				userPos.setPosition(userLatLng);
-				//if (!updatedOnce) {
-					locationChanged(userLatLng);
-				//}
+				locationChanged(userLatLng);
+				
 				updatedOnce = true;
 				Log.d("Location", "Location changed");
 			}
@@ -559,49 +551,7 @@ LoadingListener
 			}
 		};
 
-		// Register the listener with the Location Manager to receive location updates
-		// Check every 1 minute and only if location has changed by 50 meters.
-		/*ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		State wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState();
-		State mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();
-		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) &&
-				(wifi == NetworkInfo.State.CONNECTED || wifi == NetworkInfo.State.CONNECTING)) {
-			Log.d("Location", "using network");
-			locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 60000, 50,
-					locationListener);
-			
-		} else if (locationManager
-				.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			Log.d("Location", "using gps");
-			locationManager.requestLocationUpdates(
-					LocationManager.GPS_PROVIDER, 100, 0, locationListener);
-			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			if (location != null) {
-				userLatLng = new LatLng(location.getLatitude(),
-						location.getLongitude());
-				userPos.setVisible(true);
-				userPos.setPosition(userLatLng);
-				//if (!updatedOnce) {
-					locationChanged(userLatLng);
-				//}
-				updatedOnce = true;
-			}
-		} else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) &&
-					(mobile == NetworkInfo.State.CONNECTED || mobile == NetworkInfo.State.CONNECTING)) {
-				Log.d("Location", "using network");
-				locationManager.requestLocationUpdates(
-						LocationManager.NETWORK_PROVIDER, 60000, 50,
-						locationListener);
-				
-				
-		} else {
-			// No location provider enabled. Use the default location for now
-			Log.d("Location", "cannot find user location");
-			locationChanged(new LatLng(-27.498037, 153.017823));
-		}
-	*/
-		// map2Fragment = new ShowRouteFragment();
+		
 		
 		TableLayout table = (TableLayout) findViewById(R.id.triptable); 
 		table.setVisibility(View.GONE);
@@ -815,77 +765,48 @@ LoadingListener
 				FragmentManager manager = getSupportFragmentManager();
 
 				if (manager != null) {
-					//for (int i=0; i<stackStates.size(); i++) {
-					//	Log.d("Drawer", "stackStates("+i+")="+stackStates.get(i));
-					//}
+					
 					int stackCount = manager.getBackStackEntryCount();
-					Log.d("Drawer", "previousStackCount=" + previousBackStackPosition + " stackCount=" + stackCount);
-					//if (stackCount == 0) {
-						// finish();
-					for (int i =0; i <manager.getFragments().size(); i++) {
-						Fragment frag = (Fragment) manager.getFragments().get(i);
-						Log.d("Drawer", "***i="+i);
-						if (frag == null) {
-							Log.d("Drawer", "******Fragment null");
-						} else {
-							Log.d("Drawer", "***Fragment: " + frag.getClass());
-						}
-					}
-					if (previousBackStackPosition < stackCount){
-						//do nothing because back button was not actually pushed
-					//	if (manager.getFragments().get(stackCount-1).getClass() == SupportMapFragment.class) {
-					//		viewingMap = true;
-					//	}
-					} else {
-						
+					
+					
+					// If the current stack change is a "back" command
+					if (previousBackStackPosition >= stackCount){
+										
 						
 						Fragment currFrag = (Fragment) manager.getFragments()
 								.get(stackCount);
-						if (currFrag == null) {
-							Log.d("Drawer", "currFrag is null");
-						} else {
-							Log.d("Drawer", "currFrag class is "+currFrag.getClass());
+						
+						if (currFrag != null) {
+							
 							currFrag.onResume();
 							
-							// Log.d("Drawer", "First backstatefragment is called "
-							// + (Fragment)manager.getFragments().get(0));
 							if (currFrag.getClass() == SupportMapFragment.class) {
+								
 								// assume seeing NearbyStops
 	
-								Log.d("Drawer", "found the supportmapfragment");
 								StackState state;
 								
 								
-								//state = stackStates.get(stackStates
-								//		.size() - 1);
-								
+								// Get the state of this SupportMapFragment to determine action
 								state = stackStatesMap.get(stackCount);
 								
 	
 								if (state == StackState.NearbyStops) {
-									// Should check if need to refresh or not
-									Log.d("Drawer", "starting nearbyStops");
 									showNearbyStops();
 								} else if (state == StackState.ShowRoute) {
-									// Should check if need to refresh or not
-									Log.d("Drawer", "starting showroute");
 									showTrip();
 								}
-								//stackStates.remove(stackStates.size()-1);
+
 							} else {
-								if (viewingMap) {
-									//remove the map state from fragment just viewing
-									//stackStates.remove(stackStates.size()-1);
-								}
+								
+								// currently in some Fragment that does not contain a map
+								
 								viewingMap = false;
 							}
 						}
 					}
 					previousBackStackPosition = stackCount;
-					//ensure NearbyStops is still on bottom of stateStack
-					//if (stackStates.size() == 0) {
-					//	stackStates.add(StackState.NearbyStops);
-					//}
+					
 				}
 			}
 		};
@@ -930,13 +851,20 @@ LoadingListener
 		selectedTrip2 = trip2;
 	}
 	
+	/**
+	 * Adds a map state to the stack. To be called whenever move forward to show the map
+	 * @param state
+	 */
 	public void addStateToStack(StackState state) {
 		FragmentManager manager = getSupportFragmentManager();
 		int stackCount = manager.getBackStackEntryCount();
 		stackStatesMap.put(stackCount+1, state);
-		Log.d("Drawer", "Put " + state+ " into " + (stackCount-1));
+		
 	}
 
+	/**
+	 * Removes all markers from the Google map
+	 */
 	public void removeAllMarkers() {
 		for (Marker m : stopMarkers) {
 			m.setVisible(false);
@@ -1085,6 +1013,10 @@ LoadingListener
 	{
 		return mnFragment;
 	}
+	
+	/**
+	 * Change the Fragment in the content_frame to the GocardLoginFragment 
+	 */
 	public void openGocardLoginFragment() {
 		Fragment fragment = new Fragment();
 		FragmentManager manager = getSupportFragmentManager();
