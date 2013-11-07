@@ -1085,5 +1085,18 @@ LoadingListener
 	{
 		return mnFragment;
 	}
+	public void openGocardLoginFragment() {
+		Fragment fragment = new Fragment();
+		FragmentManager manager = getSupportFragmentManager();
+		// manager.addOnBackStackChangedListener(getBackListener());
+	
+		fragment = new GocardLoginFragment();
+		
+		
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.replace(R.id.content_frame, fragment);
+		transaction.addToBackStack(null);
+		transaction.commitAllowingStateLoss();
+	}
 	/*End of Testing functions */
 }

@@ -3,6 +3,7 @@ package transponders.transmob;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -60,6 +61,8 @@ public class GocardDisplayFragment extends Fragment {
 	private TableLayout balanceTable, historyTable;
 	
 	private TextView balancenumLabel, asofLabel;
+	
+	private CountDownLatch lock;
 	
 	@Override
 	public void onCreate(Bundle bundle) {
@@ -143,6 +146,9 @@ public class GocardDisplayFragment extends Fragment {
 	    	super.onPostExecute(result);
 	    	
 	    	parseResult(result);
+	    	if (lock != null) {
+	    		lock.countDown();
+	    	}
 	    }	
 	}
 	
@@ -346,5 +352,17 @@ public class GocardDisplayFragment extends Fragment {
 	            historyTable.addView(separatorLine);
         	}
 		}
+	}
+	
+	/*testing functions*/
+	public void setCountDownLatch(CountDownLatch lock) {
+		this.lock = lock;
+	
+	}
+	public TableLayout getBalanceTable() {
+		return balanceTable;
+	}
+	public TableLayout getHistoryTable() {
+		return historyTable;
 	}
 }

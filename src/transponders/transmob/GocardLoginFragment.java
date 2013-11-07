@@ -3,6 +3,7 @@ package transponders.transmob;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -66,6 +67,8 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	private String gcNumber, password;
 	
 	private static DefaultHttpClient httpClient;
+	
+	private CountDownLatch lock;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) 
@@ -162,6 +165,9 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	    	
 	    	super.onPostExecute(result);
 	    	parseResult(result);
+	    	if (lock != null) {
+	    		lock.countDown();
+	    	}
 	    }	
 	}
 	
@@ -228,6 +234,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		{	
 			wrongpassWarning.setVisibility(View.VISIBLE);
 		}
+		
 	}
 	
 	private DefaultHttpClient createHttpClient()
@@ -263,4 +270,20 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 				.getActiveNetworkInfo();
 		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
+	
+	/* test functions*/
+	public void setCountDownLatch(CountDownLatch lock) {
+		this.lock = lock;
+	}
+	public void setGocardNumber(String num) {
+		gcnumText.setText(num);
+	}
+	public void setPassword(String pass) {
+		passwordText.setText(pass);
+	}
+	public TextView getWrongPassWarning() {
+		return wrongpassWarning;
+	}
+	
+	/*End of test functions */
 }
