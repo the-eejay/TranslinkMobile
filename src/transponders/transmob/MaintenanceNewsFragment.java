@@ -35,6 +35,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -64,6 +65,8 @@ public class MaintenanceNewsFragment extends Fragment {
 	FragmentActivity parent;
 	DisplayMetrics scale;
 	
+	ActionBarActivity activity;
+	
 	// For testing purposes
 	private StringBuilder allTitles = new StringBuilder();
 	private StringBuilder allURLs = new StringBuilder();
@@ -72,12 +75,15 @@ public class MaintenanceNewsFragment extends Fragment {
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) {
+		
+		activity = (ActionBarActivity) getActivity();
+		
         // Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.maintenance_news, container, false);
 		newsTable = (TableLayout) view.findViewById(R.id.newsTable);
 		tableContext = newsTable.getContext();
 		newsDate = (TextView) view.findViewById(R.id.newsDate);
-		scale = getActivity().getResources().getDisplayMetrics();
+		scale = activity.getResources().getDisplayMetrics();
 		
 		newsDate.setOnTouchListener(new OnTouchListener()
 		{
@@ -87,7 +93,7 @@ public class MaintenanceNewsFragment extends Fragment {
 			}	
 		});
 		
-		getActivity().setProgressBarIndeterminateVisibility(true);
+		activity.setProgressBarIndeterminateVisibility(true);
 		
 		checkConnection();
         return view;
@@ -97,12 +103,12 @@ public class MaintenanceNewsFragment extends Fragment {
 	public void onResume()
 	{
 		super.onResume();
-		getActivity().getActionBar().setTitle(TITLE);
+		activity.getSupportActionBar().setTitle(TITLE);
 	}
 	
 	public void checkConnection() 
     {
-		parent = getActivity();
+		parent = activity;
 		
         ConnectivityManager connMgr = (ConnectivityManager) parent.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -295,7 +301,7 @@ public class MaintenanceNewsFragment extends Fragment {
 			e.printStackTrace();
     	}
 		
-		getActivity().setProgressBarIndeterminateVisibility(false);
+		activity.setProgressBarIndeterminateVisibility(false);
 	}
 	
 	private class NewsListener implements OnClickListener
@@ -309,7 +315,7 @@ public class MaintenanceNewsFragment extends Fragment {
 		
     	public void onClick(View v) 
 		{
-    		getActivity().setProgressBarIndeterminateVisibility(true);
+    		activity.setProgressBarIndeterminateVisibility(true);
     		
     		Fragment fragment2 = new NewsFragment();
     		Bundle args = new Bundle();

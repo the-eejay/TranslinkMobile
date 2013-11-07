@@ -224,6 +224,11 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 		ArrayList<String> usedParentIds = new ArrayList<String>();
 		if (stops != null) {
 			for (Stop stop : stops) {
+				
+				// Temporary workaround to remove known ghost stops.
+				if(stop.getId().equalsIgnoreCase("001945"))
+					continue;
+				
 				int serviceType = stop.getServiceType();
 				Log.d("stopdataresult", stop.getDescription() + " hasParent="+stop.hasParent());
 				if (stop.hasParent()) {

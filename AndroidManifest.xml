@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="8"
         android:targetSdkVersion="18" />
 
     <application
@@ -39,7 +39,7 @@
             android:value="AIzaSyDbo0rtYTIVbsxnrd4xEYOPXbO73bL0z3Y" />
 
         <activity
-            android:name="transponders.transmob.SettingsActivity"
+            android:name="transponders.transmob.SettingsFragment"
             android:label="@string/title_activity_settings"
             android:parentActivityName="transponders.transmob.NearbyStops" >
             <meta-data

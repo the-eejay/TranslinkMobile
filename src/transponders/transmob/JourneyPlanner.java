@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -91,15 +92,17 @@ public class JourneyPlanner extends Fragment implements
 	static Calendar selectedDate = Calendar.getInstance();
 	
 	double[] userLoc;
+	static ActionBarActivity activity;
 	
 	// For testing purposes
 	static ShowJourneyPage showJPFragment = null;
 	private JSONRequest request;
-	
-	@SuppressLint("NewApi")
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 
+		activity = (ActionBarActivity) getActivity();
+		
 		View view = inflater.inflate(R.layout.journey_planner, container, false);
 		userLoc = getArguments().getDoubleArray(ARGS_USER_LOC);
 		
@@ -128,10 +131,10 @@ public class JourneyPlanner extends Fragment implements
 		fromText = (AutoCompleteTextView) view.findViewById(R.id.fromLocation);
 		destText = (AutoCompleteTextView) view.findViewById(R.id.toLocation);
 		
-		LocationAdapter fromAdapter = new LocationAdapter(getActivity(),
+		LocationAdapter fromAdapter = new LocationAdapter(activity,
 			    android.R.layout.simple_spinner_dropdown_item, resolvedLocations, fromText);
 		
-		LocationAdapter destAdapter = new LocationAdapter(getActivity(),
+		LocationAdapter destAdapter = new LocationAdapter(activity,
 			    android.R.layout.simple_spinner_dropdown_item, resolvedLocations, destText);
 		
 		fromText.setAdapter(fromAdapter);
@@ -158,7 +161,7 @@ public class JourneyPlanner extends Fragment implements
 		
 		spinner = (Spinner) view.findViewById(R.id.leave_options_spinner);
 		// Create an ArrayAdapter using the string array and a default spinner layout
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(activity,
 				R.array.leave_options_array, android.R.layout.simple_spinner_item);
 		// Specify the layout to use when the list of choices appears
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -167,14 +170,14 @@ public class JourneyPlanner extends Fragment implements
 		spinner.setOnItemSelectedListener(this);
 
 		vehicleSpinner = (Spinner) view.findViewById(R.id.vehicle_type_spinner);
-		ArrayAdapter<CharSequence> vehicleAdapter = ArrayAdapter.createFromResource(getActivity(),
+		ArrayAdapter<CharSequence> vehicleAdapter = ArrayAdapter.createFromResource(activity,
 				R.array.vehicle_type_array, android.R.layout.simple_spinner_item);
 		vehicleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		vehicleSpinner.setAdapter(vehicleAdapter);
 		vehicleSpinner.setOnItemSelectedListener(this);
 		
 		maxWalkSpinner = (Spinner) view.findViewById(R.id.max_walk_spinner);
-		ArrayAdapter<CharSequence> maxWalkAdapter = ArrayAdapter.createFromResource(getActivity(),
+		ArrayAdapter<CharSequence> maxWalkAdapter = ArrayAdapter.createFromResource(activity,
 				R.array.max_walk_array, android.R.layout.simple_spinner_item);
 		maxWalkAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		maxWalkSpinner.setAdapter(maxWalkAdapter);
@@ -191,11 +194,11 @@ public class JourneyPlanner extends Fragment implements
 	public void onResume()
 	{
 		super.onResume();
-		getActivity().getActionBar().setTitle(TITLE);
+		activity.getSupportActionBar().setTitle(TITLE);
 	}
 
 	private boolean isNetworkAvailable() {
-		ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager
 				.getActiveNetworkInfo();
 		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
@@ -264,7 +267,7 @@ public class JourneyPlanner extends Fragment implements
 							
 							if(originID == null)
 							{
-								Toast.makeText(getActivity().getApplicationContext(), 
+								Toast.makeText(activity.getApplicationContext(), 
 									"Origin location is not found.", Toast.LENGTH_SHORT).show();
 								return;
 							}
@@ -281,7 +284,7 @@ public class JourneyPlanner extends Fragment implements
 					
 					if(destination == null || destination.equalsIgnoreCase(""))
 					{
-						Toast.makeText(getActivity().getApplicationContext(), "Please enter the destination!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(activity.getApplicationContext(), "Please enter the destination!", Toast.LENGTH_SHORT).show();
 						return;
 					}
 					else
@@ -294,7 +297,7 @@ public class JourneyPlanner extends Fragment implements
 							
 							if(destinationID == null)
 							{
-								Toast.makeText(getActivity().getApplicationContext(), 
+								Toast.makeText(activity.getApplicationContext(), 
 										"Destination location is not found.", Toast.LENGTH_SHORT).show();
 								return;
 							}
@@ -310,7 +313,7 @@ public class JourneyPlanner extends Fragment implements
 					if(selectedDate.before(currentDate))
 					{
 						// The entered date has already passed
-						Toast.makeText(getActivity().getApplicationContext(), "The entered date has already passed!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(activity.getApplicationContext(), "The entered date has already passed!", Toast.LENGTH_SHORT).show();
 						return;
 					}
 					
@@ -319,7 +322,7 @@ public class JourneyPlanner extends Fragment implements
 					if(selectedDate.after(dayLimit))
 					{
 						// The entered date is more than 30 days in the future
-						Toast.makeText(getActivity().getApplicationContext(), "The search date cannot be more than 30 days in the future!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(activity.getApplicationContext(), "The search date cannot be more than 30 days in the future!", Toast.LENGTH_SHORT).show();
 						return;
 					}
 
@@ -329,7 +332,8 @@ public class JourneyPlanner extends Fragment implements
 					paramList.add("" + maxWalkDistance);
 					Log.d("LeaveOption: ", "" + leaveOption);
 					Object[] paramArray = paramList.toArray();
-					String[] paramStrArray = Arrays.copyOf(paramArray, paramArray.length, String[].class);
+					String[] paramStrArray = new String[paramArray.length];
+					System.arraycopy(paramArray, 0, paramStrArray, 0, paramArray.length);
 					
 					showJPFragment = new ShowJourneyPage();
 					
@@ -346,7 +350,7 @@ public class JourneyPlanner extends Fragment implements
 		    	    fragmentTransaction.commitAllowingStateLoss();
 		    	    
 				} else {
-					Toast.makeText(getActivity().getApplicationContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(activity.getApplicationContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
 				}
 				break;
         }
@@ -360,7 +364,7 @@ public class JourneyPlanner extends Fragment implements
 		{
 			// Use the current date as the default date in the picker
 			// Create a new instance of DatePickerDialog and return it
-			return new DatePickerDialog(getActivity(), this, year, month, day);
+			return new DatePickerDialog(activity, this, year, month, day);
 		}
 
 		public void onDateSet(DatePicker view, int year, int month, int day) 
@@ -382,8 +386,8 @@ public class JourneyPlanner extends Fragment implements
 			// Use the current time as the default values for the picker
 			
 			// Create a new instance of TimePickerDialog and return it
-			return new TimePickerDialog(getActivity(), this, hour, minute,
-					DateFormat.is24HourFormat(getActivity()));
+			return new TimePickerDialog(activity, this, hour, minute,
+					DateFormat.is24HourFormat(activity));
 		}
 
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -595,7 +599,7 @@ public class JourneyPlanner extends Fragment implements
 	
 	public String resolveLocation(String input)
 	{
-		getActivity().setProgressBarIndeterminateVisibility(true);
+		activity.setProgressBarIndeterminateVisibility(true);
 		
 		 String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" 
 			  		+ Uri.encode(input)
@@ -617,7 +621,7 @@ public class JourneyPlanner extends Fragment implements
 			 e.printStackTrace();
 		 }
 		 
-		 getActivity().setProgressBarIndeterminateVisibility(false);
+		 activity.setProgressBarIndeterminateVisibility(false);
 		 if(array.size() == 0)
 		 {
 			 return null;

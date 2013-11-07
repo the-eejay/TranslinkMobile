@@ -5,14 +5,12 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -27,7 +25,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -71,9 +69,9 @@ import com.google.android.gms.maps.model.Polyline;
  * also the home screen of the application.
  * 
  * @author Transponders
- * @version 1.0
+ * @version 2.0
  */
-public class NearbyStops extends FragmentActivity implements
+public class NearbyStops extends ActionBarActivity implements
 GooglePlayServicesClient.ConnectionCallbacks, OnConnectionFailedListener, com.google.android.gms.location.LocationListener,
 LoadingListener
 {
@@ -105,17 +103,12 @@ LoadingListener
 	private Route selectedRoute;
 	private Trip selectedTrip;
 	private Trip selectedTrip2;
-	private ArrayList<StopTrip> selectedTripsStopTrips;
-	//private String selectedTripId;
 	private LatLng userLatLng;
 	private ArrayList<Marker> stopMarkers;
 	private HashMap<Marker, Stop> stopMarkersMap;
 	private CountDownTimer splashScreenTimer;
 	
 	private Polyline polyline;
-
-	// private ShowRouteFragment map2Fragment;
-	//private ArrayList<StackState> stackStates;
 	private HashMap<Integer, StackState> stackStatesMap;
 	private int previousBackStackPosition;
 	private boolean viewingMap;
@@ -138,7 +131,7 @@ LoadingListener
 	SharedPreferences settings;
     // Handle to a SharedPreferences editor
     SharedPreferences.Editor mEditor;
- // Milliseconds per second
+    // Milliseconds per second
     private static final int MILLISECONDS_PER_SECOND = 1000;
     // Update frequency in seconds
     public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
@@ -168,7 +161,7 @@ LoadingListener
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
-		getActionBar().hide();
+		getSupportActionBar().hide();
 		
 		setContentView(R.layout.activity_main);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -221,8 +214,7 @@ LoadingListener
         // Start with updates turned off
         mUpdatesRequested = true;
         mLocationClient.connect();
-
-		
+	
 		if (showTut)
 			showFirstTimeTutorial();
 		
@@ -234,17 +226,17 @@ LoadingListener
 			@Override
 			public void onFinish() {
 				closeSplashScreen();
-				
 			}
 
 			@Override
-			public void onTick(long arg0) {
-				
-			}
+			public void onTick(long arg0) {}
 			
 		}.start();
 	}
 	
+	/**
+	 * The method to initialize the side bar navigation drawer.
+	 */
 	public void initializeNavigationDrawer()
 	{
 		// Set the title and the content of the navigation drawer.
@@ -254,8 +246,7 @@ LoadingListener
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_ns);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer_ns);
 
-		// set a custom shadow that overlays the main content when the drawer
-		// opens
+		// set a custom shadow that overlays the main content when the drawer opens
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
 				GravityCompat.START);
 		
@@ -269,8 +260,8 @@ LoadingListener
 		int position = 0;
 		mDrawerList.setItemChecked(position, true);
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setTitle(TITLE);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setTitle(TITLE);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
 		mDrawerLayout, /* DrawerLayout object */
@@ -279,18 +270,15 @@ LoadingListener
 		R.string.drawer_close /* "close drawer" description for accessibility */
 		) {
 			public void onDrawerClosed(View view) {
-				getActionBar().setTitle(mTitle);
+				getSupportActionBar().setTitle(mTitle);
 			}
 
 			public void onDrawerOpened(View drawerView) {
-				getActionBar().setTitle(mDrawerTitle);
+				getSupportActionBar().setTitle(mDrawerTitle);
 			}
 		};
 
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-		
-		
-
 	}
 
 	/**
@@ -328,8 +316,19 @@ LoadingListener
 			switch (item.getItemId()) 
 			{
 				case R.id.action_settings:
-					Intent intent = new Intent(this, SettingsActivity.class);
-					startActivity(intent);
+					
+					FragmentManager manager = getSupportFragmentManager();
+					Fragment fragment = new SettingsFragment();
+					
+					FragmentTransaction transaction = manager.beginTransaction();
+					transaction.replace(R.id.content_frame, fragment);
+					transaction.addToBackStack(null);
+					transaction.commitAllowingStateLoss();
+
+					// update selected item and title, then close the drawer
+					mDrawerList.setItemChecked(4, true);
+					setTitle(menuList[4]);
+					
 					break;
 				default:
 					break;
@@ -398,8 +397,7 @@ LoadingListener
 			fragment = mnFragment;
 			break;
 		case 4:
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
+			fragment = new SettingsFragment();
 			break;
 		default:
 			break;
@@ -482,7 +480,7 @@ LoadingListener
 		stopLoader.addSavedStopMarkersToMap(true);
 		routeStopsLoader.removeEstimatedServicesFromMap();
 		routeStopsLoader.removeLineFromMap();
-		getActionBar().setTitle(TITLE);
+		getSupportActionBar().setTitle(TITLE);
 
 		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 
@@ -529,9 +527,7 @@ LoadingListener
 			}
 			
 		});*/
-		
-	
-		
+			
 		// Acquire a reference to the system Location Manager
 		LocationManager locationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
@@ -614,21 +610,20 @@ LoadingListener
 		button.setVisibility(View.VISIBLE);
 	}
 
-	
+	/**
+	 * The method to initialize the first time tutorial.
+	 */
 	public void showFirstTimeTutorial() 
 	{
 		mPager = (ViewPager) findViewById(R.id.pager);
 		mPagerAdapter = new TutorialPagerAdapter(getSupportFragmentManager(), mPager);
 		mPager.setAdapter(mPagerAdapter);
-		
-		mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-			@Override
-			public void onPageSelected(int position) {
-				invalidateOptionsMenu();
-			}
-		});
 	}
 	
+	/**
+	 * The method used in the route map page. This method loads the route map and
+	 * information for services that has ended on the current day.
+	 */
 	public void showRoute()
 	{
 		routeStopsLoader.requestRouteStops(selectedRoute);
@@ -673,7 +668,9 @@ LoadingListener
 		
 		TextView additionalInfo = (TextView) findViewById(R.id.additional_info);
 		Calendar c = Calendar.getInstance();
-		additionalInfo.setText("Showing route on " + c.get(Calendar.DAY_OF_MONTH) + "/" + (c.get(Calendar.MONTH)+1) + "/" + c.get(Calendar.YEAR));
+		additionalInfo.setText("Showing route on " + c.get(Calendar.DAY_OF_MONTH) 
+								+ "/" + (c.get(Calendar.MONTH)+1) 
+								+ "/" + c.get(Calendar.YEAR));
 		additionalInfo.setVisibility(View.VISIBLE);
 		
 		table.setVisibility(View.VISIBLE);
@@ -683,6 +680,10 @@ LoadingListener
 		button.setVisibility(View.GONE);
 	}
 
+	/**
+	 * The method used in the route map page. This method loads the trip map and
+	 * information for services that still have trips for the current day.
+	 */
 	public void showTrip() 
 	{	
 		routeStopsLoader.requestTripStops(selectedTrip);
@@ -777,9 +778,12 @@ LoadingListener
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
-		getActionBar().setTitle(mTitle);
+		getSupportActionBar().setTitle(mTitle);
 	}
 
+	/**
+	 * The method to load the timetable fragment for a selected stop.
+	 */
 	public void openTimetableFragment(String stopName) {
 		Fragment fragment = new Fragment();
 		FragmentManager manager = getSupportFragmentManager();
@@ -800,6 +804,11 @@ LoadingListener
 		setTitle("Timetable");
 	}
 
+	/**
+	 * A helper method to create custom listener for the back functionalities between fragments.
+	 * 
+	 * @return OnBackStackChangedListener the custom backstack listener.
+	 */
 	public OnBackStackChangedListener getBackListener() {
 		OnBackStackChangedListener result = new OnBackStackChangedListener() {
 			public void onBackStackChanged() {
@@ -921,12 +930,6 @@ LoadingListener
 		selectedTrip2 = trip2;
 	}
 	
-	/*public void setSelectedTripsStopTrips(ArrayList<StopTrip> stopTrips) {
-		this.selectedTripsStopTrips = stopTrips;
-	}*/
-	
-	
-
 	public void addStateToStack(StackState state) {
 		FragmentManager manager = getSupportFragmentManager();
 		int stackCount = manager.getBackStackEntryCount();
@@ -941,12 +944,12 @@ LoadingListener
 		}
 	}
 
-	/*
-	 * public ShowRouteFragment getMap2Fragment() { return map2Fragment; }
-	 * public void setMap2Fragment(ShowRouteFragment map2Fragment) {
-	 * this.map2Fragment= map2Fragment; }
+	/**
+	 * Private helper class that is the adapter of first time tutorial.
+	 * 
+	 * @author Transponders
+	 * @version 1.0
 	 */
-
 	private class TutorialPagerAdapter extends FragmentStatePagerAdapter 
 	{
 		private ViewPager pagerView;
@@ -969,37 +972,6 @@ LoadingListener
 			return NUM_PAGES;
 		}
 	}
-	
-	/*Testing functions */
-	public StopDataLoader getStopDataLoader() {
-		return stopLoader;
-	}
-
-	public RouteStopsLoader getRouteStopsLoader() {
-		return routeStopsLoader;
-	}
-
-
-	public ArrayList<Marker> getStopMarkers() {
-		return stopMarkers;
-	}
-	public Fragment getContentFragment() {
-		FragmentManager manager = getSupportFragmentManager();
-		return manager.findFragmentById(R.id.content_frame);
-	}
-	
-	public JourneyPlanner getJourneyPlannerFragment()
-	{
-		return jpFragment;
-	}
-	
-	public MaintenanceNewsFragment getMaintenanceNewsFragment()
-	{
-		return mnFragment;
-	}
-	
-	
-	/*End of Testing functions */
 
 	@Override
 	public void onConnected(Bundle arg0) {
@@ -1008,9 +980,7 @@ LoadingListener
         // If already requested, start periodic updates
         if (mUpdatesRequested) {
             mLocationClient.requestLocationUpdates(mLocationRequest, this);
-            
         }
-		
 	}
 
 	@Override
@@ -1018,28 +988,23 @@ LoadingListener
 		
 	}
 	
-	 @Override
-	    public void onLocationChanged(Location location) {
-	        // Report to the UI that the location was updated
-	        /*String msg = "Updated Location: " +
-	                Double.toString(location.getLatitude()) + "," +
-	                Double.toString(location.getLongitude());
-	        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();*/
-		 
-				// Called when a new location is found by the network location
-				// provider.
-				userLatLng = new LatLng(location.getLatitude(),
-						location.getLongitude());
-				userPos.setVisible(true);
-				userPos.setPosition(userLatLng);
-				//if (!updatedOnce) {
-					locationChanged(userLatLng);
-				//}
-				updatedOnce = true;
-				Log.d("Location", "Location changed");
-				mLocationClient.removeLocationUpdates(this);
-			
-	    }
+	@Override
+    public void onLocationChanged(Location location) {
+	 
+		// Called when a new location is found by the network location
+		// provider.
+		userLatLng = new LatLng(location.getLatitude(),
+				location.getLongitude());
+		userPos.setVisible(true);
+		userPos.setPosition(userLatLng);
+		//if (!updatedOnce) {
+			locationChanged(userLatLng);
+		//}
+		updatedOnce = true;
+		Log.d("Location", "Location changed");
+		mLocationClient.removeLocationUpdates(this);
+		
+    }
 
 	public void startUpdates() {
 		mLocationClient.requestLocationUpdates(mLocationRequest, this);
@@ -1050,6 +1015,13 @@ LoadingListener
 		
 	}
 	
+	/**
+	 * Private helper class to instantiate the trip dropdown choice in the 
+	 * route display interface.
+	 * 
+	 * @author Transponders
+	 * @version 1.0
+	 */
 	private class TripDropdownListener implements OnItemSelectedListener 
     {
     	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
@@ -1071,26 +1043,47 @@ LoadingListener
     	}
     	
     	public void onNothingSelected(AdapterView<?> arg0)
-    	{
-    		
-    	}
+    	{}
     }
 	
 	public void closeSplashScreen() {
 
 		splashFrame.setVisibility(View.GONE);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-		getActionBar().show();
+		getSupportActionBar().show();
 		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 	}
 
 	@Override
 	public void onStateChange(boolean state) {
 		setProgressBarIndeterminateVisibility(state);
-		
 	}
 	
-	/*public void setSelectedTripId(String tripId) {
-		selectedTripId = tripId;
-	}*/
+	/*Testing functions */
+	public StopDataLoader getStopDataLoader() {
+		return stopLoader;
+	}
+
+	public RouteStopsLoader getRouteStopsLoader() {
+		return routeStopsLoader;
+	}
+
+	public ArrayList<Marker> getStopMarkers() {
+		return stopMarkers;
+	}
+	public Fragment getContentFragment() {
+		FragmentManager manager = getSupportFragmentManager();
+		return manager.findFragmentById(R.id.content_frame);
+	}
+	
+	public JourneyPlanner getJourneyPlannerFragment()
+	{
+		return jpFragment;
+	}
+	
+	public MaintenanceNewsFragment getMaintenanceNewsFragment()
+	{
+		return mnFragment;
+	}
+	/*End of Testing functions */
 }
