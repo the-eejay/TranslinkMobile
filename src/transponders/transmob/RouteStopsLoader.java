@@ -77,10 +77,8 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
      *
      * @param stops ArrayList containing all the nearby stops.
      */
-	public void requestRouteStops(Route route) {
-		
-
-		
+	public void requestRouteStops(Route route) 
+	{	
 		String urlString = "http://deco3801-010.uqcloud.net/routestops.php?route="
 				+ route.getCode() + "&type=" + route.getType() + "&directions=" + route.getDirection();
 
