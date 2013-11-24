@@ -35,7 +35,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -236,6 +235,10 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
             TextView direction = new TextView(rowContext);
             direction.setPadding(30, 0, -10, 0);
             
+            int density = getResources().getDisplayMetrics().densityDpi;
+            if(density <= DisplayMetrics.DENSITY_HIGH)
+	            serviceCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 23);
+            
             // Special code & direction for trains
             if(stopType == 2)
             {	
@@ -263,7 +266,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
             	serviceCode.setText(currentRoute.getCode());
             	direction.setText(currentRoute.getDirectionAsString());
             }
-
+            
             cell2.addView(serviceCode);
             cell2.addView(direction);
             
@@ -290,6 +293,9 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
             
             firstText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
             firstText.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+            
+            if(density <= DisplayMetrics.DENSITY_HIGH)
+	            firstText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 23);
             
             if(stopType == 1)
             	firstText.setTextColor(getResources().getColor(R.color.bus_green));

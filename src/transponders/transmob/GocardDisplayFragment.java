@@ -1,40 +1,20 @@
 package transponders.transmob;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 
-
-
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -44,9 +24,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -66,7 +43,7 @@ public class GocardDisplayFragment extends Fragment {
 	private String balanceResult;
 	private TableLayout balanceTable, historyTable;
 	
-	private TextView balancenumLabel, asofLabel;
+	private TextView balanceLabel, balancenumLabel, asofLabel;
 	
 	private CountDownLatch lock;
 	
@@ -93,8 +70,17 @@ public class GocardDisplayFragment extends Fragment {
 		balanceTable = (TableLayout) view.findViewById(R.id.balance_table);
 		historyTable = (TableLayout) view.findViewById(R.id.history_table);
 		
+		balanceLabel = (TextView) view.findViewById(R.id.balance_label);
 		balancenumLabel = (TextView) view.findViewById(R.id.balancenum_label);
 		asofLabel = (TextView) view.findViewById(R.id.asof_label);
+		
+		int density = getResources().getDisplayMetrics().densityDpi;
+        if(density <= DisplayMetrics.DENSITY_HIGH)
+        {
+        	balanceLabel.setTextSize(24);
+        	balancenumLabel.setTextSize(24);
+        	balanceTable.setPadding(20, 0, 20, 0);
+        }
 		
 		balanceTable.setOnTouchListener(new OnTouchListener()
 		{
@@ -147,7 +133,6 @@ public class GocardDisplayFragment extends Fragment {
 		@Override
 	    protected void onPostExecute(String result) {
 	    	Log.d("JSONRequest", "postexecute");
-	    	//Log.d("TEST HTTPPOST", result);
 	    	
 	    	super.onPostExecute(result);
 	    	
@@ -167,7 +152,7 @@ public class GocardDisplayFragment extends Fragment {
 		Log.d("GoCard", "resultEndOfFile=" + result.substring(result.length()-20));
 		
 		if (result.contains("<table id=\"travel-history\"")) 
-		{
+		{	
 			parseResultAsHistory(result);
 			getActivity().setProgressBarIndeterminateVisibility(false);	
 		} 
@@ -198,9 +183,8 @@ public class GocardDisplayFragment extends Fragment {
     	balancenumLabel.setText(costText);
         Log.d("GoCard", "dateText="+dateText);
         Log.d("GoCard", "costText="+costText);
-
+        
 		HttpThread ht = new HttpThread();
-		
 		String url = "https://gocard.translink.com.au/webtix/tickets-and-fares/go-card/online/history";
 		ht.execute(url);
 	}
@@ -284,6 +268,12 @@ public class GocardDisplayFragment extends Fragment {
         		if(priceText.equalsIgnoreCase("$0.00"))
         			priceText = "$ 0.00";
         		
+        		if(priceText.contains("&nbsp;"))
+        		{
+        			priceText = touchOffText;
+        			touchOffText = "Haven't touched off yet.";
+        		}
+        		
         		////////////////////////////////////////////////////////////////////////
         		
 	            LinearLayout cell1 = new LinearLayout(rowContext);
@@ -293,7 +283,7 @@ public class GocardDisplayFragment extends Fragment {
 	 
 	            TableRow.LayoutParams param1 = new TableRow.LayoutParams();
 	            param1.column = 0;
-	            param1.span = 18;
+	            param1.span = 16;
 	            param1.weight = 1;
 	            cell1.setLayoutParams(param1);
 	            
@@ -327,7 +317,7 @@ public class GocardDisplayFragment extends Fragment {
 	            TextView touchOnLabel = new TextView(rowContext);
 	            TextView touchOffLabel = new TextView(rowContext);
 	            touchOnLabel.setPadding(0, 0, 0, 0);
-	            touchOffLabel.setPadding(3, 0, 0, 0);
+	            touchOffLabel.setPadding(2, 0, 0, 0);
 	            
 	            touchOnLabel.setText(touchOnText);
 	            touchOffLabel.setText(touchOffText);
@@ -354,6 +344,14 @@ public class GocardDisplayFragment extends Fragment {
 	            fareLabel.setText(priceText);
 	            fareLabel.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
 	            fareLabel.setTextColor(getActivity().getResources().getColor(R.color.train_orange));
+	            
+	            int density = getResources().getDisplayMetrics().densityDpi;
+	            if(density <= DisplayMetrics.DENSITY_HIGH)
+	            {
+	            	param3.span = 12;
+	            	fareLabel.setPadding(0, 0, 1, 0);
+	            	cell3.setLayoutParams(param3);
+	            }
 	            
 	            cell3.addView(fareLabel);
 	            newRow2.addView(cell3);

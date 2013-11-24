@@ -292,6 +292,13 @@ public class MaintenanceNewsFragment extends Fragment {
 		    			text1.setMinimumHeight(height);
 		    			text1.setBackgroundResource(R.drawable.selector);
 		    			
+		    			int density = getResources().getDisplayMetrics().densityDpi;
+		    	        if(density <= DisplayMetrics.DENSITY_HIGH)
+		    	        {
+		    	        	text1.setPadding(10, 0, 7, 0);
+		    	        	text1.setTextSize(13);
+		    	        }
+		    			
 		    			newRow.addView(text1);
 	            		newsTable.addView(newRow);
 	            		

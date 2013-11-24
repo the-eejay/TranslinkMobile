@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -76,6 +77,14 @@ public class TutorialFragment extends Fragment implements OnClickListener {
         ViewGroup rootView = (ViewGroup) inflater
                 .inflate(R.layout.tutorial_fragment, container, false);
         
+        Button button = (Button) rootView.findViewById(R.id.finish_tut_button);
+        
+        int density = getResources().getDisplayMetrics().densityDpi;
+        if(density <= DisplayMetrics.DENSITY_HIGH)
+        {
+        	button.setMinimumHeight(60);
+        }
+        
         ImageView previousArrow = (ImageView) rootView.findViewById(R.id.previous_arrow);
         previousArrow.setVisibility(View.INVISIBLE);
         previousArrow.setOnClickListener(this);
@@ -116,11 +125,8 @@ public class TutorialFragment extends Fragment implements OnClickListener {
         
         if(mPageNumber + 1 == NearbyStops.NUM_PAGES)
         {
-        	Button button = (Button) rootView.findViewById(R.id.finish_tut_button);
-        	button.setVisibility(View.VISIBLE);
-        	
-        	nextArrow.setVisibility(View.INVISIBLE);
-        	
+        	button.setVisibility(View.VISIBLE);	
+        	nextArrow.setVisibility(View.INVISIBLE);      	
         	button.setOnClickListener(this);
         }
 

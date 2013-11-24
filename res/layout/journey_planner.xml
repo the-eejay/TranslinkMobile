@@ -34,9 +34,11 @@
 		        android:layout_weight="6"
 		        android:hint="@string/fromLocation"
 		        android:inputType="text" 
+		        android:textColor="@color/black"
 		        android:layout_marginTop="5dp"
 		        android:layout_marginLeft="22dp"
-		        android:layout_marginRight="2dp"/>
+		        android:layout_marginRight="2dp"
+		        android:imeOptions="actionDone" />
 		    
 		    <Button
 	            android:id="@+id/from_clear_button"
@@ -82,9 +84,11 @@
 		        android:layout_weight="6"        
 		        android:hint="@string/toLocation"
 		        android:inputType="text" 
+		        android:textColor="@color/black"
 		        android:layout_marginTop="5dp"
 		        android:layout_marginLeft="22dp"
-		        android:layout_marginRight="2dp" />
+		        android:layout_marginRight="2dp"
+		        android:imeOptions="actionDone" />
 		    
 		    <Button
 	            android:id="@+id/to_clear_button"

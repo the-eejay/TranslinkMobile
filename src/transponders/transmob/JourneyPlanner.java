@@ -1,7 +1,6 @@
 package transponders.transmob;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +9,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -25,6 +23,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -186,6 +185,12 @@ public class JourneyPlanner extends Fragment implements
 
 		Button button = (Button) view.findViewById(R.id.sendDestButton);
 		button.setOnClickListener(this);
+		
+		int density = getResources().getDisplayMetrics().densityDpi;
+        if(density <= DisplayMetrics.DENSITY_HIGH)
+        {
+        	button.setMinimumHeight(60);
+        }
 		
 		return view;
 	}

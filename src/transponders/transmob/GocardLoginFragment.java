@@ -33,6 +33,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,7 +97,11 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		gcnumClear.setOnClickListener(this);
 		passwordClear.setOnClickListener(this);
 		
-		
+		int density = getResources().getDisplayMetrics().densityDpi;
+        if(density <= DisplayMetrics.DENSITY_HIGH)
+        {
+        	loginButton.setMinimumHeight(60);
+        }
 	
 		return view;
 	}

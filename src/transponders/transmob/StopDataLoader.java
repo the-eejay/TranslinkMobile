@@ -7,7 +7,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import android.app.ProgressDialog;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
