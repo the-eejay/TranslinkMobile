@@ -447,7 +447,7 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 			}
 		}
 		
-		String urlString = "http://deco3801-010.uqcloud.net/routeschedule.php?stop="
+		String urlString = "http://abvincita.com/transmob/routeschedule.php?stop="
 				+ stopString;
 
 		request = new JSONRequest();

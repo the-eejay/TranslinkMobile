@@ -548,7 +548,7 @@ public class JourneyPlanner extends Fragment implements
 						  Log.d("performFiltering", "TYPED TEXT LENGTH: " + typedText.length());
 						  if(!typedText.equals("Current location"))
 						  {
-							  String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" 
+							  String url = "http://abvincita.com/transmob/resolve.php?input=" 
 								  		+ Uri.encode(typedText)
 								  		+ "&maxResults=" + Uri.encode("5");
 							  request = new JSONRequest();
@@ -592,9 +592,16 @@ public class JourneyPlanner extends Fragment implements
 				  }
 				  
 				  @Override
-			      protected void publishResults(CharSequence arg0, FilterResults arg1) 
-				  {
-					  notifyDataSetChanged();
+			      protected void publishResults(CharSequence arg0, FilterResults results) 
+				  {  
+					  if (results != null && results.count > 0)
+		              {
+		                 notifyDataSetChanged();
+		              }
+		              else
+		              {
+		                  notifyDataSetInvalidated();
+		              }
 			      }
 			};
 			
@@ -611,7 +618,7 @@ public class JourneyPlanner extends Fragment implements
 	{
 		activity.setProgressBarIndeterminateVisibility(true);
 		
-		 String url = "http://deco3801-010.uqcloud.net/resolve.php?input=" 
+		 String url = "http://abvincita.com/transmob/resolve.php?input=" 
 			  		+ Uri.encode(input)
 			  		+ "&maxResults=" + Uri.encode("1");
 		 request = new JSONRequest();

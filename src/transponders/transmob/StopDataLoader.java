@@ -65,7 +65,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 	 */
 	public void requestStopsNear(double lat, double lng, int radius) {
 
-		String urlString = "http://deco3801-010.uqcloud.net/stopsnearby.php?lat="
+		String urlString = "http://abvincita.com/transmob/stopsnearby.php?lat="
 				+ lat + "&lng=" + lng + "&rad=" + radius;
 		Log.d("urlString: ", urlString);
 		JSONRequest request = new JSONRequest();
@@ -80,7 +80,7 @@ public class StopDataLoader implements JSONRequest.NetworkListener {
 	
 	public void requestStopsNear(double lat, double lng, int radius, int numOfStops) {
 
-		String urlString = "http://deco3801-010.uqcloud.net/stopsnearby.php?lat="
+		String urlString = "http://abvincita.com/transmob/stopsnearby.php?lat="
 				+ lat + "&lng=" + lng + "&rad=" + radius + "&num=" + numOfStops;
 		Log.d("urlString: ", urlString);
 		JSONRequest request = new JSONRequest();
