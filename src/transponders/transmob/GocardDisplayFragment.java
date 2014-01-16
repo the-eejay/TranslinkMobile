@@ -14,7 +14,9 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.AsyncTask.Status;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -42,14 +44,17 @@ public class GocardDisplayFragment extends Fragment {
 	
 	private String balanceResult;
 	private TableLayout balanceTable, historyTable;
-	
 	private TextView balanceLabel, balancenumLabel, asofLabel;
+	private FragmentActivity activity;
+	private HttpThread httpThread;
 	
 	private CountDownLatch lock;
 	
 	@Override
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
+		
+		activity = getActivity();
 		
 		if (getArguments() == null) {
 			balanceResult ="";
@@ -90,7 +95,7 @@ public class GocardDisplayFragment extends Fragment {
 			}	
 		});
 		
-		getActivity().setProgressBarIndeterminateVisibility(true);
+		activity.setProgressBarIndeterminateVisibility(true);
 		parseResultAsBalance(balanceResult);
 		
 		return view;
@@ -154,11 +159,11 @@ public class GocardDisplayFragment extends Fragment {
 		if (result.contains("<table id=\"travel-history\"")) 
 		{	
 			parseResultAsHistory(result);
-			getActivity().setProgressBarIndeterminateVisibility(false);	
+			activity.setProgressBarIndeterminateVisibility(false);	
 		} 
 		else 
 		{	
-        	Toast.makeText(getActivity().getApplicationContext(), "Something went wrong.", Toast.LENGTH_SHORT).show();
+        	Toast.makeText(activity.getApplicationContext(), "Something went wrong.", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -184,9 +189,9 @@ public class GocardDisplayFragment extends Fragment {
         Log.d("GoCard", "dateText="+dateText);
         Log.d("GoCard", "costText="+costText);
         
-		HttpThread ht = new HttpThread();
+		httpThread = new HttpThread();
 		String url = "https://gocard.translink.com.au/webtix/tickets-and-fares/go-card/online/history";
-		ht.execute(url);
+		httpThread.execute(url);
 	}
 	
 	/**
@@ -207,7 +212,7 @@ public class GocardDisplayFragment extends Fragment {
 			TableRow newRow = new TableRow(tableContext);
 			Context rowContext = newRow.getContext();
 			
-			DisplayMetrics scale = getActivity().getResources().getDisplayMetrics();
+			DisplayMetrics scale = activity.getResources().getDisplayMetrics();
         	int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, scale);
         	newRow.setMinimumHeight(height);
         	TextView transactionDate = new TextView(rowContext);
@@ -343,7 +348,7 @@ public class GocardDisplayFragment extends Fragment {
 	            TextView fareLabel = new TextView(rowContext2);
 	            fareLabel.setText(priceText);
 	            fareLabel.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
-	            fareLabel.setTextColor(getActivity().getResources().getColor(R.color.train_orange));
+	            fareLabel.setTextColor(activity.getResources().getColor(R.color.train_orange));
 	            
 	            int density = getResources().getDisplayMetrics().densityDpi;
 	            if(density <= DisplayMetrics.DENSITY_HIGH)
@@ -369,6 +374,18 @@ public class GocardDisplayFragment extends Fragment {
 	            historyTable.addView(separatorLine);
         	}
 		}
+	}
+	
+	@Override
+	public void onStop() 
+	{
+		activity.setProgressBarIndeterminateVisibility(false);
+		
+		// Prevents crash when user hits back before the asynctask is finished
+	    if (this.httpThread != null && this.httpThread.getStatus() == Status.RUNNING) 
+	    	this.httpThread.cancel(true);
+	    
+	    super.onStop();
 	}
 	
 	/*testing functions*/

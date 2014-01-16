@@ -603,6 +603,8 @@ public class DisplayRoutesFragment extends Fragment implements JSONRequest.Netwo
 	@Override
 	public void onStop() 
 	{
+		activity.setProgressBarIndeterminateVisibility(false);
+		
 		// Prevents crash when user hits back before the asynctask is finished
 	    if (this.request != null && this.request.getStatus() == Status.RUNNING) 
 	    	this.request.cancel(true);

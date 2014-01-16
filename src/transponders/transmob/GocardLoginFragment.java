@@ -29,8 +29,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.AsyncTask.Status;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -64,10 +66,12 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	private Button loginButton;
 	private TextView wrongpassWarning;
 	private CheckBox rememberBox;
+	private FragmentActivity activity;
 	
 	private String gcNumber, password;
 	
 	private static DefaultHttpClient httpClient;
+	private HttpThread httpThread;
 	
 	private CountDownLatch lock;
 
@@ -76,12 +80,14 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	{
 		View view = inflater.inflate(R.layout.gocard_login, container, false);
 		
+		activity = getActivity();
+		
 		gcnumText = (EditText) view.findViewById(R.id.gcnum_input);
 		passwordText = (EditText) view.findViewById(R.id.password_input);
 		wrongpassWarning = (TextView) view.findViewById(R.id.wrongpass_warning);
 		rememberBox = (CheckBox) view.findViewById(R.id.check_remember);
 		
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());;
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(activity);;
 		String savedNum = settings.getString(GOCARD_NUMBER, "");
 		String savedPassword = settings.getString(GOCARD_PASSWORD, "");
 	
@@ -127,7 +133,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 					
 					if(rememberBox.isChecked())
 					{
-						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());;
+						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(activity);;
 
 						SharedPreferences.Editor editor = settings.edit();
 		        	    editor.putString(GOCARD_NUMBER, gcNumber);
@@ -137,7 +143,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 					}
 					else
 					{
-						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());;
+						SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(activity);;
 
 						SharedPreferences.Editor editor = settings.edit();
 		        	    editor.putString(GOCARD_NUMBER, "");
@@ -145,13 +151,13 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		        	    editor.commit();
 					}
 
-					getActivity().setProgressBarIndeterminateVisibility(true);
-					HttpThread ht = new HttpThread();
+					activity.setProgressBarIndeterminateVisibility(true);
+					httpThread = new HttpThread();
 					String url = "https://gocard.translink.com.au/webtix/welcome/welcome.do";
-					ht.execute(url);
+					httpThread.execute(url);
 				}
 				else
-					Toast.makeText(getActivity().getApplicationContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(activity.getApplicationContext(), "No internet connection!", Toast.LENGTH_SHORT).show();
 				
 				break;
 		}
@@ -234,7 +240,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 		}
 		Log.d("GoCard", "resultEndOfFile=" + result.substring(result.length()-20));
 		
-		getActivity().setProgressBarIndeterminateVisibility(false);
+		activity.setProgressBarIndeterminateVisibility(false);
 		
 		//If the HTML page shows the balance table then the loging was successful
 		if (result.contains("<table id=\"balance-table\"")) 
@@ -247,7 +253,7 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 			fragment.setArguments(args);
 			
 			// Switch to the GocardLoginDisplayFragment
-			FragmentManager manager = getActivity().getSupportFragmentManager();
+			FragmentManager manager = activity.getSupportFragmentManager();
 	   		FragmentTransaction transaction = manager.beginTransaction();
      		transaction.replace(R.id.content_frame, fragment);
             transaction.addToBackStack(null);
@@ -290,10 +296,22 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	}
 	
 	private boolean isNetworkAvailable() {
-		ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager
 				.getActiveNetworkInfo();
 		return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
+	
+	@Override
+	public void onStop() 
+	{
+		activity.setProgressBarIndeterminateVisibility(false);
+		
+		// Prevents crash when user hits back before the asynctask is finished
+	    if (this.httpThread != null && this.httpThread.getStatus() == Status.RUNNING) 
+	    	this.httpThread.cancel(true);
+	    
+	    super.onStop();
 	}
 	
 	/* test functions*/
@@ -309,6 +327,5 @@ public class GocardLoginFragment extends Fragment implements OnClickListener
 	public TextView getWrongPassWarning() {
 		return wrongpassWarning;
 	}
-	
 	/*End of test functions */
 }
