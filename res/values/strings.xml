@@ -23,6 +23,7 @@
     <string name="finish_tutorial">Okay, I got it!</string>
     <string name="tutorial_image_desc">Tutorial image</string>
     <string name="next_arrow_desc">Next Arrow</string>
+    <string name="prev_arrow_desc">Prev Arrow</string>
     <string name="locate_me">Me</string>
     <string name="temp">Temp</string>
     <string name="service_code">412</string>

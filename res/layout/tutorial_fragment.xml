@@ -36,7 +36,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:src="@drawable/prev_arrow"
-            android:contentDescription="@string/next_arrow_desc"/>
+            android:contentDescription="@string/prev_arrow_desc"/>
 	    
 	    <LinearLayout 
 	         android:id="@+id/tutorial_box"

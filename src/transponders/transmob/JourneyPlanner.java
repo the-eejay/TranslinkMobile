@@ -558,7 +558,7 @@ public class JourneyPlanner extends Fragment implements
 							  String result = request.get();
 							  
 							  Object obj = JSONValue.parse(result);
-							  JSONArray array = (JSONArray)((JSONObject)obj).get("Locations");
+							  JSONArray array = (JSONArray)((JSONObject)obj).get("Suggestions");
 									
 							  for(int i = 0; i < array.size(); i++)
 							  {
@@ -631,7 +631,7 @@ public class JourneyPlanner extends Fragment implements
 			 String result = request.get();
 			  
 			 Object obj = JSONValue.parse(result);
-			 array = (JSONArray)((JSONObject)obj).get("Locations");
+			 array = (JSONArray)((JSONObject)obj).get("Suggestions");
 		 }
 		 catch (Exception e)
 		 {
