@@ -63,7 +63,7 @@ public class ShowJourneyPage extends Fragment implements JSONRequest.NetworkList
 
 		/* Call our php code on web zone */
 
-		String urlString = "http://abvincita.com/transmob/journeyplan.php?fromLocId="
+		String urlString = "url"
 				+ Uri.encode(fromId) + "&destLocId=" + Uri.encode(destId) + "&date=" + Uri.encode(date)
 				+ "&leaveOption=" + Uri.encode(leaveOption) 
 				+ "&vehicleTypes=" + Uri.encode(vehType) 
