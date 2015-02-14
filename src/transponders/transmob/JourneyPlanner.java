@@ -548,9 +548,7 @@ public class JourneyPlanner extends Fragment implements
 						  Log.d("performFiltering", "TYPED TEXT LENGTH: " + typedText.length());
 						  if(!typedText.equals("Current location"))
 						  {
-							  String url = "http://abvincita.com/transmob/resolve.php?input=" 
-								  		+ Uri.encode(typedText)
-								  		+ "&maxResults=" + Uri.encode("5");
+							  String url = "url" + Uri.encode(typedText) + "&maxResults=" + Uri.encode("5");
 							  request = new JSONRequest();
 							  request.setListener(JourneyPlanner.this);
 							  request.execute(url);
@@ -618,9 +616,7 @@ public class JourneyPlanner extends Fragment implements
 	{
 		activity.setProgressBarIndeterminateVisibility(true);
 		
-		 String url = "http://abvincita.com/transmob/resolve.php?input=" 
-			  		+ Uri.encode(input)
-			  		+ "&maxResults=" + Uri.encode("1");
+		 String url = "url" + Uri.encode(input) + "&maxResults=" + Uri.encode("1");
 		 request = new JSONRequest();
 		 request.setListener(JourneyPlanner.this);
 		 request.execute(url);
