@@ -79,7 +79,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
      */
 	public void requestRouteStops(Route route) 
 	{	
-		String urlString = "http://abvincita.com/transmob/routestops.php?route="
+		String urlString = "url"
 				+ route.getCode() + "&type=" + route.getType() + "&directions=" + route.getDirection();
 
 		JSONRequest request = new JSONRequest();
@@ -98,7 +98,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 		
 
 		
-		String urlString = "http://abvincita.com/transmob/routeline.php?route="
+		String urlString = "url"
 				+ route.getCode() + "&type=" + route.getType();
 
 		JSONRequest request = new JSONRequest();
@@ -115,7 +115,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	public void requestTripStops(Trip trip) {
 		stopTrips.clear();
 		serviceType = (int) (Math.log(trip.getRoute().getType()) / Math.log(2));
-		String urlString = "http://abvincita.com/transmob/tripstops.php?tripId="+trip.getTripId();
+		String urlString = "url" + trip.getTripId();
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
 		request.execute(urlString);
@@ -128,7 +128,7 @@ public class RouteStopsLoader implements JSONRequest.NetworkListener{
 	}
 	
 	public void requestTripLine(Trip trip) {
-		String urlString = "http://abvincita.com/transmob/tripline.php?tripId=" + trip.getTripId();
+		String urlString = "url" + trip.getTripId();
 		JSONRequest request = new JSONRequest();
 		request.setListener(this);
 		request.execute(urlString);
